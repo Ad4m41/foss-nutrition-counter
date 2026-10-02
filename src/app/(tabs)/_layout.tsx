@@ -1,50 +1,29 @@
 import React from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '../../state/AppProvider';
-import { useTheme } from '../../components/ui';
+import { DiaryProvider } from '../../state/DiaryProvider';
+import { DiaryNavigation } from '../../components/DiaryNavigation';
+import { fonts, useTheme } from '../../components/ui';
 export default function TabLayout() {
   const { t } = useApp();
   const colors = useTheme();
-  const insets = useSafeAreaInsets();
   return (
-    <Tabs
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.bg },
-        headerTintColor: colors.text,
-        headerShadowVisible: false,
-        headerTitleStyle: { fontSize: 26, fontWeight: '700' },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: {
-          height: 64 + insets.bottom,
-          paddingTop: 6,
-          paddingBottom: 6 + insets.bottom,
-          backgroundColor: colors.surface,
-          borderTopColor: colors.line,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: t.diary,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="journal-outline" size={size} color={color} />
-          ),
+    <DiaryProvider>
+      <Tabs
+        tabBar={(props) => <DiaryNavigation {...props} />}
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.bg },
+          headerTintColor: colors.text,
+          headerShadowVisible: false,
+          headerTitleStyle: { fontFamily: fonts.display, fontSize: 26 },
         }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: t.settings,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="options-outline" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{ title: t.diary, headerShown: false }}
+        />
+        <Tabs.Screen name="settings" options={{ title: t.settings }} />
+      </Tabs>
+    </DiaryProvider>
   );
 }

@@ -10,6 +10,7 @@ import { en } from '../src/core/i18n';
 import { AnalysisError } from '../src/core/nutrition';
 import { analyzePhoto } from '../src/services/gemini';
 import { pickPhoto } from '../src/services/photos';
+const mockParams: { day: string; capture?: string } = { day: '2026-10-02' };
 const mockSaveMeal = jest.fn();
 const mockBack = jest.fn();
 const mockConfirm = jest.fn();
@@ -36,7 +37,7 @@ jest.mock('expo-router', () => ({
     replace: jest.fn(),
   },
   Stack: { Screen: () => null },
-  useLocalSearchParams: () => ({ day: '2026-10-02' }),
+  useLocalSearchParams: () => mockParams,
 }));
 jest.mock('expo-router/react-navigation', () => ({
   useNavigation: () => ({ dispatch: jest.fn() }),
@@ -61,6 +62,8 @@ jest.mock('../src/components/confirm', () => ({
   confirmAction: (...args: unknown[]) => mockConfirm(...args),
 }));
 beforeEach(() => {
+  delete mockParams.capture;
+  jest.mocked(pickPhoto).mockClear();
   mockSaveMeal.mockReset();
   jest.mocked(analyzePhoto).mockReset();
   mockConfirm.mockReset().mockResolvedValue(true);
@@ -166,4 +169,12 @@ test('a persistence failure keeps the meal draft for retry', async () => {
   await screen.findByText(en.storageError);
   expect(screen.getByLabelText(en.name).props.value).toBe('Lunch');
   expect(mockBack).not.toHaveBeenCalled();
+});
+
+test('add-from-camera opens the camera once and keeps the selected day', async () => {
+  mockParams.capture = 'camera';
+  await render(<MealScreen />);
+  await waitFor(() => expect(pickPhoto).toHaveBeenCalledWith(true));
+  expect(pickPhoto).toHaveBeenCalledTimes(1);
+  expect(screen.getByLabelText(en.date).props.value).toBe('2026-10-02');
 });

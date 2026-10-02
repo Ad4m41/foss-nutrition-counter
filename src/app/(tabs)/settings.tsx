@@ -2,6 +2,7 @@ import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Linking, Platform, Switch, View } from 'react-native';
 import { useApp } from '../../state/AppProvider';
+import { macroKeys, parseMacroGoals } from '../../core/macroGoals';
 import { Language, parseNumber } from '../../core/nutrition';
 import {
   Body,
@@ -19,6 +20,13 @@ export default function SettingsScreen() {
   const [waterGoal, setWaterGoal] = useState(
     String(settings.waterGoal ?? 2000),
   );
+  const [macroDraft, setMacroDraft] = useState(() => ({
+    protein: settings.macroGoals?.protein
+      ? String(settings.macroGoals.protein)
+      : '',
+    carbs: settings.macroGoals?.carbs ? String(settings.macroGoals.carbs) : '',
+    fat: settings.macroGoals?.fat ? String(settings.macroGoals.fat) : '',
+  }));
   const [goal, setGoal] = useState(String(settings.goal));
   useFocusEffect(
     useCallback(() => {
@@ -36,6 +44,12 @@ export default function SettingsScreen() {
   async function save() {
     const value = parseNumber(goal);
     const water = parseNumber(waterGoal);
+    const macroGoals = parseMacroGoals(macroDraft);
+    if (macroGoals === null) {
+      setError(true);
+      setMessage(t.invalidMacroGoals);
+      return;
+    }
     if (
       !Number.isFinite(value) ||
       value <= 0 ||
@@ -55,6 +69,7 @@ export default function SettingsScreen() {
         {
           ...settings,
           goal: value,
+          macroGoals,
           waterGoal: Math.round(water),
           model: model.trim(),
           language,
@@ -81,6 +96,7 @@ export default function SettingsScreen() {
       await clear();
       setGoal('2000');
       setWaterGoal('2000');
+      setMacroDraft({ protein: '', carbs: '', fat: '' });
       setModel('gemini-3.5-flash-lite');
       setKey('');
       setConsent(false);
@@ -118,6 +134,22 @@ export default function SettingsScreen() {
         editable={!busy}
       />
       <Body muted>{t.waterHelp}</Body>
+      <Label>{t.macroGoals}</Label>
+      <Body muted>{t.macroGoalsHelp}</Body>
+      <View style={{ marginTop: 16 }}>
+        {macroKeys.map((key) => (
+          <Field
+            key={key}
+            label={`${t[key]} (g)`}
+            value={macroDraft[key]}
+            keyboardType="decimal-pad"
+            editable={!busy}
+            onChangeText={(value) =>
+              setMacroDraft((current) => ({ ...current, [key]: value }))
+            }
+          />
+        ))}
+      </View>
       <Label>{t.key}</Label>
       <Body muted>{t.keyHelp}</Body>
       <View style={{ marginTop: 16 }}>

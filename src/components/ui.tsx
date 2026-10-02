@@ -21,16 +21,24 @@ import {
 } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
 const light = {
-  bg: '#F5F6F3',
+  bg: '#FAF7F2',
   surface: '#FFFFFF',
-  tint: '#E6EFE8',
-  text: '#202922',
+  tint: '#E7EDE5',
+  text: '#263C32',
   muted: '#58645C',
-  primary: '#216C50',
+  primary: '#284F3E',
   onPrimary: '#FFFFFF',
-  line: '#DFE4DE',
+  line: '#E6E5DD',
   danger: '#AB2634',
   dangerBg: '#FCEEF0',
+  accent: '#F1BE9B',
+  accentText: '#543727',
+  water: '#267B8D',
+  waterTint: '#E5F2F2',
+  protein: '#437F97',
+  carbs: '#907445',
+  fat: '#94608D',
+  energy: '#A6533B',
 };
 const dark: typeof light = {
   bg: '#151C18',
@@ -43,6 +51,20 @@ const dark: typeof light = {
   line: '#3C4B3F',
   danger: '#FFB0B9',
   dangerBg: '#432832',
+  accent: '#DAA781',
+  accentText: '#30231A',
+  water: '#92CDD8',
+  waterTint: '#21383A',
+  protein: '#92C9DD',
+  carbs: '#DABD84',
+  fat: '#D5A4D2',
+  energy: '#EEAA8B',
+};
+export const fonts = {
+  body: 'Manrope_400Regular',
+  medium: 'Manrope_600SemiBold',
+  bold: 'Manrope_700Bold',
+  display: 'Manrope_800ExtraBold',
 };
 export function useTheme() {
   return useColorScheme() === 'dark' ? dark : light;
@@ -50,9 +72,11 @@ export function useTheme() {
 export function Page({
   children,
   footer,
+  footerInset = true,
 }: {
   children: React.ReactNode;
   footer?: React.ReactNode;
+  footerInset?: boolean;
 }) {
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -75,7 +99,7 @@ export function Page({
           style={{
             paddingHorizontal: 24,
             paddingTop: 8,
-            paddingBottom: Math.max(12, insets.bottom),
+            paddingBottom: footerInset ? Math.max(12, insets.bottom) : 12,
             backgroundColor: colors.bg,
           }}
         >
@@ -97,7 +121,8 @@ export function Label({
     <Text
       style={{
         color: colors.text,
-        fontSize: large ? 28 : 19,
+        fontSize: large ? 30 : 19,
+        fontFamily: fonts.bold,
         fontWeight: '700',
         marginTop: 28,
         marginBottom: 16,
@@ -119,7 +144,8 @@ export function Body({
     <Text
       style={{
         color: muted ? colors.muted : colors.text,
-        fontSize: 16,
+        fontSize: 15,
+        fontFamily: fonts.body,
         lineHeight: 24,
       }}
     >
@@ -179,6 +205,7 @@ export function Button({
           color: foreground,
           fontSize: 16,
           fontWeight: '600',
+          fontFamily: fonts.bold,
           flexShrink: 1,
           textAlign: 'center',
         }}
@@ -221,8 +248,15 @@ export function IconButton({
 export function Field({ label, ...props }: TextInputProps & { label: string }) {
   const colors = useTheme();
   return (
-    <View style={{ flexGrow: 1, marginBottom: 16 }}>
-      <Text style={{ color: colors.muted, fontSize: 14, marginBottom: 6 }}>
+    <View style={{ flexGrow: 1, flexShrink: 1, minWidth: 0, marginBottom: 16 }}>
+      <Text
+        style={{
+          color: colors.muted,
+          fontSize: 13,
+          fontFamily: fonts.medium,
+          marginBottom: 8,
+        }}
+      >
         {label}
       </Text>
       <TextInput
@@ -232,6 +266,8 @@ export function Field({ label, ...props }: TextInputProps & { label: string }) {
         {...props}
         style={[
           styles.input,
+          { minWidth: 0, width: '100%' },
+          { fontFamily: fonts.medium },
           {
             color: colors.text,
             backgroundColor: colors.surface,
@@ -311,6 +347,7 @@ export function Nutrition({
               style={{
                 color: colors.text,
                 fontSize: index < 4 ? 21 : 16,
+                fontFamily: fonts.bold,
                 fontWeight: '600',
                 fontVariant: ['tabular-nums'],
               }}
@@ -351,5 +388,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
+    fontFamily: fonts.medium,
   },
 });

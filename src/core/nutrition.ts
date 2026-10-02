@@ -46,6 +46,7 @@ export type Settings = {
   profile?: Profile;
   profileSetupDone?: boolean;
   waterGoal?: number;
+  macroGoals?: Partial<Record<'protein' | 'carbs' | 'fat', number>>;
 };
 export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 export function totals(items: Nutrients[]): Nutrients {

@@ -1,11 +1,15 @@
 # Mobile diary
 
-Mode: Operate. Phone-first, portrait, Android and iOS.
+Mode: Operate. Android/iOS portrait phones, supplementary web preview. Code-led.
+Seed: b9c17600. User-pinned approved direction overrides the roll: food-first warm journal with a Fitatu-inspired pinned macro strip and a wheel age selector. Existing data and key validation remain product constraints.
 
 ## Direction contract
-THESIS: A meal diary with editable estimates; make today's entries and the next action easy to find.
-OWN-WORLD: Pale blue surfaces, deep blue ink, a blue action tint, native system type, border-separated meal rows. Dark mode uses navy surfaces and light blue actions.
-STORY: Choose a day, see the food logged, add a photo or manual entry, correct portions, save.
-FIRST VIEWPORT: Native navigation title; day selector; calories against goal with a horizontal meter and macro labels; meal rows or an actionable empty state; a wide Add meal button.
-FORM: Native tab navigation with pushed editors. No decorative animation; use native navigation motion. Signature interaction: changing grams immediately recalculates the meal summary.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+THESIS: See meals immediately, keep daily macros within thumb reach, make profile setup tactile and short.
+OWN-WORLD: Warm cream, evergreen ink and apricot actions; Manrope typography; colored macro rails with explicit labels; original otter.
+STORY: Choose a day, scan meal photos and portions, add via camera or manual entry, open nutrient detail when needed.
+FIRST VIEWPORT: Custom date header and compact week strip; food entries start above the fold; a fixed four-column macro strip sits immediately above custom tab navigation and central add control. Extra nutrients have their own detail route.
+FORM: Three profile steps (body data, activity, goal); cylinder age scroll with snapping and accessible increment/decrement; animated segmented sex selection. Reanimated powers the wheel and measured progress. Reduced motion retains usable controls.
+FINISH: Source checks, bounded browser captures and independent finish review; native device rendering remains pending when no emulator is available. Document actual tokens and behavior in DESIGN.md and design.json.
+
+Keep user-edited macro goals optional. No invented personalized macro targets or new backend. Preserve selected date when adding a meal from navigation. Empty, loading, unknown nutrients, storage errors, narrow width and large text must keep actions usable.

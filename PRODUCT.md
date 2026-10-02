@@ -28,7 +28,7 @@ First launch opens Gemini key setup with a persistent manual-mode skip. Saved ke
 
 ## Visual Direction
 
-The user approved a bright, calm diary inspired by Foodnoms, with an original graphite and green palette, native controls and accessible nutrition summaries. The otter uses an original bundled Rive animation with breathing and blinking. Its body width reflects logged food; a droplet reflects logged water. This is a playful diary reaction, not an estimate of body weight. Expo Go, web and reduced motion use a bundled still; native animation requires a development or preview build.
+The user approved a bright, calm diary inspired by Foodnoms, with warm cream surfaces, evergreen ink, apricot add actions and bundled Manrope typography. Meals lead the diary; a pinned four-column macro strip sits above custom navigation. Three profile steps include a snapping cylinder age wheel, animated sex selection and five activity levels. Reanimated powers wheel transforms and progress, respecting reduced motion. Optional macro targets remain user-editable. The otter uses an original bundled Rive animation with breathing and blinking. Its body width reflects logged food; a droplet reflects logged water. This is a playful diary reaction, not an estimate of body weight. Expo Go, web and reduced motion use a bundled still; native animation requires a development or preview build.
 
 ## Product Principles
 

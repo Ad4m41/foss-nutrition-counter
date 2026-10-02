@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '../state/AppProvider';
 import { OtterMascot } from './OtterMascot';
 import { otterState } from '../core/otter';
-import { Body, Button, Label, Notice, useTheme } from './ui';
+import { ProgressTrack } from './ProgressTrack';
+import { Body, Button, Notice, fonts, useTheme } from './ui';
 export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
   const { water, adjustWater, settings, t } = useApp();
   const colors = useTheme();
@@ -14,6 +15,7 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [help, setHelp] = useState(false);
   const lock = useRef(false);
   const ml = water[day] ?? 0;
   const goal = settings.waterGoal ?? 2000;
@@ -33,7 +35,7 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
     }
   }
   return (
-    <View style={{ marginTop: 12 }}>
+    <View>
       <View
         style={{
           flexDirection: 'row',
@@ -44,13 +46,23 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
       >
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Ionicons name="water-outline" size={22} color={colors.primary} />
-            <Label>{t.water}</Label>
+            <Ionicons name="water-outline" size={22} color={colors.water} />
+            <Text
+              style={{
+                fontFamily: fonts.bold,
+                color: colors.text,
+                fontSize: 19,
+              }}
+            >
+              {t.water}
+            </Text>
           </View>
           <Text
             style={{
               color: colors.text,
               fontSize: 24,
+              fontFamily: fonts.bold,
+              marginTop: 12,
               fontWeight: '600',
               fontVariant: ['tabular-nums'],
             }}
@@ -71,32 +83,12 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
           <OtterMascot {...otterState(kcal, settings.goal, ml, goal)} />
         </View>
       </View>
-      <Body muted>{t.otterHelp}</Body>
-      <View
-        accessibilityRole="progressbar"
-        accessibilityLabel={t.water}
-        accessibilityValue={{
-          min: 0,
-          max: goal,
-          now: Math.min(ml, goal),
-          text: `${ml} / ${goal} ml`,
-        }}
-        style={{
-          height: 4,
-          borderRadius: 2,
-          backgroundColor: colors.line,
-          overflow: 'hidden',
-          marginVertical: 12,
-        }}
-      >
-        <View
-          style={{
-            height: 4,
-            width: `${Math.min(100, (ml / goal) * 100)}%`,
-            backgroundColor: colors.primary,
-          }}
-        />
-      </View>
+      <ProgressTrack
+        value={ml}
+        goal={goal}
+        color={colors.water}
+        label={t.water}
+      />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
         {[250, 500].map((amount) => (
           <Button
@@ -120,7 +112,28 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
           />
         )}
       </View>
-      <Body muted>{t.waterHelp}</Body>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: help }}
+        onPress={() => setHelp(!help)}
+        style={{ minHeight: 48, justifyContent: 'center' }}
+      >
+        <Text
+          style={{
+            fontFamily: fonts.medium,
+            color: colors.muted,
+            fontSize: 12,
+          }}
+        >
+          {t.waterInfo} {help ? '−' : '+'}
+        </Text>
+      </Pressable>
+      {help && (
+        <View style={{ gap: 8 }}>
+          <Body muted>{t.otterHelp}</Body>
+          <Body muted>{t.waterHelp}</Body>
+        </View>
+      )}
       {error && <Notice error text={t.storageError} />}
     </View>
   );

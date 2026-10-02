@@ -68,7 +68,11 @@ const toIngredient = (item: DraftIngredient): Ingredient => ({
   ),
 });
 export default function MealScreen() {
-  const params = useLocalSearchParams<{ id?: string; day?: string }>();
+  const params = useLocalSearchParams<{
+    id?: string;
+    day?: string;
+    capture?: string;
+  }>();
   const { meals, apiKey, settings, t, saveMeal, deleteMeal, updateSettings } =
     useApp();
   const colors = useTheme();
@@ -95,6 +99,7 @@ export default function MealScreen() {
   const [description, setDescription] = useState('');
   const [busy, setBusy] = useState<'photo' | 'analysis' | 'save' | null>(null);
   const lock = useRef(false);
+  const autoCamera = useRef(false);
   const controller = useRef<AbortController | null>(null);
   const [message, setMessage] = useState('');
   const [leaving, setLeaving] = useState(false);
@@ -177,6 +182,14 @@ export default function MealScreen() {
       setBusy(null);
     }
   }
+  useEffect(() => {
+    if (params.capture === 'camera' && !original && !autoCamera.current) {
+      autoCamera.current = true;
+      void photo(true);
+    }
+    // Launch the camera once for the explicit add-from-camera action.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.capture]);
   async function analyze() {
     if (lock.current) return;
     if (!apiKey) {

@@ -1,5 +1,23 @@
 import { Language } from './nutrition';
 export const en = {
+  continue: 'Continue',
+  back: 'Back',
+  profileBodyTitle: 'A little about you',
+  profileActivityTitle: 'How do you move?',
+  profileGoalTitle: 'Your pace. Your goal.',
+  profileGoalIntro: 'Choose a starting direction. You can change it later.',
+  editGoalLater: 'Your editable starting goal',
+  shortCarbs: 'Carbs',
+  shortProtein: 'Protein',
+  shortFat: 'Fat',
+  nutritionDetails: 'Open daily nutrition details',
+  waterInfo: 'About your otter and water goal',
+  macroGoals: 'Daily macro goals',
+  macroGoalsHelp:
+    'Optional gram targets. Leave a field blank to track intake without a target.',
+  invalidMacroGoals:
+    'Enter positive numbers for macro goals, or leave them blank.',
+
   profile: 'Your profile',
   profileIntro:
     'Set a starting energy goal for your day. These details stay on your device.',
@@ -185,6 +203,23 @@ export const en = {
   aiTerms: 'Google API terms',
 };
 export const pl: Record<keyof typeof en, string> = {
+  continue: 'Dalej',
+  back: 'Wstecz',
+  profileBodyTitle: 'Poznajmy się',
+  profileActivityTitle: 'Jak wygląda Twój dzień?',
+  profileGoalTitle: 'Twój rytm. Twój cel.',
+  profileGoalIntro: 'Wybierz kierunek na początek. Możesz go później zmienić.',
+  editGoalLater: 'Cel początkowy, który możesz zmienić',
+  shortCarbs: 'Węgle',
+  shortProtein: 'Białko',
+  shortFat: 'Tłuszcz',
+  nutritionDetails: 'Otwórz szczegóły wartości odżywczych dnia',
+  waterInfo: 'O wydrze i celu wody',
+  macroGoals: 'Dzienne cele makro',
+  macroGoalsHelp:
+    'Opcjonalne cele w gramach. Puste pole pozwala śledzić spożycie bez celu.',
+  invalidMacroGoals:
+    'Podaj dodatnie wartości celów makro albo zostaw pola puste.',
   profile: 'Twój profil',
   profileIntro:
     'Ustal początkowy cel energii na dzień. Te dane zostają na Twoim urządzeniu.',
