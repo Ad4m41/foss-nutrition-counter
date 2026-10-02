@@ -1,0 +1,241 @@
+import { Language } from './nutrition';
+export const en = {
+  diary: 'Diary',
+  settings: 'Settings',
+  addMeal: 'Add meal',
+  editMeal: 'Edit meal',
+  today: 'Today',
+  previous: 'Previous day',
+  next: 'Next day',
+  dailyTotal: 'Daily nutrition',
+  goal: 'Daily calorie goal',
+  consumed: 'logged',
+  remaining: 'remaining',
+  over: 'over goal',
+  kcal: 'kcal',
+  protein: 'Protein',
+  fat: 'Fat',
+  carbs: 'Carbs',
+  meals: 'Your meals',
+  emptyTitle: 'Make room for your first meal',
+  emptyBody:
+    'Take a photo or enter a meal yourself. You can adjust every estimate before saving.',
+  photo: 'Meal photo',
+  camera: 'Take photo',
+  gallery: 'Choose photo',
+  manual: 'Enter manually',
+  description: 'Anything the photo misses?',
+  descriptionHint: 'For example: 200 g rice, a tablespoon of oil',
+  replaceIngredientsBody:
+    'A new analysis will replace the current ingredients and nutrition. Continue?',
+  analyze: 'Estimate nutrition',
+  analyzing: 'Looking at your meal…',
+  estimate: 'AI estimate · check the ingredients and portions',
+  name: 'Meal name',
+  date: 'Date (YYYY-MM-DD)',
+  ingredients: 'Ingredients',
+  ingredient: 'Ingredient name',
+  grams: 'Portion (g)',
+  addIngredient: 'Add ingredient',
+  removeIngredient: 'Remove ingredient',
+  save: 'Save meal',
+  saving: 'Saving…',
+  cancel: 'Cancel',
+  discard: 'Discard changes',
+  discardBody: 'Leave without saving this meal?',
+  delete: 'Delete meal',
+  deleteBody: 'Delete this meal and its photo?',
+  notes: 'Estimation notes',
+  key: 'Gemini API key',
+  keyHint: 'Paste your key from Google AI Studio',
+  keyHelp:
+    'Your key stays in the phone’s secure storage. Each analysis uses your Google project’s quota.',
+  getKey: 'Get an API key',
+  model: 'Gemini model',
+  modelHelp:
+    'Use a model available to your project. Free limits can change. No automatic switch to another model.',
+  language: 'Language',
+  saveSettings: 'Save settings',
+  saved: 'Saved',
+  storage: 'Your data',
+  storageBody:
+    'Meals and photos stay on this device. Photo analysis sends the selected photo and description to Google.',
+  clear: 'Delete all local data',
+  clearBody:
+    'Remove all meals, photos, settings and the API key? This cannot be undone.',
+  consentTitle: 'Send this photo to Google?',
+  consentBody:
+    'Gemini will receive the photo and your description to estimate nutrition. Google may use free-tier data to improve its products. Estimates can be wrong; check the result before saving.',
+  allow: 'Allow photo analysis',
+  privacy: 'Read Google’s terms',
+  consentLabel: 'Allow Gemini photo analysis',
+  keyMissing: 'Add your Gemini key in Settings, or enter this meal manually.',
+  openSettings: 'Open settings',
+  invalidForm:
+    'Enter a meal name, a valid date and at least one ingredient. Portions must be greater than zero; nutrition values must be zero or greater.',
+  invalidSettings:
+    'Enter a calorie goal greater than zero and a valid model name.',
+  storageError:
+    'Could not save your data. Your changes are still here; try again.',
+  loadError: 'Could not open your diary. Try loading it again.',
+  retry: 'Try again',
+  cameraPermission:
+    'Allow camera access in your phone settings, or choose a photo from your gallery.',
+  photoError: 'Could not open that photo. Try another photo.',
+  keyError:
+    'Google rejected the request. Check your API key and project access in Settings.',
+  quotaError:
+    'Your Google project has reached an API limit. Try later or enter the meal manually.',
+  modelError:
+    'This model is unavailable. Choose a model supported by your project in Settings.',
+  networkError:
+    'Could not connect to Google. Check your connection and try again.',
+  timeoutError:
+    'The analysis took too long. Your photo is still here; try again.',
+  invalidError:
+    'Gemini did not return usable nutrition data. Try again or enter the meal manually.',
+  noFoodError:
+    'Could not recognize food in this photo. Try a clearer photo or enter the meal manually.',
+  serverError: 'Google could not complete the analysis. Try again later.',
+  unsaved: 'Unsaved changes',
+  loading: 'Opening your diary…',
+  notFound: 'This meal is no longer in your diary.',
+  summary: 'Meal total',
+  amountHelp:
+    'Nutrition values are for this portion. Changing grams scales them.',
+  ai: 'Photo estimate',
+  manualSource: 'Manual entry',
+  noKeySaved: 'No key saved',
+  keySaved: 'Key saved',
+  hide: 'Hide',
+  show: 'Show',
+  removeKey: 'Remove key',
+  webNotice:
+    'Browser preview: meals use browser storage and the API key is kept only until you refresh. The mobile app uses SQLite and secure key storage.',
+  dateHint: 'For example: 2026-10-02',
+  resetDone: 'Local data deleted',
+  pending: 'Please wait for the current action to finish.',
+  noPhoto: 'Add a photo to use Gemini, or enter the ingredients below.',
+  aiTerms: 'Google API terms',
+};
+export const pl: Record<keyof typeof en, string> = {
+  diary: 'Dziennik',
+  settings: 'Ustawienia',
+  addMeal: 'Dodaj posiłek',
+  editMeal: 'Edytuj posiłek',
+  today: 'Dzisiaj',
+  previous: 'Poprzedni dzień',
+  next: 'Następny dzień',
+  dailyTotal: 'Bilans dnia',
+  goal: 'Dzienny cel kalorii',
+  consumed: 'zapisano',
+  remaining: 'pozostało',
+  over: 'ponad cel',
+  kcal: 'kcal',
+  protein: 'Białko',
+  fat: 'Tłuszcze',
+  carbs: 'Węglowodany',
+  meals: 'Twoje posiłki',
+  emptyTitle: 'Zacznij od pierwszego posiłku',
+  emptyBody:
+    'Zrób zdjęcie lub wpisz posiłek ręcznie. Przed zapisaniem możesz poprawić każdą porcję.',
+  photo: 'Zdjęcie posiłku',
+  camera: 'Zrób zdjęcie',
+  gallery: 'Wybierz zdjęcie',
+  manual: 'Wpisz ręcznie',
+  description: 'Czego nie widać na zdjęciu?',
+  descriptionHint: 'Np. 200 g ryżu, łyżka oleju',
+  replaceIngredientsBody:
+    'Nowa analiza zastąpi obecne składniki i wartości. Kontynuować?',
+  analyze: 'Oszacuj wartości',
+  analyzing: 'Sprawdzam Twój posiłek…',
+  estimate: 'Szacunek AI · sprawdź składniki i porcje',
+  name: 'Nazwa posiłku',
+  date: 'Data (RRRR-MM-DD)',
+  ingredients: 'Składniki',
+  ingredient: 'Nazwa składnika',
+  grams: 'Porcja (g)',
+  addIngredient: 'Dodaj składnik',
+  removeIngredient: 'Usuń składnik',
+  save: 'Zapisz posiłek',
+  saving: 'Zapisywanie…',
+  cancel: 'Anuluj',
+  discard: 'Odrzuć zmiany',
+  discardBody: 'Wyjść bez zapisywania posiłku?',
+  delete: 'Usuń posiłek',
+  deleteBody: 'Usunąć ten posiłek wraz ze zdjęciem?',
+  notes: 'Uwagi do szacunku',
+  key: 'Klucz API Gemini',
+  keyHint: 'Wklej klucz z Google AI Studio',
+  keyHelp:
+    'Klucz zostaje w bezpiecznym magazynie telefonu. Każda analiza korzysta z limitu Twojego projektu Google.',
+  getKey: 'Uzyskaj klucz API',
+  model: 'Model Gemini',
+  modelHelp:
+    'Wybierz model dostępny w Twoim projekcie. Darmowe limity mogą się zmieniać. Aplikacja nie przełącza modelu automatycznie.',
+  language: 'Język',
+  saveSettings: 'Zapisz ustawienia',
+  saved: 'Zapisano',
+  storage: 'Twoje dane',
+  storageBody:
+    'Posiłki i zdjęcia zostają na tym urządzeniu. Analiza zdjęcia wysyła wybrane zdjęcie i opis do Google.',
+  clear: 'Usuń wszystkie dane lokalne',
+  clearBody:
+    'Usunąć wszystkie posiłki, zdjęcia, ustawienia i klucz API? Tej operacji nie można cofnąć.',
+  consentTitle: 'Wysłać zdjęcie do Google?',
+  consentBody:
+    'Gemini otrzyma zdjęcie i opis, aby oszacować wartości odżywcze. Google może używać danych z darmowego poziomu do ulepszania swoich produktów. Sprawdź wynik przed zapisaniem: szacunki mogą być błędne.',
+  allow: 'Zezwól na analizę zdjęć',
+  privacy: 'Przeczytaj warunki Google',
+  consentLabel: 'Zezwalaj na analizę zdjęć przez Gemini',
+  keyMissing: 'Dodaj klucz Gemini w Ustawieniach lub wpisz posiłek ręcznie.',
+  openSettings: 'Otwórz ustawienia',
+  invalidForm:
+    'Podaj nazwę posiłku, poprawną datę i co najmniej jeden składnik. Porcje muszą być większe od zera, a wartości odżywcze nieujemne.',
+  invalidSettings: 'Podaj cel kalorii większy od zera i poprawną nazwę modelu.',
+  storageError:
+    'Nie udało się zapisać danych. Twoje zmiany są nadal tutaj; spróbuj ponownie.',
+  loadError: 'Nie udało się otworzyć dziennika. Spróbuj wczytać go ponownie.',
+  retry: 'Spróbuj ponownie',
+  cameraPermission:
+    'Zezwól na dostęp do aparatu w ustawieniach telefonu lub wybierz zdjęcie z galerii.',
+  photoError: 'Nie udało się otworzyć zdjęcia. Wybierz inne zdjęcie.',
+  keyError:
+    'Google odrzucił żądanie. Sprawdź klucz API i dostęp do projektu w Ustawieniach.',
+  quotaError:
+    'Twój projekt Google osiągnął limit API. Spróbuj później lub wpisz posiłek ręcznie.',
+  modelError:
+    'Ten model jest niedostępny. W Ustawieniach wybierz model obsługiwany przez Twój projekt.',
+  networkError:
+    'Nie udało się połączyć z Google. Sprawdź internet i spróbuj ponownie.',
+  timeoutError:
+    'Analiza trwała zbyt długo. Zdjęcie jest nadal tutaj; spróbuj ponownie.',
+  invalidError:
+    'Gemini nie zwrócił poprawnych wartości odżywczych. Spróbuj ponownie lub wpisz posiłek ręcznie.',
+  noFoodError:
+    'Nie udało się rozpoznać jedzenia. Spróbuj wyraźniejszego zdjęcia lub wpisz posiłek ręcznie.',
+  serverError: 'Google nie ukończył analizy. Spróbuj później.',
+  unsaved: 'Niezapisane zmiany',
+  loading: 'Otwieram dziennik…',
+  notFound: 'Tego posiłku nie ma już w dzienniku.',
+  summary: 'Razem w posiłku',
+  amountHelp:
+    'Wartości dotyczą tej porcji. Zmiana gramów przelicza je proporcjonalnie.',
+  ai: 'Szacunek ze zdjęcia',
+  manualSource: 'Wpis ręczny',
+  noKeySaved: 'Brak zapisanego klucza',
+  keySaved: 'Klucz zapisany',
+  hide: 'Ukryj',
+  show: 'Pokaż',
+  removeKey: 'Usuń klucz',
+  webNotice:
+    'Podgląd w przeglądarce: posiłki korzystają z pamięci przeglądarki, a klucz znika po odświeżeniu. Aplikacja mobilna używa SQLite i bezpiecznego magazynu kluczy.',
+  dateHint: 'Np. 2026-10-02',
+  resetDone: 'Usunięto dane lokalne',
+  pending: 'Poczekaj na zakończenie bieżącej operacji.',
+  noPhoto: 'Dodaj zdjęcie, aby użyć Gemini, lub wpisz składniki poniżej.',
+  aiTerms: 'Warunki API Google',
+};
+export function translations(language: Language) {
+  return language === 'pl' ? pl : en;
+}
