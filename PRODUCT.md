@@ -16,7 +16,7 @@ People who want to log meals on an Android phone or iPhone, using a photo or a m
 
 ## Product Purpose
 
-A free, open source food diary. Photograph a meal, review estimated portions and nutrition, and save it to a daily diary.
+A free, open source nutrition diary tracking calories, protein, carbohydrates, fats, saturated fat, sugars, fiber and salt. Photograph a meal, review estimated portions and nutrition, and save it to a daily diary.
 
 ## Capabilities and Constraints
 

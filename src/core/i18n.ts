@@ -15,7 +15,15 @@ export const en = {
   kcal: 'kcal',
   protein: 'Protein',
   fat: 'Fat',
-  carbs: 'Carbs',
+  carbs: 'Carbohydrates',
+  saturatedFat: 'Saturated fat',
+  sugars: 'Sugars',
+  fiber: 'Fiber',
+  salt: 'Salt',
+  unknown: 'Not known',
+  unknownHelp:
+    'Leave extra nutrition fields blank when unknown. Enter 0 only if you know the value is zero.',
+  incompleteNutrition: 'Some values are missing. Their totals are not known.',
   meals: 'Your meals',
   emptyTitle: 'Make room for your first meal',
   emptyBody:
@@ -135,6 +143,15 @@ export const pl: Record<keyof typeof en, string> = {
   protein: 'Białko',
   fat: 'Tłuszcze',
   carbs: 'Węglowodany',
+  saturatedFat: 'Tłuszcze nasycone',
+  sugars: 'Cukry',
+  fiber: 'Błonnik',
+  salt: 'Sól',
+  unknown: 'Brak danych',
+  unknownHelp:
+    'Zostaw dodatkowe pola puste, jeśli nie znasz wartości. Wpisz 0 tylko wtedy, gdy wiesz, że wartość wynosi zero.',
+  incompleteNutrition:
+    'Część wartości jest nieznana. Nie można podać ich pełnej sumy.',
   meals: 'Twoje posiłki',
   emptyTitle: 'Zacznij od pierwszego posiłku',
   emptyBody:

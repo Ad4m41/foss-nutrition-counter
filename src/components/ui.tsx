@@ -14,7 +14,11 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Nutrients } from '../core/nutrition';
+import {
+  Nutrients,
+  nutrientKeys,
+  additionalNutrientKeys,
+} from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
 const light = {
   bg: '#F4F8FC',
@@ -278,22 +282,31 @@ export function Nutrition({
         <Text style={{ fontSize: 17, fontWeight: '400' }}>{t.kcal}</Text>
       </Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20 }}>
-        {(['protein', 'fat', 'carbs'] as const).map((key) => (
-          <View key={key} style={{ minWidth: 70 }}>
-            <Text style={{ color: colors.muted, fontSize: 14 }}>{t[key]}</Text>
-            <Text
-              style={{
-                color: colors.text,
-                fontSize: 17,
-                fontWeight: '600',
-                fontVariant: ['tabular-nums'],
-              }}
-            >
-              {Math.round(value[key] * 10) / 10} g
-            </Text>
-          </View>
-        ))}
+        {nutrientKeys
+          .filter((key) => key !== 'kcal')
+          .map((key) => (
+            <View key={key} style={{ minWidth: 70 }}>
+              <Text style={{ color: colors.muted, fontSize: 14 }}>
+                {t[key]}
+              </Text>
+              <Text
+                style={{
+                  color: colors.text,
+                  fontSize: 17,
+                  fontWeight: '600',
+                  fontVariant: ['tabular-nums'],
+                }}
+              >
+                {value[key] == null || !Number.isFinite(value[key])
+                  ? t.unknown
+                  : `${Math.round(value[key]! * (key === 'salt' ? 100 : 10)) / (key === 'salt' ? 100 : 10)} g`}
+              </Text>
+            </View>
+          ))}
       </View>
+      {additionalNutrientKeys.some((key) => value[key] == null) && (
+        <Body muted>{t.incompleteNutrition}</Body>
+      )}
     </View>
   );
 }

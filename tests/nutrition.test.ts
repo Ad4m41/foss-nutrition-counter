@@ -6,6 +6,7 @@ import {
   totals,
   validDay,
   validateAnalysis,
+  validIngredient,
 } from '../src/core/nutrition';
 const rice = {
   id: 'rice',
@@ -20,7 +21,9 @@ const output = {
   isFood: true,
   name: 'Rice bowl',
   notes: 'Portion estimated.',
-  ingredients: [rice],
+  ingredients: [
+    { ...rice, saturatedFat: null, sugars: null, fiber: null, salt: null },
+  ],
 };
 test('resizing a portion scales all nutrients without changing the original', () => {
   expect(resizePortion(rice, 100)).toEqual({
@@ -37,7 +40,16 @@ test.each([0, -1, NaN, Infinity])('rejects unusable portion %s', (grams) =>
   expect(() => resizePortion(rice, grams)).toThrow(),
 );
 test('totals handle empty days and multiple meal ingredients', () => {
-  expect(totals([])).toEqual({ kcal: 0, protein: 0, fat: 0, carbs: 0 });
+  expect(totals([])).toEqual({
+    kcal: 0,
+    protein: 0,
+    fat: 0,
+    carbs: 0,
+    saturatedFat: 0,
+    sugars: 0,
+    fiber: 0,
+    salt: 0,
+  });
   expect(totals([rice, resizePortion(rice, 100)]).kcal).toBe(390);
 });
 test('uses local calendar date instead of UTC serialization', () => {
@@ -65,3 +77,45 @@ test.each([
 ])('rejects unusable AI result', (result) =>
   expect(() => validateAnalysis(result)).toThrow(),
 );
+
+test('portion changes scale salt, fiber, sugars and saturated fat', () => {
+  const result = resizePortion(
+    { ...rice, salt: 1.2, fiber: 4, sugars: 2, saturatedFat: 0.4 },
+    100,
+  );
+  expect(result).toMatchObject({
+    salt: 0.6,
+    fiber: 2,
+    sugars: 1,
+    saturatedFat: 0.2,
+  });
+});
+test('legacy meals preserve missing values instead of inventing zero', () => {
+  expect(validIngredient(rice)).toBe(true);
+  expect(totals([rice]).salt).toBeNull();
+  expect(resizePortion({ ...rice, salt: null }, 100).salt).toBeNull();
+});
+test('a missing value makes a daily total unknown; explicit zeros stay zero', () => {
+  expect(
+    totals([
+      { ...rice, salt: 0 },
+      { ...rice, salt: 0 },
+    ]).salt,
+  ).toBe(0);
+  expect(
+    totals([
+      { ...rice, salt: 1 },
+      { ...rice, salt: null },
+    ]).salt,
+  ).toBeNull();
+});
+test.each([-1, NaN, Infinity, '1'])(
+  'rejects invalid added nutrition %s',
+  (salt) => {
+    expect(validIngredient({ ...rice, salt } as never)).toBe(false);
+  },
+);
+test('AI must return extra fields, including explicit nulls when unknown', () => {
+  expect(() => validateAnalysis({ ...output, ingredients: [rice] })).toThrow();
+  expect(validateAnalysis(output).ingredients[0].salt).toBeNull();
+});

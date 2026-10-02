@@ -11,6 +11,8 @@ import {
   Nutrients,
   newIngredient,
   nutrientKeys,
+  requiredNutrientKeys,
+  additionalNutrientKeys,
   parseNumber,
   resizePortion,
   totals,
@@ -37,20 +39,18 @@ type DraftIngredient = {
   id: string;
   name: string;
   grams: string;
-  kcal: string;
-  protein: string;
-  fat: string;
-  carbs: string;
-};
+} & Record<(typeof nutrientKeys)[number], string>;
 const toDraft = (item: Ingredient): DraftIngredient => ({
   baseGrams: item.grams,
   id: item.id,
   name: item.name,
   grams: String(item.grams),
-  kcal: String(item.kcal),
-  protein: String(item.protein),
-  fat: String(item.fat),
-  carbs: String(item.carbs),
+  ...(Object.fromEntries(
+    nutrientKeys.map((key) => [
+      key,
+      item[key] == null ? '' : String(item[key]),
+    ]),
+  ) as Record<(typeof nutrientKeys)[number], string>),
 });
 const toIngredient = (item: DraftIngredient): Ingredient => ({
   id: item.id,
@@ -60,6 +60,12 @@ const toIngredient = (item: DraftIngredient): Ingredient => ({
   protein: parseNumber(item.protein),
   fat: parseNumber(item.fat),
   carbs: parseNumber(item.carbs),
+  ...Object.fromEntries(
+    additionalNutrientKeys.map((key) => [
+      key,
+      item[key].trim() ? parseNumber(item[key]) : null,
+    ]),
+  ),
 });
 export default function MealScreen() {
   const params = useLocalSearchParams<{ id?: string; day?: string }>();
@@ -298,11 +304,15 @@ export default function MealScreen() {
       .map(toIngredient)
       .map(
         (item) =>
-          Object.fromEntries(
-            nutrientKeys.map((key) => [
-              key,
-              Number.isFinite(item[key]) ? item[key] : 0,
-            ]),
+          Object.assign(
+            {},
+            item,
+            Object.fromEntries(
+              requiredNutrientKeys.map((key) => [
+                key,
+                Number.isFinite(item[key]) ? item[key] : 0,
+              ]),
+            ),
           ) as Nutrients,
       ),
   );
@@ -421,6 +431,7 @@ export default function MealScreen() {
       />
       <Label>{t.ingredients}</Label>
       <Body muted>{t.amountHelp}</Body>
+      <Body muted>{t.unknownHelp}</Body>
       {ingredients.map((item, index) => (
         <View
           key={item.id}
@@ -466,6 +477,11 @@ export default function MealScreen() {
                         : `${t[key]} (g)`
                   }
                   value={item[key]}
+                  placeholder={
+                    additionalNutrientKeys.some((nutrient) => nutrient === key)
+                      ? t.unknown
+                      : undefined
+                  }
                   keyboardType="decimal-pad"
                   onChangeText={(text) => changeIngredient(index, key, text)}
                   editable={!busy}

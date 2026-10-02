@@ -146,7 +146,7 @@ Frontmatter component references describe light mode. Dark mode uses the corresp
 
 The implementation also uses supporting nutrition values (17px, weight 600), notice text (15px, line height 22px), and date metadata (13px). Text sizes are React Native logical units; the frontmatter uses portable px notation. Keep native text scaling enabled.
 
-**The Stable Numbers Rule.** Nutrition totals and macro values use tabular numbers so portion changes remain easy to compare.
+**The Stable Numbers Rule.** Nutrition totals use tabular numbers so portion changes remain easy to compare.
 
 ## Layout
 
@@ -182,7 +182,7 @@ Native Expo Router tabs expose Diary and Settings with Ionicons outline symbols.
 
 ### Meal Rows and Nutrition
 
-Meal rows use a 64-unit square photo or tinted outline-icon placeholder, a flexible title and calorie/source column, and a trailing chevron. Rows have vertical padding 16 and pressed opacity 0.7. The editor recalculates nutrition immediately when grams change; it does not animate the values. In-progress analysis exposes a cancel action using the existing button treatment.
+Meal rows use a 64-unit square photo or tinted outline-icon placeholder, a flexible title and calorie/source column, and a trailing chevron. Rows have vertical padding 16 and pressed opacity 0.7. Nutrition summaries show calories, protein, carbohydrates, fats, saturated fat, sugars, fiber and salt. Missing extra values display a localized unknown label; a note explains incomplete totals. The editor recalculates nutrition immediately when grams change; it does not animate the values. In-progress analysis exposes a cancel action using the existing button treatment.
 
 ## Do's and Don'ts
 

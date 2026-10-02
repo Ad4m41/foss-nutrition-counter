@@ -1,6 +1,6 @@
 # Meal Diary / Dziennik posiłków
 
-Free and open-source calorie tracker for Android and iOS. Log meals from photos with Gemini AI or enter them manually. Vibe coded with Codex.
+Free and open-source nutrition tracker for Android and iOS. Log meals from photos with Gemini AI or enter them manually. Vibe coded with Codex. Track calories, protein, carbohydrates, fats, saturated fat, sugars, fiber and salt.
 
 ## Run locally
 
@@ -11,7 +11,18 @@ npm ci
 npm start
 ```
 
-Use a development build for device testing:
+## Try on your phone with Expo Go
+
+1. Install **Expo Go** from Google Play or the App Store, with support for SDK 57.
+2. Connect your phone and computer to the same Wi-Fi network.
+3. Run `npm ci`, then `npx expo start --go` (or `npm run start:go`).
+4. Scan the terminal QR code in Expo Go on Android or with the Camera app on iPhone.
+5. On a physical iPhone, run `npx expo login` and sign in to Expo Go with the same Expo account.
+6. Add your Gemini key in the app's Settings; manual entries work without it.
+
+If LAN access fails, run `npx expo start --go --tunnel`. Keep the computer and development server running. See [Expo's device instructions](https://docs.expo.dev/get-started/start-developing/).
+
+The current device features use modules bundled in Expo Go. Expo Go does not apply this project's app icon or custom permission descriptions. For a standalone app, or an SDK mismatch you cannot resolve in Expo Go, use a development build:
 
 ```sh
 npx expo run:android
@@ -34,9 +45,11 @@ EAS requires signing credentials; physical iOS distribution requires Apple provi
 1. Create a project and API key in [Google AI Studio](https://aistudio.google.com/apikey).
 2. Open **Settings**, paste the key, choose a model available to your project, and save.
 3. Add a photo, optionally describe hidden ingredients or a known portion, and tap **Estimate nutrition**.
-4. Review ingredient names, grams, kcal and macros. Save only after checking them.
+4. Review ingredient names, grams and nutrition values. Save only after checking them.
 
 The default is `gemini-3.5-flash-lite`. Model access and free quotas vary by project; check [active limits](https://ai.google.dev/gemini-api/docs/rate-limits) and [pricing](https://ai.google.dev/gemini-api/docs/pricing). The app makes one request per analysis action and never changes models automatically. Using a paid project can incur Google charges.
+
+Track kcal, protein, carbohydrates, fat, saturated fat, sugars, fiber and salt. All non-energy values use grams; salt means salt-equivalent, not sodium. Blank extra fields mean unknown, including in older entries. A daily total remains unknown when any ingredient lacks that value; enter a confirmed zero as `0`. Sugars are included in carbohydrates and saturated fat in fat, not added again.
 
 Nutrition values describe each ingredient’s entered portion, not 100 g. Changing grams scales that ingredient’s values. You can override each value, add or remove ingredients, and change the meal date. The initial 2,000 kcal goal is an editable starting value, not a personalized recommendation.
 

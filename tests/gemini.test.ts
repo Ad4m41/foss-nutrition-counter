@@ -11,7 +11,18 @@ const output = {
   name: 'Rice',
   notes: '',
   ingredients: [
-    { name: 'Rice', grams: 200, kcal: 260, protein: 5, fat: 1, carbs: 56 },
+    {
+      name: 'Rice',
+      grams: 200,
+      kcal: 260,
+      protein: 5,
+      fat: 1,
+      carbs: 56,
+      saturatedFat: 0.2,
+      sugars: 0.1,
+      fiber: 1,
+      salt: null,
+    },
   ],
 };
 const fetchMock = jest.fn();
@@ -28,6 +39,10 @@ test('sends the key in a header and asks for structured portion nutrition', asyn
   });
   expect((await analyzePhoto(options)).name).toBe('Rice');
   const [url, init] = fetchMock.mock.calls[0];
+  const schema = JSON.parse(init.body).generationConfig.responseJsonSchema;
+  expect(schema.properties.ingredients.items.required).toEqual(
+    expect.arrayContaining(['salt', 'fiber', 'sugars', 'saturatedFat']),
+  );
   expect(url).not.toContain(options.key);
   expect(init.headers['x-goog-api-key']).toBe(options.key);
   expect(JSON.parse(init.body).contents[0].parts[0].inlineData.mimeType).toBe(

@@ -87,6 +87,10 @@ test('photo analysis remains a draft; edited portions persist once', async () =>
         protein: 5,
         fat: 1,
         carbs: 56,
+        salt: 2,
+        fiber: 4,
+        sugars: 1,
+        saturatedFat: 0.2,
       },
     ],
   });
@@ -110,6 +114,12 @@ test('photo analysis remains a draft; edited portions persist once', async () =>
   await fireEvent.press(screen.getByText(en.save));
   await waitFor(() => expect(mockSaveMeal).toHaveBeenCalledTimes(1));
   expect(mockSaveMeal.mock.calls[0][0].ingredients[0].kcal).toBe(130);
+  expect(mockSaveMeal.mock.calls[0][0].ingredients[0]).toMatchObject({
+    salt: 1,
+    fiber: 2,
+    sugars: 0.5,
+    saturatedFat: 0.1,
+  });
   finish?.();
   await waitFor(() => expect(mockBack).toHaveBeenCalledTimes(1));
 });
@@ -144,6 +154,7 @@ test('manual logging works without calling Gemini', async () => {
   await fireEvent.press(screen.getByText(en.save));
   await waitFor(() => expect(mockBack).toHaveBeenCalled());
   expect(mockSaveMeal.mock.calls[0][0].source).toBe('manual');
+  expect(mockSaveMeal.mock.calls[0][0].ingredients[0].salt).toBeNull();
   expect(analyzePhoto).not.toHaveBeenCalled();
 });
 test('a persistence failure keeps the meal draft for retry', async () => {

@@ -47,7 +47,8 @@
     "lint": "expo lint",
     "test": "jest --runInBand",
     "format": "prettier --write src tests package.json app.json tsconfig.json eas.json README.md PRODUCT.md DESIGN.md",
-    "format:check": "prettier --check src tests package.json app.json tsconfig.json eas.json README.md PRODUCT.md DESIGN.md"
+    "format:check": "prettier --check src tests package.json app.json tsconfig.json eas.json README.md PRODUCT.md DESIGN.md",
+    "start:go": "expo start --go"
   },
   "private": true,
   "license": "GPL-3.0-only"
