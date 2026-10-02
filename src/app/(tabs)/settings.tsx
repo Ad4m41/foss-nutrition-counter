@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { Linking, Platform, Switch, View } from 'react-native';
 import { useApp } from '../../state/AppProvider';
 import { Language, parseNumber } from '../../core/nutrition';
@@ -15,7 +16,15 @@ import { confirmAction } from '../../components/confirm';
 export default function SettingsScreen() {
   const { settings, apiKey, updateSettings, clear, t } = useApp();
   const colors = useTheme();
+  const [waterGoal, setWaterGoal] = useState(
+    String(settings.waterGoal ?? 2000),
+  );
   const [goal, setGoal] = useState(String(settings.goal));
+  useFocusEffect(
+    useCallback(() => {
+      setGoal(String(settings.goal));
+    }, [settings.goal]),
+  );
   const [model, setModel] = useState(settings.model);
   const [key, setKey] = useState(apiKey);
   const [language, setLanguage] = useState<Language>(settings.language);
@@ -26,9 +35,13 @@ export default function SettingsScreen() {
   const [error, setError] = useState(false);
   async function save() {
     const value = parseNumber(goal);
+    const water = parseNumber(waterGoal);
     if (
       !Number.isFinite(value) ||
       value <= 0 ||
+      !Number.isFinite(water) ||
+      water < 100 ||
+      water > 20000 ||
       !/^[a-zA-Z0-9._-]+$/.test(model.trim())
     ) {
       setError(true);
@@ -39,7 +52,15 @@ export default function SettingsScreen() {
     setMessage('');
     try {
       await updateSettings(
-        { goal: value, model: model.trim(), language, consent },
+        {
+          ...settings,
+          goal: value,
+          waterGoal: Math.round(water),
+          model: model.trim(),
+          language,
+          consent,
+          skipKeySetup: !key.trim(),
+        },
         key,
       );
       setError(false);
@@ -59,6 +80,7 @@ export default function SettingsScreen() {
     try {
       await clear();
       setGoal('2000');
+      setWaterGoal('2000');
       setModel('gemini-3.5-flash-lite');
       setKey('');
       setConsent(false);
@@ -73,6 +95,13 @@ export default function SettingsScreen() {
   }
   return (
     <Page>
+      <Button
+        title={t.profile}
+        secondary
+        icon="person-outline"
+        disabled={busy}
+        onPress={() => router.push('/profile')}
+      />
       <Label large>{t.goal}</Label>
       <Field
         label={`${t.goal} (${t.kcal})`}
@@ -81,6 +110,14 @@ export default function SettingsScreen() {
         keyboardType="decimal-pad"
         editable={!busy}
       />
+      <Field
+        label={t.waterGoal}
+        value={waterGoal}
+        onChangeText={setWaterGoal}
+        keyboardType="number-pad"
+        editable={!busy}
+      />
+      <Body muted>{t.waterHelp}</Body>
       <Label>{t.key}</Label>
       <Body muted>{t.keyHelp}</Body>
       <View style={{ marginTop: 16 }}>

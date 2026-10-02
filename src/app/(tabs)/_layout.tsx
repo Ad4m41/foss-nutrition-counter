@@ -14,6 +14,8 @@ export default function TabLayout() {
         headerStyle: { backgroundColor: colors.bg },
         headerTintColor: colors.text,
         headerShadowVisible: false,
+        headerTitleStyle: { fontSize: 26, fontWeight: '700' },
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {

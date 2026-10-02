@@ -17,6 +17,8 @@ const defaults = (): Settings => ({
 });
 type Context = {
   meals: Meal[];
+  water: Record<string, number>;
+  adjustWater: (day: string, delta: number) => Promise<void>;
   settings: Settings;
   apiKey: string;
   ready: boolean;
@@ -30,6 +32,7 @@ type Context = {
 const AppContext = createContext<Context | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [meals, setMeals] = useState<Meal[]>([]);
+  const [water, setWater] = useState<Record<string, number>>({});
   const [settings, setSettings] = useState(defaults);
   const [apiKey, setApiKey] = useState('');
   const [ready, setReady] = useState(false);
@@ -40,9 +43,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         storage.listMeals(),
         storage.readSettings(),
         storage.readKey(),
+        storage.readWater(),
       ])
-        .then(([entries, prefs, key]) => {
+        .then(([entries, prefs, key, drinks]) => {
           setMeals(entries);
+          setWater(drinks);
           setSettings(prefs ?? defaults());
           setApiKey(key ?? '');
           setReady(true);
@@ -76,6 +81,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setApiKey(key.trim());
     }
   }
+  async function adjustWater(day: string, delta: number) {
+    const ml = await storage.adjustWater(day, delta);
+    setWater((current) => ({ ...current, [day]: ml }));
+  }
   async function clear() {
     try {
       await storage.clearStorage();
@@ -87,6 +96,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider
       value={{
         meals,
+        water,
+        adjustWater,
         settings,
         apiKey,
         ready,

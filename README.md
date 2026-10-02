@@ -18,11 +18,11 @@ npm start
 3. Run `npm ci`, then `npx expo start --go` (or `npm run start:go`).
 4. Scan the terminal QR code in Expo Go on Android or with the Camera app on iPhone.
 5. On a physical iPhone, run `npx expo login` and sign in to Expo Go with the same Expo account.
-6. Add your Gemini key in the app's Settings; manual entries work without it.
+6. Paste your Gemini key on the opening screen, or choose **Continue without a key** for manual logging.
 
 If LAN access fails, run `npx expo start --go --tunnel`. Keep the computer and development server running. See [Expo's device instructions](https://docs.expo.dev/get-started/start-developing/).
 
-The current device features use modules bundled in Expo Go. Expo Go does not apply this project's app icon or custom permission descriptions. For a standalone app, or an SDK mismatch you cannot resolve in Expo Go, use a development build:
+Logging, key setup, the profile slider and water controls work in Expo Go; the otter is static there. Animated Rive requires native modules available in a development or standalone build. Expo Go does not apply this project's app icon or custom permission descriptions. For a standalone app, or an SDK mismatch you cannot resolve in Expo Go, use a development build:
 
 ```sh
 npx expo run:android
@@ -52,12 +52,20 @@ npx eas-cli@latest build --platform android --profile preview
 
 Open the completed build link on your Android phone, download the APK and allow installation from that source. This preview includes the app bundle and works without a running development server. Photo analysis still needs internet access. Forks should link their own EAS project. See [Expo's APK instructions](https://docs.expo.dev/build-reference/apk/).
 
+## Profile, goals and water
+
+After key setup, enter age, height, weight and sex, choose one of five daily activity levels, and select maintain, lose or gain weight. You can skip profile setup or edit it later in Settings. The calorie estimate uses [Mifflin–St Jeor](https://pubmed.ncbi.nlm.nih.gov/2305711/?format=pubmed), multiplied by an estimated PAL. The five app bands are 1.4, 1.6, 1.8, 2.0 and 2.2; they are coarse defaults within the [NIDDK activity range](https://www.niddk.nih.gov/bwp), not measured activity or a clinical model. Lose/gain applies an editable starting adjustment of −10%/+10%. The estimate supports adults aged 18–100, excluding pregnancy and breastfeeding.
+
+The diary records water per selected day. Add 250 or 500 ml, or undo the last addition in the current session. Set your water goal in Settings; 2,000 ml is an editable default, not an individualized recommendation. Reset removes profile, water, meals, photos and the key. The diary includes an otter: native Rive animates breathing, blinking, body width based on logged food, and a droplet based on logged water. Its appearance does not estimate your body weight. Expo Go, web, reduced motion and runtime errors use a bundled still. Rive needs a new development or preview build; an OTA update cannot add its native modules. See [the asset source](assets/otter/README.md).
+
 ## Configure Gemini
 
 1. Create a project and API key in [Google AI Studio](https://aistudio.google.com/apikey).
-2. Open **Settings**, paste the key, choose a model available to your project, and save.
+2. Paste the key on the opening screen and tap **Check key and continue**. You can change it and the model later in **Settings**.
 3. Add a photo, optionally describe hidden ingredients or a known portion, and tap **Estimate nutrition**.
 4. Review ingredient names, grams and nutrition values. Save only after checking them.
+
+The app checks saved keys at launch and after returning from the background, using Google's model-list endpoint without generating content. Rate limits (HTTP 429) allow entry. Rejected keys return to setup; offline or server errors preserve access with a saved key. A new key must pass the check or receive HTTP 429 before saving. **Continue without a key** clears the key and remembers manual mode. Adding a key in Settings re-enables checking. Web previews retain keys only in memory, so refreshing requires re-entry unless manual mode was selected.
 
 The default is `gemini-3.5-flash-lite`. Model access and free quotas vary by project; check [active limits](https://ai.google.dev/gemini-api/docs/rate-limits) and [pricing](https://ai.google.dev/gemini-api/docs/pricing). The app makes one request per analysis action and never changes models automatically. Using a paid project can incur Google charges.
 

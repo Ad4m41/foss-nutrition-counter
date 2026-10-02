@@ -1,0 +1,231 @@
+<Rive version="1" kind="fragment">
+  <Artboard name="Otter" id="0:2" width="320" height="340" viewModelId="0:100" viewModelInstanceId="0:103" defaultStateMachineId="0:7" styleId="0:5">
+    <LayoutComponentStyle id="0:5" name="Artboard style" />
+    <Node name="Otter illustration" id="0:20">
+      <Shape name="Water drop" x="160" y="224">
+        <DataBindContext sourcePathIds="0:100-0:102" propertyKey="18" />
+        <PointsPath isClosed="true">
+          <StraightVertex x="0" y="-20" radius="3" />
+          <StraightVertex x="14" y="3" radius="14" />
+          <StraightVertex x="0" y="18" radius="14" />
+          <StraightVertex x="-14" y="3" radius="14" />
+        </PointsPath>
+        <Fill>
+          <SolidColor colorValue="FF63B6AE" />
+        </Fill>
+      </Shape>
+      <Shape name="Eye highlight" x="130" y="135" rotation="0">
+        <Ellipse width="3.5" height="3.5" />
+        <Fill>
+          <SolidColor colorValue="FFFFFFFF" />
+        </Fill>
+      </Shape>
+      <Node name="Blink eye" id="0:50" x="132" y="137">
+        <Shape name="Eye" x="0" y="0" rotation="0">
+          <Ellipse width="9" height="11" />
+          <Fill>
+            <SolidColor colorValue="FF28251F" />
+          </Fill>
+        </Shape>
+      </Node>
+      <Shape name="Eye highlight" x="186" y="135" rotation="0">
+        <Ellipse width="3.5" height="3.5" />
+        <Fill>
+          <SolidColor colorValue="FFFFFFFF" />
+        </Fill>
+      </Shape>
+      <Node name="Blink eye" id="0:51" x="188" y="137">
+        <Shape name="Eye" x="0" y="0" rotation="0">
+          <Ellipse width="9" height="11" />
+          <Fill>
+            <SolidColor colorValue="FF28251F" />
+          </Fill>
+        </Shape>
+      </Node>
+      <Shape name="Nose" x="160" y="157" rotation="0">
+        <Ellipse width="16" height="10" />
+        <Fill>
+          <SolidColor colorValue="FF302B26" />
+        </Fill>
+      </Shape>
+      <Shape name="Smile" x="160" y="167" rotation="0">
+        <Ellipse width="12" height="5" />
+        <Fill>
+          <SolidColor colorValue="FF714E3A" />
+        </Fill>
+      </Shape>
+      <Shape name="Left muzzle" x="145" y="158" rotation="0">
+        <Ellipse width="34" height="25" />
+        <Fill>
+          <SolidColor colorValue="FFF5E3C4" />
+        </Fill>
+      </Shape>
+      <Shape name="Right muzzle" x="175" y="158" rotation="0">
+        <Ellipse width="34" height="25" />
+        <Fill>
+          <SolidColor colorValue="FFF5E3C4" />
+        </Fill>
+      </Shape>
+      <Shape name="Whisker" x="104" y="154" rotation="-0.12">
+        <Ellipse width="24" height="2" />
+        <Fill>
+          <SolidColor colorValue="FF72523E" />
+        </Fill>
+      </Shape>
+      <Shape name="Whisker" x="104" y="164" rotation="0.12">
+        <Ellipse width="24" height="2" />
+        <Fill>
+          <SolidColor colorValue="FF72523E" />
+        </Fill>
+      </Shape>
+      <Shape name="Whisker" x="210" y="154" rotation="0.12">
+        <Ellipse width="24" height="2" />
+        <Fill>
+          <SolidColor colorValue="FF72523E" />
+        </Fill>
+      </Shape>
+      <Shape name="Whisker" x="210" y="164" rotation="-0.12">
+        <Ellipse width="24" height="2" />
+        <Fill>
+          <SolidColor colorValue="FF72523E" />
+        </Fill>
+      </Shape>
+      <Shape name="Cheek left" x="113" y="151" rotation="0">
+        <Ellipse width="13" height="7" />
+        <Fill>
+          <SolidColor colorValue="FFD59E7E" />
+        </Fill>
+      </Shape>
+      <Shape name="Cheek right" x="207" y="151" rotation="0">
+        <Ellipse width="13" height="7" />
+        <Fill>
+          <SolidColor colorValue="FFD59E7E" />
+        </Fill>
+      </Shape>
+      <Shape name="Face" x="160" y="139" rotation="0">
+        <Ellipse width="128" height="92" />
+        <Fill>
+          <SolidColor colorValue="FF94684B" />
+        </Fill>
+      </Shape>
+      <Shape name="Inner ear left" x="110" y="98" rotation="0">
+        <Ellipse width="13" height="14" />
+        <Fill>
+          <SolidColor colorValue="FFD4AA85" />
+        </Fill>
+      </Shape>
+      <Shape name="Inner ear right" x="210" y="98" rotation="0">
+        <Ellipse width="13" height="14" />
+        <Fill>
+          <SolidColor colorValue="FFD4AA85" />
+        </Fill>
+      </Shape>
+      <Shape name="Ear left" x="109" y="97" rotation="0">
+        <Ellipse width="25" height="27" />
+        <Fill>
+          <SolidColor colorValue="FF82573F" />
+        </Fill>
+      </Shape>
+      <Shape name="Ear right" x="211" y="97" rotation="0">
+        <Ellipse width="25" height="27" />
+        <Fill>
+          <SolidColor colorValue="FF82573F" />
+        </Fill>
+      </Shape>
+      <Node name="Body" x="160" y="231">
+        <DataBindContext sourcePathIds="0:100-0:101" propertyKey="16" />
+        <Shape name="Left paw" x="-34" y="-10" rotation="-0.5">
+          <Ellipse width="27" height="44" />
+          <Fill>
+            <SolidColor colorValue="FF94684B" />
+          </Fill>
+        </Shape>
+        <Shape name="Right paw" x="34" y="-10" rotation="0.5">
+          <Ellipse width="27" height="44" />
+          <Fill>
+            <SolidColor colorValue="FF94684B" />
+          </Fill>
+        </Shape>
+        <Shape name="Belly" x="0" y="0" rotation="0">
+          <Ellipse width="69" height="94" />
+          <Fill>
+            <SolidColor colorValue="FFE6C9A1" />
+          </Fill>
+        </Shape>
+        <Shape name="Body" x="0" y="0" rotation="0">
+          <Ellipse width="102" height="130" />
+          <Fill>
+            <SolidColor colorValue="FF94684B" />
+          </Fill>
+        </Shape>
+        <Shape name="Left foot" x="-34" y="61" rotation="-0.12">
+          <Ellipse width="35" height="22" />
+          <Fill>
+            <SolidColor colorValue="FF82573F" />
+          </Fill>
+        </Shape>
+        <Shape name="Right foot" x="34" y="61" rotation="0.12">
+          <Ellipse width="35" height="22" />
+          <Fill>
+            <SolidColor colorValue="FF82573F" />
+          </Fill>
+        </Shape>
+      </Node>
+      <Shape name="Tail" x="230" y="292" rotation="-0.35">
+        <Ellipse width="119" height="28" />
+        <Fill>
+          <SolidColor colorValue="FF82573F" />
+        </Fill>
+      </Shape>
+    </Node>
+    <StateMachine name="Otter" id="0:7">
+      <StateMachineLayer name="Idle layer">
+        <AnyState x="200" y="-100" />
+        <ExitState x="400" y="-100" />
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:12" />
+        </EntryState>
+        <AnimationState x="200" y="0" id="0:12" animationId="0:6" />
+      </StateMachineLayer>
+    </StateMachine>
+    <LinearAnimation name="Idle" id="0:6" duration="240" loopValue="loop">
+      <KeyedObject objectId="0:20">
+        <KeyedProperty propertyKey="14">
+          <KeyFrameDouble frame="0" value="0" interpolationType="cubic">
+            <CubicEaseInterpolator />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="120" value="-4" interpolationType="cubic">
+            <CubicEaseInterpolator />
+          </KeyFrameDouble>
+          <KeyFrameDouble frame="240" value="0" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:50">
+        <KeyedProperty propertyKey="17">
+          <KeyFrameDouble frame="0" value="1" />
+          <KeyFrameDouble frame="119" value="1" interpolationType="linear" />
+          <KeyFrameDouble frame="125" value="0.08" interpolationType="linear" />
+          <KeyFrameDouble frame="131" value="1" />
+          <KeyFrameDouble frame="240" value="1" />
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:51">
+        <KeyedProperty propertyKey="17">
+          <KeyFrameDouble frame="0" value="1" />
+          <KeyFrameDouble frame="119" value="1" interpolationType="linear" />
+          <KeyFrameDouble frame="125" value="0.08" interpolationType="linear" />
+          <KeyFrameDouble frame="131" value="1" />
+          <KeyFrameDouble frame="240" value="1" />
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+  </Artboard>
+  <ViewModel name="Otter" id="0:100" defaultInstanceId="0:103">
+    <ViewModelPropertyNumber name="bodyScale" id="0:101" />
+    <ViewModelPropertyNumber name="hydration" id="0:102" />
+    <ViewModelInstance exports="true" name="Default" id="0:103">
+      <ViewModelInstanceNumber viewModelPropertyId="0:101" propertyValue="1" />
+      <ViewModelInstanceNumber viewModelPropertyId="0:102" propertyValue="1" />
+    </ViewModelInstance>
+  </ViewModel>
+</Rive>

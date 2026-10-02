@@ -1,124 +1,124 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-02T09:58:07.594935+00:00",
+  "generatedAt": "2026-10-02T12:02:29.084023+00:00",
   "title": "Design System: Meal Diary",
   "extensions": {
     "colorMeta": {
       "light-bg": {
         "role": "neutral",
-        "displayName": "Light bg",
+        "displayName": "Light Page",
         "tonalRamp": [
-          "oklch(15% 0.0068 247.89)",
-          "oklch(26% 0.0068 247.89)",
-          "oklch(38% 0.0068 247.89)",
-          "oklch(49% 0.0068 247.89)",
-          "oklch(61% 0.0068 247.89)",
-          "oklch(72% 0.0068 247.89)",
-          "oklch(84% 0.0068 247.89)",
-          "oklch(95% 0.0068 247.89)"
+          "oklch(15% 0.0041 121.56)",
+          "oklch(26% 0.0041 121.56)",
+          "oklch(38% 0.0041 121.56)",
+          "oklch(49% 0.0041 121.56)",
+          "oklch(61% 0.0041 121.56)",
+          "oklch(72% 0.0041 121.56)",
+          "oklch(84% 0.0041 121.56)",
+          "oklch(95% 0.0041 121.56)"
         ]
       },
       "light-surface": {
         "role": "neutral",
-        "displayName": "Light surface",
+        "displayName": "Light Surface",
         "tonalRamp": [
-          "oklch(15% 0.0000 89.88)",
-          "oklch(26% 0.0000 89.88)",
-          "oklch(38% 0.0000 89.88)",
-          "oklch(49% 0.0000 89.88)",
-          "oklch(61% 0.0000 89.88)",
-          "oklch(72% 0.0000 89.88)",
-          "oklch(84% 0.0000 89.88)",
-          "oklch(95% 0.0000 89.88)"
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(38% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(72% 0.0000 0.00)",
+          "oklch(84% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
         ]
       },
       "light-tint": {
         "role": "primary",
-        "displayName": "Light tint",
+        "displayName": "Light Leaf Tint",
         "tonalRamp": [
-          "oklch(15% 0.0214 245.86)",
-          "oklch(26% 0.0214 245.86)",
-          "oklch(38% 0.0214 245.86)",
-          "oklch(49% 0.0214 245.86)",
-          "oklch(61% 0.0214 245.86)",
-          "oklch(72% 0.0214 245.86)",
-          "oklch(84% 0.0214 245.86)",
-          "oklch(95% 0.0214 245.86)"
+          "oklch(15% 0.0133 152.60)",
+          "oklch(26% 0.0133 152.60)",
+          "oklch(38% 0.0133 152.60)",
+          "oklch(49% 0.0133 152.60)",
+          "oklch(61% 0.0133 152.60)",
+          "oklch(72% 0.0133 152.60)",
+          "oklch(84% 0.0133 152.60)",
+          "oklch(95% 0.0133 152.60)"
         ]
       },
       "light-text": {
         "role": "neutral",
-        "displayName": "Light text",
+        "displayName": "Light Ink",
         "tonalRamp": [
-          "oklch(15% 0.0533 250.04)",
-          "oklch(26% 0.0533 250.04)",
-          "oklch(38% 0.0533 250.04)",
-          "oklch(49% 0.0533 250.04)",
-          "oklch(61% 0.0533 250.04)",
-          "oklch(72% 0.0533 250.04)",
-          "oklch(84% 0.0533 250.04)",
-          "oklch(95% 0.0533 250.04)"
+          "oklch(15% 0.0180 151.71)",
+          "oklch(26% 0.0180 151.71)",
+          "oklch(38% 0.0180 151.71)",
+          "oklch(49% 0.0180 151.71)",
+          "oklch(61% 0.0180 151.71)",
+          "oklch(72% 0.0180 151.71)",
+          "oklch(84% 0.0180 151.71)",
+          "oklch(95% 0.0180 151.71)"
         ]
       },
       "light-muted": {
         "role": "neutral",
-        "displayName": "Light muted",
+        "displayName": "Light Muted Ink",
         "tonalRamp": [
-          "oklch(15% 0.0483 245.69)",
-          "oklch(26% 0.0483 245.69)",
-          "oklch(38% 0.0483 245.69)",
-          "oklch(49% 0.0483 245.69)",
-          "oklch(61% 0.0483 245.69)",
-          "oklch(72% 0.0483 245.69)",
-          "oklch(84% 0.0483 245.69)",
-          "oklch(95% 0.0483 245.69)"
+          "oklch(15% 0.0194 156.43)",
+          "oklch(26% 0.0194 156.43)",
+          "oklch(38% 0.0194 156.43)",
+          "oklch(49% 0.0194 156.43)",
+          "oklch(61% 0.0194 156.43)",
+          "oklch(72% 0.0194 156.43)",
+          "oklch(84% 0.0194 156.43)",
+          "oklch(95% 0.0194 156.43)"
         ]
       },
       "light-primary": {
         "role": "primary",
-        "displayName": "Light primary",
+        "displayName": "Light Green Action",
         "tonalRamp": [
-          "oklch(15% 0.1494 256.33)",
-          "oklch(26% 0.1494 256.33)",
-          "oklch(38% 0.1494 256.33)",
-          "oklch(49% 0.1494 256.33)",
-          "oklch(61% 0.1494 256.33)",
-          "oklch(72% 0.1494 256.33)",
-          "oklch(84% 0.1494 256.33)",
-          "oklch(95% 0.1494 256.33)"
+          "oklch(15% 0.0864 164.39)",
+          "oklch(26% 0.0864 164.39)",
+          "oklch(38% 0.0864 164.39)",
+          "oklch(49% 0.0864 164.39)",
+          "oklch(61% 0.0864 164.39)",
+          "oklch(72% 0.0864 164.39)",
+          "oklch(84% 0.0864 164.39)",
+          "oklch(95% 0.0864 164.39)"
         ]
       },
       "light-on-primary": {
         "role": "primary",
-        "displayName": "Light on primary",
+        "displayName": "Light On Green",
         "tonalRamp": [
-          "oklch(15% 0.0000 89.88)",
-          "oklch(26% 0.0000 89.88)",
-          "oklch(38% 0.0000 89.88)",
-          "oklch(49% 0.0000 89.88)",
-          "oklch(61% 0.0000 89.88)",
-          "oklch(72% 0.0000 89.88)",
-          "oklch(84% 0.0000 89.88)",
-          "oklch(95% 0.0000 89.88)"
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(38% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(72% 0.0000 0.00)",
+          "oklch(84% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
         ]
       },
       "light-line": {
         "role": "neutral",
-        "displayName": "Light line",
+        "displayName": "Light Line",
         "tonalRamp": [
-          "oklch(15% 0.0252 246.23)",
-          "oklch(26% 0.0252 246.23)",
-          "oklch(38% 0.0252 246.23)",
-          "oklch(49% 0.0252 246.23)",
-          "oklch(61% 0.0252 246.23)",
-          "oklch(72% 0.0252 246.23)",
-          "oklch(84% 0.0252 246.23)",
-          "oklch(95% 0.0252 246.23)"
+          "oklch(15% 0.0097 140.51)",
+          "oklch(26% 0.0097 140.51)",
+          "oklch(38% 0.0097 140.51)",
+          "oklch(49% 0.0097 140.51)",
+          "oklch(61% 0.0097 140.51)",
+          "oklch(72% 0.0097 140.51)",
+          "oklch(84% 0.0097 140.51)",
+          "oklch(95% 0.0097 140.51)"
         ]
       },
       "light-danger": {
         "role": "neutral",
-        "displayName": "Light danger",
+        "displayName": "Light Danger",
         "tonalRamp": [
           "oklch(15% 0.1682 20.86)",
           "oklch(26% 0.1682 20.86)",
@@ -132,7 +132,7 @@
       },
       "light-danger-bg": {
         "role": "neutral",
-        "displayName": "Light danger bg",
+        "displayName": "Light Danger Surface",
         "tonalRamp": [
           "oklch(15% 0.0154 7.49)",
           "oklch(26% 0.0154 7.49)",
@@ -146,119 +146,119 @@
       },
       "dark-bg": {
         "role": "neutral",
-        "displayName": "Dark bg",
+        "displayName": "Dark Page",
         "tonalRamp": [
-          "oklch(15% 0.0336 249.48)",
-          "oklch(26% 0.0336 249.48)",
-          "oklch(38% 0.0336 249.48)",
-          "oklch(49% 0.0336 249.48)",
-          "oklch(61% 0.0336 249.48)",
-          "oklch(72% 0.0336 249.48)",
-          "oklch(84% 0.0336 249.48)",
-          "oklch(95% 0.0336 249.48)"
+          "oklch(15% 0.0130 160.07)",
+          "oklch(26% 0.0130 160.07)",
+          "oklch(38% 0.0130 160.07)",
+          "oklch(49% 0.0130 160.07)",
+          "oklch(61% 0.0130 160.07)",
+          "oklch(72% 0.0130 160.07)",
+          "oklch(84% 0.0130 160.07)",
+          "oklch(95% 0.0130 160.07)"
         ]
       },
       "dark-surface": {
         "role": "neutral",
-        "displayName": "Dark surface",
+        "displayName": "Dark Surface",
         "tonalRamp": [
-          "oklch(15% 0.0437 248.40)",
-          "oklch(26% 0.0437 248.40)",
-          "oklch(38% 0.0437 248.40)",
-          "oklch(49% 0.0437 248.40)",
-          "oklch(61% 0.0437 248.40)",
-          "oklch(72% 0.0437 248.40)",
-          "oklch(84% 0.0437 248.40)",
-          "oklch(95% 0.0437 248.40)"
+          "oklch(15% 0.0190 154.47)",
+          "oklch(26% 0.0190 154.47)",
+          "oklch(38% 0.0190 154.47)",
+          "oklch(49% 0.0190 154.47)",
+          "oklch(61% 0.0190 154.47)",
+          "oklch(72% 0.0190 154.47)",
+          "oklch(84% 0.0190 154.47)",
+          "oklch(95% 0.0190 154.47)"
         ]
       },
       "dark-tint": {
         "role": "primary",
-        "displayName": "Dark tint",
+        "displayName": "Dark Leaf Tint",
         "tonalRamp": [
-          "oklch(15% 0.0580 246.47)",
-          "oklch(26% 0.0580 246.47)",
-          "oklch(38% 0.0580 246.47)",
-          "oklch(49% 0.0580 246.47)",
-          "oklch(61% 0.0580 246.47)",
-          "oklch(72% 0.0580 246.47)",
-          "oklch(84% 0.0580 246.47)",
-          "oklch(95% 0.0580 246.47)"
+          "oklch(15% 0.0314 155.19)",
+          "oklch(26% 0.0314 155.19)",
+          "oklch(38% 0.0314 155.19)",
+          "oklch(49% 0.0314 155.19)",
+          "oklch(61% 0.0314 155.19)",
+          "oklch(72% 0.0314 155.19)",
+          "oklch(84% 0.0314 155.19)",
+          "oklch(95% 0.0314 155.19)"
         ]
       },
       "dark-text": {
         "role": "neutral",
-        "displayName": "Dark text",
+        "displayName": "Dark Ink",
         "tonalRamp": [
-          "oklch(15% 0.0142 254.60)",
-          "oklch(26% 0.0142 254.60)",
-          "oklch(38% 0.0142 254.60)",
-          "oklch(49% 0.0142 254.60)",
-          "oklch(61% 0.0142 254.60)",
-          "oklch(72% 0.0142 254.60)",
-          "oklch(84% 0.0142 254.60)",
-          "oklch(95% 0.0142 254.60)"
+          "oklch(15% 0.0090 134.87)",
+          "oklch(26% 0.0090 134.87)",
+          "oklch(38% 0.0090 134.87)",
+          "oklch(49% 0.0090 134.87)",
+          "oklch(61% 0.0090 134.87)",
+          "oklch(72% 0.0090 134.87)",
+          "oklch(84% 0.0090 134.87)",
+          "oklch(95% 0.0090 134.87)"
         ]
       },
       "dark-muted": {
         "role": "neutral",
-        "displayName": "Dark muted",
+        "displayName": "Dark Muted Ink",
         "tonalRamp": [
-          "oklch(15% 0.0360 244.28)",
-          "oklch(26% 0.0360 244.28)",
-          "oklch(38% 0.0360 244.28)",
-          "oklch(49% 0.0360 244.28)",
-          "oklch(61% 0.0360 244.28)",
-          "oklch(72% 0.0360 244.28)",
-          "oklch(84% 0.0360 244.28)",
-          "oklch(95% 0.0360 244.28)"
+          "oklch(15% 0.0226 149.64)",
+          "oklch(26% 0.0226 149.64)",
+          "oklch(38% 0.0226 149.64)",
+          "oklch(49% 0.0226 149.64)",
+          "oklch(61% 0.0226 149.64)",
+          "oklch(72% 0.0226 149.64)",
+          "oklch(84% 0.0226 149.64)",
+          "oklch(95% 0.0226 149.64)"
         ]
       },
       "dark-primary": {
         "role": "primary",
-        "displayName": "Dark primary",
+        "displayName": "Dark Green Action",
         "tonalRamp": [
-          "oklch(15% 0.0936 255.15)",
-          "oklch(26% 0.0936 255.15)",
-          "oklch(38% 0.0936 255.15)",
-          "oklch(49% 0.0936 255.15)",
-          "oklch(61% 0.0936 255.15)",
-          "oklch(72% 0.0936 255.15)",
-          "oklch(84% 0.0936 255.15)",
-          "oklch(95% 0.0936 255.15)"
+          "oklch(15% 0.0717 157.14)",
+          "oklch(26% 0.0717 157.14)",
+          "oklch(38% 0.0717 157.14)",
+          "oklch(49% 0.0717 157.14)",
+          "oklch(61% 0.0717 157.14)",
+          "oklch(72% 0.0717 157.14)",
+          "oklch(84% 0.0717 157.14)",
+          "oklch(95% 0.0717 157.14)"
         ]
       },
       "dark-on-primary": {
         "role": "primary",
-        "displayName": "Dark on primary",
+        "displayName": "Dark On Green",
         "tonalRamp": [
-          "oklch(15% 0.0776 255.81)",
-          "oklch(26% 0.0776 255.81)",
-          "oklch(38% 0.0776 255.81)",
-          "oklch(49% 0.0776 255.81)",
-          "oklch(61% 0.0776 255.81)",
-          "oklch(72% 0.0776 255.81)",
-          "oklch(84% 0.0776 255.81)",
-          "oklch(95% 0.0776 255.81)"
+          "oklch(15% 0.0542 158.01)",
+          "oklch(26% 0.0542 158.01)",
+          "oklch(38% 0.0542 158.01)",
+          "oklch(49% 0.0542 158.01)",
+          "oklch(61% 0.0542 158.01)",
+          "oklch(72% 0.0542 158.01)",
+          "oklch(84% 0.0542 158.01)",
+          "oklch(95% 0.0542 158.01)"
         ]
       },
       "dark-line": {
         "role": "neutral",
-        "displayName": "Dark line",
+        "displayName": "Dark Line",
         "tonalRamp": [
-          "oklch(15% 0.0469 246.77)",
-          "oklch(26% 0.0469 246.77)",
-          "oklch(38% 0.0469 246.77)",
-          "oklch(49% 0.0469 246.77)",
-          "oklch(61% 0.0469 246.77)",
-          "oklch(72% 0.0469 246.77)",
-          "oklch(84% 0.0469 246.77)",
-          "oklch(95% 0.0469 246.77)"
+          "oklch(15% 0.0277 150.90)",
+          "oklch(26% 0.0277 150.90)",
+          "oklch(38% 0.0277 150.90)",
+          "oklch(49% 0.0277 150.90)",
+          "oklch(61% 0.0277 150.90)",
+          "oklch(72% 0.0277 150.90)",
+          "oklch(84% 0.0277 150.90)",
+          "oklch(95% 0.0277 150.90)"
         ]
       },
       "dark-danger": {
         "role": "neutral",
-        "displayName": "Dark danger",
+        "displayName": "Dark Danger",
         "tonalRamp": [
           "oklch(15% 0.0930 11.77)",
           "oklch(26% 0.0930 11.77)",
@@ -272,7 +272,7 @@
       },
       "dark-danger-bg": {
         "role": "neutral",
-        "displayName": "Dark danger bg",
+        "displayName": "Dark Danger Surface",
         "tonalRamp": [
           "oklch(15% 0.0431 356.06)",
           "oklch(26% 0.0431 356.06)",
@@ -286,9 +286,13 @@
       }
     },
     "typographyMeta": {
-      "nutrient-total": {
-        "displayName": "Nutrient total",
-        "purpose": "Calories with tabular numbers; native platform font."
+      "nutrient-main": {
+        "displayName": "Main Nutrient Value",
+        "purpose": "Calories and three macronutrients; native platform type with tabular numbers."
+      },
+      "nutrient-detail": {
+        "displayName": "Additional Nutrient Value",
+        "purpose": "Saturated fat, sugars, fiber and salt retain individual visible labels."
       }
     },
     "shadows": [],
@@ -299,74 +303,90 @@
     {
       "name": "Primary action",
       "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Native button translation; pressed and disabled opacity mirror the source.",
-      "html": "<button class=\"ds-button-primary\">Save meal</button>",
-      "css": ".ds-button-primary { min-height:52px; padding:14px 18px; border:0; border-radius:14px; background:#175CB0; color:#FFFFFF; font:600 16px system-ui; } .ds-button-primary:active { opacity:.8; } .ds-button-primary:disabled { opacity:.55; } .ds-button-primary:focus-visible { outline:auto; }"
+      "description": "Native button translation; browser hover and focus are supplementary.",
+      "html": "<button class=\"ds-button-primary\">Add meal</button>",
+      "css": ".ds-button-primary { min-height:52px; padding:14px 18px; border:0; border-radius:12px; background:#216C50; color:#FFFFFF; font:600 16px system-ui; } .ds-button-primary:hover { opacity:.9; } .ds-button-primary:active { opacity:.8; } .ds-button-primary:disabled { opacity:.55; } .ds-button-primary:focus-visible { outline:auto; }",
+      "refersTo": "button-primary"
     },
     {
       "name": "Secondary action",
       "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Native button translation; pressed and disabled opacity mirror the source.",
+      "description": "Native button translation; browser hover and focus are supplementary.",
       "html": "<button class=\"ds-button-secondary\">Add ingredient</button>",
-      "css": ".ds-button-secondary { min-height:52px; padding:14px 18px; border:0; border-radius:14px; background:#E1EEFA; color:#175CB0; font:600 16px system-ui; } .ds-button-secondary:active { opacity:.8; } .ds-button-secondary:disabled { opacity:.55; } .ds-button-secondary:focus-visible { outline:auto; }"
+      "css": ".ds-button-secondary { min-height:52px; padding:14px 18px; border:0; border-radius:12px; background:#E6EFE8; color:#216C50; font:600 16px system-ui; } .ds-button-secondary:hover { opacity:.9; } .ds-button-secondary:active { opacity:.8; } .ds-button-secondary:disabled { opacity:.55; } .ds-button-secondary:focus-visible { outline:auto; }",
+      "refersTo": "button-secondary"
     },
     {
-      "name": "Destructive action",
+      "name": "Danger action",
       "kind": "button",
-      "refersTo": "button-danger",
-      "description": "Native button translation; pressed and disabled opacity mirror the source.",
+      "description": "Native button translation; browser hover and focus are supplementary.",
       "html": "<button class=\"ds-button-danger\">Delete meal</button>",
-      "css": ".ds-button-danger { min-height:52px; padding:14px 18px; border:0; border-radius:14px; background:#FCEEF0; color:#AB2634; font:600 16px system-ui; } .ds-button-danger:active { opacity:.8; } .ds-button-danger:disabled { opacity:.55; } .ds-button-danger:focus-visible { outline:auto; }"
+      "css": ".ds-button-danger { min-height:52px; padding:14px 18px; border:0; border-radius:12px; background:#FCEEF0; color:#AB2634; font:600 16px system-ui; } .ds-button-danger:hover { opacity:.9; } .ds-button-danger:active { opacity:.8; } .ds-button-danger:disabled { opacity:.55; } .ds-button-danger:focus-visible { outline:auto; }",
+      "refersTo": "button-danger"
     },
     {
       "name": "Labeled field",
       "kind": "input",
-      "refersTo": "field",
-      "description": "Label above a native-style outlined field; browser focus is a browser affordance.",
+      "description": "Visible label and native-style field; browser focus remains a browser affordance.",
       "html": "<label class=\"ds-field-label\">Grams<input class=\"ds-field\" value=\"150\" inputmode=\"decimal\"></label>",
-      "css": ".ds-field-label { display:block; color:#4A647B; font:14px system-ui; } .ds-field { display:block; margin-top:6px; min-height:50px; padding:12px; border:1px solid #CBDAE8; border-radius:10px; background:#FFFFFF; color:#172F47; font:16px system-ui; } .ds-field::selection { background:#175CB0; color:#FFFFFF; } .ds-field:focus-visible { outline:auto; }"
+      "css": ".ds-field-label { display:block; color:#58645C; font:14px system-ui; } .ds-field { display:block; margin-top:6px; min-height:50px; padding:12px; border:1px solid #DFE4DE; border-radius:10px; background:#FFFFFF; color:#202922; font:16px system-ui; } .ds-field:hover { border-color:#58645C; } .ds-field:focus-visible { outline:auto; } .ds-field::selection { background:#216C50; color:white; }",
+      "refersTo": "field"
     },
     {
-      "name": "Daily summary",
+      "name": "Daily nutrition grid",
       "kind": "card",
-      "refersTo": "daily-summary",
-      "description": "Flat tinted nutrition container and progress track.",
-      "html": "<div class=\"ds-summary\"><div class=\"ds-summary-label\">Daily total</div><div class=\"ds-summary-total\">640 <span>kcal</span></div><div class=\"ds-summary-macros\">Protein 32 g \u00b7 Fat 18 g \u00b7 Carbs 88 g</div><div class=\"ds-summary-track\"><div class=\"ds-summary-fill\"></div></div></div>",
-      "css": ".ds-summary { padding:22px; border-radius:16px; background:#E1EEFA; color:#172F47; font:16px system-ui; } .ds-summary-label { color:#4A647B; font-size:15px; } .ds-summary-total { margin:10px 0; font-size:32px; font-weight:700; font-variant-numeric:tabular-nums; } .ds-summary-total span { font-size:17px; font-weight:400; } .ds-summary-macros { color:#4A647B; } .ds-summary-track { margin:8px 0; height:8px; background:#CBDAE8; border-radius:4px; overflow:hidden; } .ds-summary-fill { width:32%; height:8px; background:#175CB0; }"
+      "description": "Flat surface with eight labeled nutrient cells; figures are demonstration data.",
+      "html": "<section class=\"ds-summary\"><strong class=\"ds-summary-heading\">Daily total</strong><div class=\"ds-nutrients\"><div class=\"ds-nutrient\"><span>Calories</span><strong class=\"ds-nutrient-value ds-nutrient-main\">{value}</strong></div><div class=\"ds-nutrient\"><span>Protein</span><strong class=\"ds-nutrient-value ds-nutrient-main\">{value}</strong></div><div class=\"ds-nutrient\"><span>Carbohydrates</span><strong class=\"ds-nutrient-value ds-nutrient-main\">{value}</strong></div><div class=\"ds-nutrient\"><span>Fat</span><strong class=\"ds-nutrient-value ds-nutrient-main\">{value}</strong></div><div class=\"ds-nutrient\"><span>Saturated fat</span><strong class=\"ds-nutrient-value\">{value}</strong></div><div class=\"ds-nutrient\"><span>Sugars</span><strong class=\"ds-nutrient-value\">{value}</strong></div><div class=\"ds-nutrient\"><span>Fiber</span><strong class=\"ds-nutrient-value\">{value}</strong></div><div class=\"ds-nutrient\"><span>Salt</span><strong class=\"ds-nutrient-value\">{value}</strong></div></div><div class=\"ds-summary-track\"><div class=\"ds-summary-fill\"></div></div><p class=\"ds-summary-note\">1360 kcal remaining \u00b7 2000 kcal</p></section>",
+      "css": ".ds-summary { padding:16px; border-radius:16px; background:#FFFFFF; color:#202922; font:16px/24px system-ui; } .ds-summary-heading { font-size:19px; font-weight:600; } .ds-nutrients { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:16px; margin-top:12px; } .ds-nutrient { padding:6px 0; } .ds-nutrient:nth-child(-n+6) { border-bottom:1px solid #DFE4DE; } .ds-nutrient span { display:block; margin-bottom:4px; color:#58645C; font-size:12px; line-height:normal; } .ds-nutrient-value { font-size:16px; font-weight:600; font-variant-numeric:tabular-nums; } .ds-nutrient-main { font-size:21px; } .ds-summary-track { height:4px; margin:8px 0; border-radius:4px; background:#DFE4DE; overflow:hidden; } .ds-summary-fill { height:4px; width:32%; background:#216C50; } .ds-summary-note { margin:0; color:#58645C; }",
+      "refersTo": "daily-summary"
+    },
+    {
+      "name": "Date chip",
+      "kind": "chip",
+      "description": "Selected date from the five-day strip; browser focus is supplementary.",
+      "html": "<button class=\"ds-date-chip\" aria-pressed=\"true\"><span>Fri</span><strong>2</strong></button>",
+      "css": ".ds-date-chip { display:flex; flex-direction:column; gap:4px; min-height:60px; min-width:48px; align-items:center; justify-content:center; border:0; border-radius:12px; background:#216C50; color:#FFFFFF; font:12px system-ui; } .ds-date-chip strong { font-size:18px; font-weight:600; } .ds-date-chip:hover { opacity:.9; } .ds-date-chip:active { opacity:.7; } .ds-date-chip:focus-visible { outline:auto; }",
+      "refersTo": "date-chip-selected"
     },
     {
       "name": "Notice",
       "kind": "custom",
-      "refersTo": "notice",
-      "description": "Informational tint; errors swap to danger semantic roles.",
+      "description": "Informational leaf tint; errors swap to danger roles.",
       "html": "<div class=\"ds-notice\">Review the estimate before saving.</div>",
-      "css": ".ds-notice { margin:12px 0; padding:16px; border-radius:12px; background:#E1EEFA; color:#172F47; font:15px/22px system-ui; }"
+      "css": ".ds-notice { margin:12px 0; padding:16px; border-radius:12px; background:#E6EFE8; color:#202922; font:15px/22px system-ui; }",
+      "refersTo": "notice"
     },
     {
-      "name": "Meal row",
+      "name": "Meal record",
       "kind": "custom",
-      "description": "Border-separated record; the browser sample omits the native photo/icon.",
-      "html": "<button class=\"ds-meal-row\"><span class=\"ds-meal-copy\"><strong>Lunch</strong><span>640 kcal \u00b7 Manual</span></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#4A647B\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 5 7 7-7 7\"/></svg></button>",
-      "css": ".ds-meal-row { display:flex; align-items:center; gap:14px; width:100%; padding:16px 0; border:0; border-bottom:1px solid #CBDAE8; background:transparent; color:#172F47; text-align:left; font:16px/24px system-ui; } .ds-meal-copy { flex:1; display:flex; flex-direction:column; gap:5px; } .ds-meal-copy strong { font-size:18px; font-weight:600; } .ds-meal-copy span { color:#4A647B; } .ds-meal-row:active { opacity:.7; } .ds-meal-row:focus-visible { outline:auto; }"
+      "description": "Open, border-separated record with a square placeholder; illustration is a supplementary inline icon.",
+      "html": "<button class=\"ds-meal-row\"><span class=\"ds-meal-photo\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#216C50\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M5 3v7m3-7v7M3 3v5a3 3 0 0 0 6 0V3M6 11v10M18 3v18m0-18c-4 2-4 8 0 8\"/></svg></span><span class=\"ds-meal-copy\"><strong>Lunch</strong><span>640 kcal \u00b7 Manual</span></span><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#58645C\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-meal-row { display:flex; gap:14px; align-items:center; width:100%; padding:16px 0; border:0; border-bottom:1px solid #DFE4DE; background:transparent; color:#202922; text-align:left; font:16px/24px system-ui; } .ds-meal-photo { display:flex; width:76px; height:76px; flex:none; border-radius:14px; align-items:center; justify-content:center; background:#E6EFE8; } .ds-meal-copy { flex:1; display:flex; flex-direction:column; gap:5px; } .ds-meal-copy strong { font-size:18px; font-weight:600; } .ds-meal-copy span { color:#58645C; } .ds-meal-row:hover { opacity:.9; } .ds-meal-row:active { opacity:.7; } .ds-meal-row:focus-visible { outline:auto; }"
     },
     {
       "name": "Tab navigation",
       "kind": "nav",
-      "description": "Semantic tab colors; native router supplies icon sizing and interaction. Browser representation is supplementary. Native tab height is 64 plus the safe-area bottom inset, with padding 6 above and 6 plus that inset below.",
-      "html": "<nav class=\"ds-tabs\" aria-label=\"Main\"><button class=\"ds-tab ds-tab-selected\" aria-current=\"page\">Diary</button><button class=\"ds-tab\">Settings</button></nav>",
-      "css": ".ds-tabs { display:flex; min-height:64px; padding:6px 0; border-top:1px solid #CBDAE8; background:#FFFFFF; } .ds-tab { flex:1; min-height:48px; border:0; background:transparent; color:#4A647B; font:14px system-ui; } .ds-tab-selected { color:#175CB0; } .ds-tab:focus-visible { outline:auto; }"
+      "description": "Supplementary native-tab translation without safe-area inset; native tabs add the device inset.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Main\"><button class=\"ds-tab ds-tab-selected\" aria-current=\"page\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><rect x=\"5\" y=\"3\" width=\"15\" height=\"18\" rx=\"2\"/><path d=\"M9 3v18m3-12h5m-5 4h5\"/></svg>Diary</button><button class=\"ds-tab\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M4 6h16M4 12h16M4 18h16\"/><circle cx=\"8\" cy=\"6\" r=\"2\" fill=\"white\"/><circle cx=\"16\" cy=\"12\" r=\"2\" fill=\"white\"/><circle cx=\"10\" cy=\"18\" r=\"2\" fill=\"white\"/></svg>Settings</button></nav>",
+      "css": ".ds-tabs { display:flex; min-height:64px; padding:6px 0; border-top:1px solid #DFE4DE; background:#FFFFFF; } .ds-tab { display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:center; flex:1; min-height:48px; border:0; background:transparent; color:#58645C; font:600 12px system-ui; } .ds-tab-selected { color:#216C50; } .ds-tab:hover { opacity:.9; } .ds-tab:active { opacity:.7; } .ds-tab:focus-visible { outline:auto; }"
+    },
+    {
+      "name": "Water progress",
+      "kind": "custom",
+      "description": "Numeric water total and thin goal track; figures are demonstration data. This specimen omits the bundled 100-by-106 otter that appears beside the native total, using Rive on supported native builds and a static asset elsewhere.",
+      "html": "<section class=\"ds-water\"><strong>Water</strong><div class=\"ds-water-total\">750 <span>/ 2000 ml</span></div><div class=\"ds-water-track\"><div class=\"ds-water-fill\"></div></div></section>",
+      "css": ".ds-water { color:#202922; font:700 19px system-ui; } .ds-water-total { margin-top:16px; font-size:24px; font-weight:600; font-variant-numeric:tabular-nums; } .ds-water-total span { font-size:15px; font-weight:400; color:#58645C; } .ds-water-track { margin:12px 0; height:4px; border-radius:2px; overflow:hidden; background:#DFE4DE; } .ds-water-fill { height:4px; width:37.5%; background:#216C50; }"
     }
   ],
   "narrative": {
-    "northStar": "The Mobile Meal Diary",
-    "overview": "A quiet, practical diary for Android and iOS phones. Blue actions and pale surfaces frame editable food records; dark mode substitutes navy surfaces and light blue actions. Native navigation and platform text keep the interface familiar.\n\nThis record describes the implemented source, not device visual approval. Browser specimens in the sidecar are supplementary translations of native components. No native device screenshots were available.",
+    "northStar": "The Calm Daily Diary",
+    "overview": "A calm daily diary for Android and iOS phones. Pale warm neutral pages, white surfaces, graphite text and dark green actions give food and nutrition a clear, familiar frame. The Foodnoms reference informs the quiet diary rhythm; the graphite and green identity belongs to this app. System dark mode uses forest surfaces and pale green actions.\n\nNative platform text and Expo Router navigation support a portrait, touch-first interface. Setup offers an own-key connection or manual mode, followed by an optional local profile. Nutrition remains visible in a compact grid; primary diary and editor actions stay below the scrolling content. Motion is limited to native navigation and the optional otter\u2019s quiet breathing and blinking.\n\nThis document records implemented source and the approved visual direction. Browser review images and sidecar specimens are supplementary; no native device screenshots or native visual approval are available.",
     "keyCharacteristics": [
-      "Semantic light and dark palettes.",
+      "Warm neutral pages and paired green themes.",
       "Native platform typography and navigation.",
-      "Flat tonal summaries and border-separated records.",
-      "Large touch controls and immediately recalculated nutrition."
+      "Compact, equally discoverable nutrient labels.",
+      "Flat white cards and border-separated meal records.",
+      "Pinned primary actions with scrolling supporting content."
     ],
     "rules": [
       {
@@ -376,20 +396,24 @@
       },
       {
         "name": "The Stable Numbers Rule",
-        "body": "Nutrition totals and macro values use tabular numbers so portion changes remain easy to compare.",
+        "body": "Nutrition and water totals use tabular numbers so changes remain easy to compare.",
         "section": "typography"
       }
     ],
     "dos": [
-      "Do use semantic foreground/background pairs in both color schemes.",
-      "Do preserve native text scaling, wrapping, and at least 48-unit touch targets.",
-      "Do use tabular numbers for nutrition values.",
-      "Do separate meal records with flat borders and use tint for summaries."
+      "Do use matching semantic foreground/background roles in both color schemes.",
+      "Do retain visible nutrient labels and unknown-value feedback.",
+      "Do keep primary diary and editor actions reachable below the scrolling content.",
+      "Do preserve native text scaling, wrapping and at least 48-unit touch targets.",
+      "Do use tabular numbers for nutrition and water totals.",
+      "Do keep meal records flat and use surfaces to group nutrition."
     ],
     "donts": [
-      "Don't add decorative animation to this diary; keep native navigation transitions.",
+      "Don't restore the former blue identity or introduce a second decorative accent.",
+      "Don't add large decorative transitions; keep native navigation and the restrained mascot motion.",
       "Don't use color alone to communicate errors or selected controls.",
-      "Don't treat browser specimens as evidence of native device approval."
+      "Don't treat browser specimens as evidence of native device approval.",
+      "Don't describe mascot shape as body weight, or change its happy expression to judge entries."
     ]
   }
 }

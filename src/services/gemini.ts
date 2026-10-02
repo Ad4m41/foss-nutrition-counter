@@ -5,6 +5,62 @@ import {
   validateAnalysis,
 } from '../core/nutrition';
 
+export type KeyStatus = 'valid' | 'limited' | 'invalid' | 'unavailable';
+
+/** Authenticate without generating content or depending on a selected model. */
+export async function checkApiKey(
+  key: string,
+  signal?: AbortSignal,
+): Promise<KeyStatus> {
+  if (!key.trim()) return 'invalid';
+  const controller = new AbortController();
+  const cancel = () => controller.abort();
+  signal?.addEventListener('abort', cancel);
+  if (signal?.aborted) cancel();
+  const timer = setTimeout(cancel, 10000);
+  try {
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models?pageSize=1',
+      {
+        headers: { 'x-goog-api-key': key.trim() },
+        signal: controller.signal,
+      },
+    );
+    if (response.ok) return 'valid';
+    if (response.status === 429) return 'limited';
+    if (response.status === 401 || response.status === 403) return 'invalid';
+    if (response.status === 400) {
+      const body = await response.json().catch(() => null);
+      if (/^API key (not valid|expired)\b/i.test(body?.error?.message ?? ''))
+        return 'invalid';
+      const reasons =
+        body?.error?.details?.map(
+          (detail: { reason?: string }) => detail.reason,
+        ) ?? [];
+      if (
+        reasons.some((reason: string) =>
+          [
+            'API_KEY_INVALID',
+            'API_KEY_EXPIRED',
+            'API_KEY_SERVICE_BLOCKED',
+            'API_KEY_HTTP_REFERRER_BLOCKED',
+            'API_KEY_IP_ADDRESS_BLOCKED',
+            'API_KEY_ANDROID_APP_BLOCKED',
+            'API_KEY_IOS_APP_BLOCKED',
+          ].includes(reason),
+        )
+      )
+        return 'invalid';
+    }
+    return 'unavailable';
+  } catch {
+    return 'unavailable';
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', cancel);
+  }
+}
+
 const schema = {
   type: 'object',
   properties: {

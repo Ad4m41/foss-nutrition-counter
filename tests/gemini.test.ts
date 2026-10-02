@@ -1,4 +1,4 @@
-import { analyzePhoto } from '../src/services/gemini';
+import { analyzePhoto, checkApiKey } from '../src/services/gemini';
 const options = {
   key: 'test-key',
   model: 'gemini-3.5-flash-lite',
@@ -96,4 +96,50 @@ test('timeout aborts the request', async () => {
   jest.advanceTimersByTime(45000);
   await assertion;
   jest.useRealTimers();
+});
+
+describe('key authentication', () => {
+  test.each([
+    [200, 'valid'],
+    [429, 'limited'],
+    [401, 'invalid'],
+    [403, 'invalid'],
+    [500, 'unavailable'],
+    [404, 'unavailable'],
+  ])('HTTP %s returns %s without inference', async (status, expected) => {
+    fetchMock.mockResolvedValue({ ok: status === 200, status });
+    expect(await checkApiKey(' test-key ')).toBe(expected);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toContain('/models?pageSize=1');
+    expect(url).not.toContain('test-key');
+    expect(init.headers['x-goog-api-key']).toBe('test-key');
+    expect(init.body).toBeUndefined();
+  });
+  test.each(['API_KEY_INVALID', 'API_KEY_EXPIRED'])(
+    'rejects explicit %s',
+    async (reason) => {
+      fetchMock.mockResolvedValue({
+        ok: false,
+        status: 400,
+        json: async () => ({ error: { details: [{ reason }] } }),
+      });
+      expect(await checkApiKey('key')).toBe('invalid');
+    },
+  );
+  test('does not confuse generic bad requests with invalid keys', async () => {
+    fetchMock.mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: { message: 'Bad request' } }),
+    });
+    expect(await checkApiKey('key')).toBe('unavailable');
+  });
+  test('network errors preserve uncertainty', async () => {
+    fetchMock.mockRejectedValue(new Error('offline'));
+    expect(await checkApiKey('key')).toBe('unavailable');
+  });
+  test('empty keys never make a request', async () => {
+    expect(await checkApiKey(' ')).toBe('invalid');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

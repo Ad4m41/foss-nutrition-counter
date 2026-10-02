@@ -98,6 +98,7 @@ export default function MealScreen() {
   const controller = useRef<AbortController | null>(null);
   const [message, setMessage] = useState('');
   const [leaving, setLeaving] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const snapshot = JSON.stringify({
     name,
     day,
@@ -324,7 +325,19 @@ export default function MealScreen() {
       </Page>
     );
   return (
-    <Page>
+    <Page
+      footer={
+        <Button
+          title={t.save}
+          loading={busy === 'save'}
+          disabled={!!busy}
+          icon="checkmark"
+          onPress={() => {
+            void save();
+          }}
+        />
+      }
+    >
       <Stack.Screen options={{ title: original ? t.editMeal : t.addMeal }} />
       {!original && (
         <>
@@ -344,7 +357,6 @@ export default function MealScreen() {
             <Button
               title={t.camera}
               icon="camera-outline"
-              secondary
               disabled={!!busy}
               onPress={() => {
                 void photo(true);
@@ -431,7 +443,6 @@ export default function MealScreen() {
       />
       <Label>{t.ingredients}</Label>
       <Body muted>{t.amountHelp}</Body>
-      <Body muted>{t.unknownHelp}</Body>
       {ingredients.map((item, index) => (
         <View
           key={item.id}
@@ -463,7 +474,13 @@ export default function MealScreen() {
           <View
             style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12 }}
           >
-            {(['grams', ...nutrientKeys] as const).map((key) => (
+            {(
+              [
+                'grams',
+                ...requiredNutrientKeys,
+                ...(expanded[item.id] ? additionalNutrientKeys : []),
+              ] as const
+            ).map((key) => (
               <View
                 key={key}
                 style={{ minWidth: 120, flexGrow: 1, flexBasis: '43%' }}
@@ -489,6 +506,18 @@ export default function MealScreen() {
               </View>
             ))}
           </View>
+          <Button
+            title={expanded[item.id] ? t.lessNutrition : t.moreNutrition}
+            secondary
+            icon={expanded[item.id] ? 'chevron-up' : 'chevron-down'}
+            onPress={() =>
+              setExpanded((current) => ({
+                ...current,
+                [item.id]: !current[item.id],
+              }))
+            }
+          />
+          {expanded[item.id] && <Body muted>{t.unknownHelp}</Body>}
         </View>
       ))}
       <Button
@@ -512,15 +541,6 @@ export default function MealScreen() {
         </>
       ) : null}
       <Nutrition value={sum} heading={t.summary} />
-      <Button
-        title={t.save}
-        loading={busy === 'save'}
-        disabled={!!busy}
-        icon="checkmark"
-        onPress={() => {
-          void save();
-        }}
-      />
       {original && (
         <Button
           title={t.delete}

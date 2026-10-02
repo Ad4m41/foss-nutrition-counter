@@ -4,6 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, useColorScheme, View } from 'react-native';
 import { AppProvider, useApp } from '../state/AppProvider';
 import { Body, Button, Notice, useTheme } from '../components/ui';
+import { KeyGate } from '../components/KeyGate';
+import { ProfileGate } from '../components/ProfileForm';
 function Navigation() {
   const { ready, error, reload, t } = useApp();
   const colors = useTheme();
@@ -40,17 +42,22 @@ function Navigation() {
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.bg },
-          headerTintColor: colors.text,
-          contentStyle: { backgroundColor: colors.bg },
-          headerShadowVisible: false,
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="meal" options={{ title: t.addMeal }} />
-      </Stack>
+      <KeyGate>
+        <ProfileGate>
+          <Stack
+            screenOptions={{
+              headerStyle: { backgroundColor: colors.bg },
+              headerTintColor: colors.text,
+              contentStyle: { backgroundColor: colors.bg },
+              headerShadowVisible: false,
+            }}
+          >
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="profile" options={{ title: t.profile }} />
+            <Stack.Screen name="meal" options={{ title: t.addMeal }} />
+          </Stack>
+        </ProfileGate>
+      </KeyGate>
     </>
   );
 }

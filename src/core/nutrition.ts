@@ -1,3 +1,4 @@
+import { Profile } from './profile';
 export type Language = 'pl' | 'en';
 export const requiredNutrientKeys = [
   'kcal',
@@ -41,6 +42,10 @@ export type Settings = {
   language: Language;
   model: string;
   consent: boolean;
+  skipKeySetup?: boolean;
+  profile?: Profile;
+  profileSetupDone?: boolean;
+  waterGoal?: number;
 };
 export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 export function totals(items: Nutrients[]): Nutrients {

@@ -1,3 +1,4 @@
+import { WaterTracker } from '../../components/WaterTracker';
 import React, { useMemo, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
@@ -27,7 +28,15 @@ export default function Diary() {
   const sum = totals(entries.flatMap((meal) => meal.ingredients));
   const diff = settings.goal - sum.kcal;
   return (
-    <Page>
+    <Page
+      footer={
+        <Button
+          title={t.addMeal}
+          icon="add"
+          onPress={() => router.push({ pathname: '/meal', params: { day } })}
+        />
+      }
+    >
       <View
         style={{
           flexDirection: 'row',
@@ -70,7 +79,8 @@ export default function Diary() {
           <Text style={{ color: colors.muted, fontSize: 13 }}>
             {new Date(`${day}T12:00:00`).toLocaleDateString(settings.language, {
               weekday: 'long',
-              year: 'numeric',
+              day: 'numeric',
+              month: 'long',
             })}
           </Text>
         </Pressable>
@@ -81,9 +91,63 @@ export default function Diary() {
         />
       </View>
       <View
+        style={{ flexDirection: 'row', gap: 6, marginTop: 16, marginBottom: 8 }}
+      >
+        {[-2, -1, 0, 1, 2].map((offset) => {
+          const date = moveDay(day, offset);
+          const selected = offset === 0;
+          return (
+            <Pressable
+              key={date}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              accessibilityLabel={new Date(
+                `${date}T12:00:00`,
+              ).toLocaleDateString(settings.language, {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+              onPress={() => setDay(date)}
+              style={({ pressed }) => ({
+                flex: 1,
+                minHeight: 60,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                borderRadius: 12,
+                backgroundColor: selected ? colors.primary : colors.surface,
+                opacity: pressed ? 0.7 : 1,
+              })}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: selected ? colors.onPrimary : colors.muted,
+                }}
+              >
+                {new Date(`${date}T12:00:00`).toLocaleDateString(
+                  settings.language,
+                  { weekday: 'short' },
+                )}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: '600',
+                  color: selected ? colors.onPrimary : colors.text,
+                }}
+              >
+                {new Date(`${date}T12:00:00`).getDate()}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      <View
         style={{
-          backgroundColor: colors.tint,
-          padding: 22,
+          backgroundColor: colors.surface,
+          padding: 16,
           borderRadius: 16,
           marginTop: 16,
         }}
@@ -98,7 +162,7 @@ export default function Diary() {
             text: `${Math.round(sum.kcal)} / ${settings.goal} ${t.kcal}`,
           }}
           style={{
-            height: 8,
+            height: 4,
             backgroundColor: colors.line,
             borderRadius: 4,
             overflow: 'hidden',
@@ -107,7 +171,7 @@ export default function Diary() {
         >
           <View
             style={{
-              height: 8,
+              height: 4,
               backgroundColor: colors.primary,
               width: `${Math.min(100, (sum.kcal / settings.goal) * 100)}%`,
             }}
@@ -118,7 +182,7 @@ export default function Diary() {
           {diff >= 0 ? t.remaining : t.over} · {settings.goal} {t.kcal}
         </Body>
       </View>
-      <Label large>{t.meals}</Label>
+      <Label>{t.meals}</Label>
       {entries.length === 0 ? (
         <View style={{ paddingVertical: 22, gap: 12 }}>
           <Ionicons
@@ -154,14 +218,14 @@ export default function Diary() {
               <Image
                 source={{ uri: meal.photoUri }}
                 accessibilityLabel={meal.name}
-                style={{ width: 64, height: 64, borderRadius: 12 }}
+                style={{ width: 76, height: 76, borderRadius: 14 }}
               />
             ) : (
               <View
                 style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: 12,
+                  width: 76,
+                  height: 76,
+                  borderRadius: 14,
                   backgroundColor: colors.tint,
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -189,13 +253,7 @@ export default function Diary() {
           </Pressable>
         ))
       )}
-      <View style={{ marginTop: 24 }}>
-        <Button
-          title={t.addMeal}
-          icon="add"
-          onPress={() => router.push({ pathname: '/meal', params: { day } })}
-        />
-      </View>
+      <WaterTracker day={day} kcal={sum.kcal} />
     </Page>
   );
 }

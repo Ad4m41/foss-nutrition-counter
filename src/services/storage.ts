@@ -1,3 +1,4 @@
+import { validateWaterChange } from '../core/water';
 import * as SQLite from 'expo-sqlite';
 import * as SecureStore from 'expo-secure-store';
 import { Directory, File, Paths } from 'expo-file-system';
@@ -11,7 +12,8 @@ async function db() {
       CREATE TABLE IF NOT EXISTS meals (id TEXT PRIMARY KEY NOT NULL, day TEXT NOT NULL, payload TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS meals_day ON meals(day);
       CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id = 1), payload TEXT NOT NULL);
-      PRAGMA user_version = 1;`);
+      CREATE TABLE IF NOT EXISTS water (day TEXT PRIMARY KEY NOT NULL, ml INTEGER NOT NULL CHECK(ml >= 0));
+      PRAGMA user_version = 2;`);
     return connection;
   })();
   try {
@@ -102,4 +104,26 @@ export async function clearStorage() {
     await (await db()).runAsync('DELETE FROM meals');
     await (await db()).runAsync('DELETE FROM settings');
   });
+}
+
+export async function readWater(): Promise<Record<string, number>> {
+  const rows = await (
+    await db()
+  ).getAllAsync<{ day: string; ml: number }>('SELECT day, ml FROM water');
+  return Object.fromEntries(rows.map(({ day, ml }) => [day, ml]));
+}
+export async function adjustWater(day: string, delta: number): Promise<number> {
+  validateWaterChange(day, delta);
+  const connection = await db();
+  await connection.runAsync(
+    'INSERT INTO water (day, ml) VALUES (?, max(0, ?)) ON CONFLICT(day) DO UPDATE SET ml = max(0, water.ml + ?)',
+    day,
+    delta,
+    delta,
+  );
+  const row = await connection.getFirstAsync<{ ml: number }>(
+    'SELECT ml FROM water WHERE day = ?',
+    day,
+  );
+  return row?.ml ?? 0;
 }

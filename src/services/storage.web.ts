@@ -1,3 +1,4 @@
+import { validateWaterChange } from '../core/water';
 // Browser preview only. The API key lives in memory, never localStorage.
 import { Meal, Settings } from '../core/nutrition';
 let key = '';
@@ -45,5 +46,20 @@ export async function writeKey(value: string) {
 export async function clearStorage() {
   localStorage.removeItem(MEALS);
   localStorage.removeItem(SETTINGS);
+  localStorage.removeItem('meal-diary-water');
   key = '';
+}
+
+export async function readWater(): Promise<Record<string, number>> {
+  return JSON.parse(localStorage.getItem('meal-diary-water') || '{}');
+}
+export async function adjustWater(day: string, delta: number): Promise<number> {
+  validateWaterChange(day, delta);
+  // No await between read and write, so rapid browser writes cannot race.
+  const water: Record<string, number> = JSON.parse(
+    localStorage.getItem('meal-diary-water') || '{}',
+  );
+  water[day] = Math.max(0, (water[day] ?? 0) + delta);
+  localStorage.setItem('meal-diary-water', JSON.stringify(water));
+  return water[day];
 }

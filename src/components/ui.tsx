@@ -21,33 +21,39 @@ import {
 } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
 const light = {
-  bg: '#F4F8FC',
+  bg: '#F5F6F3',
   surface: '#FFFFFF',
-  tint: '#E1EEFA',
-  text: '#172F47',
-  muted: '#4A647B',
-  primary: '#175CB0',
+  tint: '#E6EFE8',
+  text: '#202922',
+  muted: '#58645C',
+  primary: '#216C50',
   onPrimary: '#FFFFFF',
-  line: '#CBDAE8',
+  line: '#DFE4DE',
   danger: '#AB2634',
   dangerBg: '#FCEEF0',
 };
 const dark: typeof light = {
-  bg: '#101E2C',
-  surface: '#182C3F',
-  tint: '#213F59',
-  text: '#EFF6FF',
-  muted: '#B0C6D9',
-  primary: '#9AC6FF',
-  onPrimary: '#102E54',
-  line: '#3B5369',
+  bg: '#151C18',
+  surface: '#202A23',
+  tint: '#2A3C30',
+  text: '#F1F5EF',
+  muted: '#B8C6BA',
+  primary: '#A3D8B7',
+  onPrimary: '#163A27',
+  line: '#3C4B3F',
   danger: '#FFB0B9',
   dangerBg: '#432832',
 };
 export function useTheme() {
   return useColorScheme() === 'dark' ? dark : light;
 }
-export function Page({ children }: { children: React.ReactNode }) {
+export function Page({
+  children,
+  footer,
+}: {
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   return (
@@ -64,6 +70,18 @@ export function Page({ children }: { children: React.ReactNode }) {
       >
         <View style={styles.content}>{children}</View>
       </ScrollView>
+      {footer && (
+        <View
+          style={{
+            paddingHorizontal: 24,
+            paddingTop: 8,
+            paddingBottom: Math.max(12, insets.bottom),
+            backgroundColor: colors.bg,
+          }}
+        >
+          <View style={styles.content}>{footer}</View>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -79,10 +97,10 @@ export function Label({
     <Text
       style={{
         color: colors.text,
-        fontSize: large ? 26 : 19,
+        fontSize: large ? 28 : 19,
         fontWeight: '700',
-        marginTop: 20,
-        marginBottom: 12,
+        marginTop: 28,
+        marginBottom: 16,
       }}
     >
       {children}
@@ -203,7 +221,7 @@ export function IconButton({
 export function Field({ label, ...props }: TextInputProps & { label: string }) {
   const colors = useTheme();
   return (
-    <View style={{ flexGrow: 1, flexBasis: 100, marginBottom: 12 }}>
+    <View style={{ flexGrow: 1, marginBottom: 16 }}>
       <Text style={{ color: colors.muted, fontSize: 14, marginBottom: 6 }}>
         {label}
       </Text>
@@ -266,43 +284,45 @@ export function Nutrition({
   const { t } = useApp();
   const colors = useTheme();
   return (
-    <View style={{ gap: 10, marginVertical: 14 }}>
+    <View style={{ gap: 12, marginVertical: 0 }}>
       {heading && (
-        <Text style={{ color: colors.muted, fontSize: 15 }}>{heading}</Text>
+        <Text style={{ color: colors.text, fontSize: 19, fontWeight: '600' }}>
+          {heading}
+        </Text>
       )}
-      <Text
-        style={{
-          color: colors.text,
-          fontSize: 32,
-          fontWeight: '700',
-          fontVariant: ['tabular-nums'],
-        }}
-      >
-        {Math.round(value.kcal)}{' '}
-        <Text style={{ fontSize: 17, fontWeight: '400' }}>{t.kcal}</Text>
-      </Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20 }}>
-        {nutrientKeys
-          .filter((key) => key !== 'kcal')
-          .map((key) => (
-            <View key={key} style={{ minWidth: 70 }}>
-              <Text style={{ color: colors.muted, fontSize: 14 }}>
-                {t[key]}
-              </Text>
-              <Text
-                style={{
-                  color: colors.text,
-                  fontSize: 17,
-                  fontWeight: '600',
-                  fontVariant: ['tabular-nums'],
-                }}
-              >
-                {value[key] == null || !Number.isFinite(value[key])
-                  ? t.unknown
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 16 }}>
+        {nutrientKeys.map((key, index) => (
+          <View
+            key={key}
+            style={{
+              flexBasis: '45%',
+              flexGrow: 1,
+              paddingVertical: 6,
+              borderBottomWidth: index < 6 ? 1 : 0,
+              borderBottomColor: colors.line,
+            }}
+          >
+            <Text
+              style={{ color: colors.muted, fontSize: 12, marginBottom: 4 }}
+            >
+              {t[key]}
+            </Text>
+            <Text
+              style={{
+                color: colors.text,
+                fontSize: index < 4 ? 21 : 16,
+                fontWeight: '600',
+                fontVariant: ['tabular-nums'],
+              }}
+            >
+              {value[key] == null || !Number.isFinite(value[key])
+                ? t.unknown
+                : key === 'kcal'
+                  ? `${Math.round(value.kcal)} ${t.kcal}`
                   : `${Math.round(value[key]! * (key === 'salt' ? 100 : 10)) / (key === 'salt' ? 100 : 10)} g`}
-              </Text>
-            </View>
-          ))}
+            </Text>
+          </View>
+        ))}
       </View>
       {additionalNutrientKeys.some((key) => value[key] == null) && (
         <Body muted>{t.incompleteNutrition}</Body>
@@ -311,13 +331,13 @@ export function Nutrition({
   );
 }
 const styles = StyleSheet.create({
-  page: { flexGrow: 1, padding: 20 },
-  content: { width: '100%', maxWidth: 640, alignSelf: 'center' },
+  page: { flexGrow: 1, padding: 24 },
+  content: { width: '100%', maxWidth: 560, alignSelf: 'center' },
   button: {
     minHeight: 52,
     paddingVertical: 14,
     paddingHorizontal: 18,
-    borderRadius: 14,
+    borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

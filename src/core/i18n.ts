@@ -1,5 +1,63 @@
 import { Language } from './nutrition';
 export const en = {
+  profile: 'Your profile',
+  profileIntro:
+    'Set a starting energy goal for your day. These details stay on your device.',
+  age: 'Age (years)',
+  height: 'Height (cm)',
+  weight: 'Weight (kg)',
+  sex: 'Sex',
+  female: 'Female',
+  male: 'Male',
+  sexHelp: 'Used only to estimate energy needs.',
+  activity: 'Daily activity',
+  activityHelp:
+    'Include work, walking and sport. Drag the slider or tap a level.',
+  activity0: 'Mostly sitting',
+  activity1: 'Light activity',
+  activity2: 'Moderate activity',
+  activity3: 'High activity',
+  activity4: 'Very high activity',
+  activityDetail0: 'Most of the day seated, little walking or exercise.',
+  activityDetail1: 'Mostly seated, with regular walks or light exercise.',
+  activityDetail2:
+    'Regular movement during the day and several workouts a week.',
+  activityDetail3: 'An active job or frequent, demanding workouts.',
+  activityDetail4: 'Physical work combined with frequent, demanding training.',
+  objective: 'Your goal',
+  lose: 'Lose weight',
+  maintain: 'Maintain weight',
+  gain: 'Gain weight',
+  estimatedGoal: 'Starting calorie goal',
+  estimateHelp:
+    'An estimate for adults, excluding pregnancy and breastfeeding. Adjust your goal in Settings. Weight goals use a small 10% change from estimated maintenance.',
+  invalidProfile:
+    'Enter an age from 18–100, height from 100–250 cm and weight from 30–350 kg, then choose sex.',
+  skipProfile: 'Set up later',
+  saveProfile: 'Save profile',
+  otterHelp:
+    'Your otter reacts to logged food and water. Its shape does not represent your weight.',
+  water: 'Water',
+  waterGoal: 'Daily water goal (ml)',
+  waterHelp:
+    '2,000 ml is a starting value you can edit, not a personalized recommendation.',
+  undoWater: 'Undo last drink',
+  addWater: 'Add water',
+
+  moreNutrition: 'Salt, fiber and other nutrients',
+  lessNutrition: 'Hide extra nutrients',
+  setupTitle: 'Connect Gemini',
+  setupBody: 'Paste your API key to estimate nutrition from photos.',
+  checkKey: 'Check key and continue',
+  checkingKey: 'Checking your key…',
+  skipKey: 'Continue without a key',
+  skipKeyHelp: 'Log meals manually. You can add a key later in Settings.',
+  invalidKey:
+    'Google rejected this key. Paste a new key or continue without one.',
+  keyUnavailable:
+    'Could not check your key. Check your connection and try again, or continue without a key.',
+  keyCheckPrivacy:
+    'This check sends only your key to Google, without photos or meal data.',
   diary: 'Diary',
   settings: 'Settings',
   addMeal: 'Add meal',
@@ -127,6 +185,65 @@ export const en = {
   aiTerms: 'Google API terms',
 };
 export const pl: Record<keyof typeof en, string> = {
+  profile: 'Twój profil',
+  profileIntro:
+    'Ustal początkowy cel energii na dzień. Te dane zostają na Twoim urządzeniu.',
+  age: 'Wiek (lata)',
+  height: 'Wzrost (cm)',
+  weight: 'Waga (kg)',
+  sex: 'Płeć',
+  female: 'Kobieta',
+  male: 'Mężczyzna',
+  sexHelp: 'Używamy jej tylko do oszacowania zapotrzebowania na energię.',
+  activity: 'Aktywność w ciągu dnia',
+  activityHelp:
+    'Uwzględnij pracę, chodzenie i sport. Przesuń suwak lub dotknij poziomu.',
+  activity0: 'Głównie siedzę',
+  activity1: 'Lekka aktywność',
+  activity2: 'Umiarkowana aktywność',
+  activity3: 'Duża aktywność',
+  activity4: 'Bardzo duża aktywność',
+  activityDetail0: 'Większość dnia na siedząco, mało spacerów i ćwiczeń.',
+  activityDetail1:
+    'Głównie siedzenie, ale też regularne spacery lub lekkie ćwiczenia.',
+  activityDetail2: 'Regularny ruch w ciągu dnia i kilka treningów w tygodniu.',
+  activityDetail3: 'Aktywna praca lub częste, wymagające treningi.',
+  activityDetail4:
+    'Praca fizyczna połączona z częstymi, wymagającymi treningami.',
+  objective: 'Twój cel',
+  lose: 'Schudnąć',
+  maintain: 'Utrzymać wagę',
+  gain: 'Zwiększyć masę',
+  estimatedGoal: 'Początkowy cel kalorii',
+  estimateHelp:
+    'Szacunek dla dorosłych, poza ciążą i karmieniem piersią. Cel możesz zmienić w ustawieniach. Zmiana masy oznacza niewielką korektę 10% względem szacowanego utrzymania.',
+  invalidProfile:
+    'Podaj wiek 18–100 lat, wzrost 100–250 cm i wagę 30–350 kg oraz wybierz płeć.',
+  skipProfile: 'Uzupełnię później',
+  saveProfile: 'Zapisz profil',
+  otterHelp:
+    'Wydra reaguje na zapisane jedzenie i wodę. Jej sylwetka nie przedstawia Twojej wagi.',
+  water: 'Woda',
+  waterGoal: 'Dzienny cel wody (ml)',
+  waterHelp:
+    '2 000 ml to początkowa wartość do zmiany, a nie indywidualne zalecenie.',
+  undoWater: 'Cofnij ostatni napój',
+  addWater: 'Dodaj wodę',
+
+  moreNutrition: 'Sól, błonnik i pozostałe wartości',
+  lessNutrition: 'Zwiń dodatkowe wartości',
+  setupTitle: 'Połącz z Gemini',
+  setupBody: 'Wklej klucz API, aby szacować wartości odżywcze ze zdjęć.',
+  checkKey: 'Sprawdź klucz i przejdź dalej',
+  checkingKey: 'Sprawdzam klucz…',
+  skipKey: 'Wejdź bez klucza',
+  skipKeyHelp:
+    'Dodawaj posiłki ręcznie. Klucz możesz dodać później w ustawieniach.',
+  invalidKey: 'Google odrzuciło ten klucz. Wklej nowy lub wejdź bez klucza.',
+  keyUnavailable:
+    'Nie udało się sprawdzić klucza. Sprawdź połączenie i spróbuj ponownie lub wejdź bez klucza.',
+  keyCheckPrivacy:
+    'Podczas sprawdzania wysyłamy do Google tylko klucz, bez zdjęć i danych posiłków.',
   diary: 'Dziennik',
   settings: 'Ustawienia',
   addMeal: 'Dodaj posiłek',
