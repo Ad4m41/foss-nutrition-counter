@@ -40,6 +40,18 @@ npx expo start --dev-client
 
 EAS requires signing credentials; physical iOS distribution requires Apple provisioning. No binaries have been published. `npm run web` starts a browser preview; it does not replace Android/iOS testing.
 
+## Install an Android APK
+
+The configured EAS project ID is `7f3bafe9-d857-425b-af29-63b66138f914`. Sign in to an Expo account with access to that project, verify the link, then build:
+
+```sh
+npx eas-cli@latest login
+npx eas-cli@latest init --id 7f3bafe9-d857-425b-af29-63b66138f914
+npx eas-cli@latest build --platform android --profile preview
+```
+
+Open the completed build link on your Android phone, download the APK and allow installation from that source. This preview includes the app bundle and works without a running development server. Photo analysis still needs internet access. Forks should link their own EAS project. See [Expo's APK instructions](https://docs.expo.dev/build-reference/apk/).
+
 ## Configure Gemini
 
 1. Create a project and API key in [Google AI Studio](https://aistudio.google.com/apikey).

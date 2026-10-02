@@ -41,6 +41,11 @@
       ],
       "expo-font"
     ],
-    "scheme": "mealdiary"
+    "scheme": "mealdiary",
+    "extra": {
+      "eas": {
+        "projectId": "7f3bafe9-d857-425b-af29-63b66138f914"
+      }
+    }
   }
 }
