@@ -668,19 +668,6 @@ export default function MealScreen() {
                     ))}
                   </View>
                   <Body muted>{t.unknownHelp}</Body>
-                  <View style={{ marginTop: 12 }}>
-                    <Button
-                      title={t.lessNutrition}
-                      secondary
-                      icon="chevron-up"
-                      onPress={() =>
-                        setExpanded((current) => ({
-                          ...current,
-                          [item.id]: false,
-                        }))
-                      }
-                    />
-                  </View>
                 </View>
               )}
             </View>

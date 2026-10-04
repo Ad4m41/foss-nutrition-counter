@@ -52,23 +52,44 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
   }
   return (
     <View style={{ gap: 12 }}>
-      <Button
-        title={selected.name}
+      <Pressable
+        accessibilityRole="button"
         accessibilityLabel={`${t.language}: ${selected.name}`}
-        leading={
-          <Image
-            source={selected.flag}
-            style={{ width: 30, height: 20, borderRadius: 3 }}
-          />
-        }
-        icon="chevron-down"
-        secondary
+        accessibilityState={{ disabled: disabled || busy, expanded: open }}
         disabled={disabled || busy}
         onPress={() => {
+          feedback('press');
           setSearch('');
           setOpen(true);
         }}
-      />
+        style={({ pressed }) => ({
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 12,
+          minHeight: 52,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderRadius: 12,
+          backgroundColor: colors.tint,
+          opacity: disabled || busy ? 0.55 : pressed ? 0.8 : 1,
+        })}
+      >
+        <Image
+          source={selected.flag}
+          style={{ width: 30, height: 20, borderRadius: 3 }}
+        />
+        <Text
+          style={{
+            flex: 1,
+            fontFamily: fonts.bold,
+            fontSize: 16,
+            color: colors.primary,
+          }}
+        >
+          {selected.name}
+        </Text>
+        <Ionicons name="chevron-down" size={21} color={colors.primary} />
+      </Pressable>
       <View
         style={{
           flexDirection: 'row',
@@ -114,7 +135,6 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
               gap: 16,
             }}
           >
-            <Body>{t.language}</Body>
             <Field
               label={t.searchLanguage}
               value={search}
@@ -166,13 +186,6 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
                   >
                     {item.name}
                   </Text>
-                  {item.code === settings.language && (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={22}
-                      color={colors.primary}
-                    />
-                  )}
                 </Pressable>
               ))}
             {!languages.some((item) =>

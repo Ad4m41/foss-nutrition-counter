@@ -34,7 +34,10 @@ export function WaterTracker({ day }: { day: string }) {
       <View
         style={{
           backgroundColor: colors.waterTint,
-          borderRadius: 16,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          borderBottomLeftRadius: 6,
+          borderBottomRightRadius: 6,
           padding: 18,
         }}
       >
@@ -111,7 +114,7 @@ export function WaterTracker({ day }: { day: string }) {
           </View>
         )}
       </View>
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+      <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
         {[250, -250].map((amount, index) => (
           <Pressable
             key={amount}
@@ -128,8 +131,8 @@ export function WaterTracker({ day }: { day: string }) {
               justifyContent: 'center',
               alignItems: 'center',
               backgroundColor: colors.waterTint,
-              borderTopLeftRadius: index === 0 ? 16 : 6,
-              borderTopRightRadius: index === 0 ? 6 : 16,
+              borderTopLeftRadius: 6,
+              borderTopRightRadius: 6,
               borderBottomLeftRadius: index === 0 ? 16 : 6,
               borderBottomRightRadius: index === 0 ? 6 : 16,
               opacity:
