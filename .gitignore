@@ -48,3 +48,8 @@ coverage/
 *.keystore
 .impeccable/review/
 .impeccable/config.local.json
+
+# Release output
+/meal-diary-*.apk
+/SHA256SUMS.txt
+/build.json

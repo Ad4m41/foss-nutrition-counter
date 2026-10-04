@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { BlurTargetView } from 'expo-blur';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -75,31 +76,60 @@ export function Page({
   footer,
   footerInset = true,
   footerFullWidth = false,
+  footerOverlay = false,
+  blurTarget,
 }: {
   children: React.ReactNode;
   footer?: React.ReactNode;
   footerInset?: boolean;
   footerFullWidth?: boolean;
+  footerOverlay?: boolean;
+  blurTarget?: React.RefObject<View | null>;
 }) {
   const colors = useTheme();
   const insets = useSafeAreaInsets();
+  const [footerHeight, setFooterHeight] = useState(0);
+  const content = (
+    <ScrollView
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={[
+        styles.page,
+        {
+          paddingBottom:
+            Math.max(32, insets.bottom + 20) +
+            (footerOverlay ? footerHeight : 0),
+        },
+      ]}
+    >
+      <View style={styles.content}>{children}</View>
+    </ScrollView>
+  );
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: colors.bg }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[
-          styles.page,
-          { paddingBottom: Math.max(32, insets.bottom + 20) },
-        ]}
-      >
-        <View style={styles.content}>{children}</View>
-      </ScrollView>
+      {blurTarget ? (
+        <BlurTargetView ref={blurTarget} style={{ flex: 1 }}>
+          {content}
+        </BlurTargetView>
+      ) : (
+        content
+      )}
       {footer && (
         <View
+          onLayout={(event) => {
+            if (footerOverlay) setFooterHeight(event.nativeEvent.layout.height);
+          }}
           style={{
+            ...(footerOverlay
+              ? ({
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                } as const)
+              : {}),
             paddingHorizontal: footerFullWidth ? 0 : 24,
             paddingTop: footerFullWidth ? 0 : 8,
             paddingBottom: footerFullWidth
@@ -107,7 +137,7 @@ export function Page({
               : footerInset
                 ? Math.max(12, insets.bottom)
                 : 12,
-            backgroundColor: colors.bg,
+            backgroundColor: footerOverlay ? 'transparent' : colors.bg,
           }}
         >
           {footerFullWidth ? (

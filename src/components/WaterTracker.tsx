@@ -115,7 +115,7 @@ export function WaterTracker({ day }: { day: string }) {
         )}
       </View>
       <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
-        {[250, -250].map((amount, index) => (
+        {[-250, 250].map((amount, index) => (
           <Pressable
             key={amount}
             accessibilityRole="button"

@@ -16,6 +16,9 @@ import {
 } from '../core/nutrition';
 import { AiUsage, TokenUsage, createAiTracker } from '../core/aiUsage';
 import { nutritionEstimate } from '../core/profile';
+import { AppRelease } from '../core/releases';
+import { checkForUpdate } from '../services/releases';
+import { Backup } from '../core/backup';
 import { translations } from '../core/i18n';
 import * as storage from '../services/storage';
 const tracker = createAiTracker(storage);
@@ -39,6 +42,12 @@ type Context = {
   deleteMeal: (meal: Meal) => Promise<void>;
   updateSettings: (settings: Settings, key?: string) => Promise<void>;
   clear: () => Promise<void>;
+  restoreBackup: (backup: Backup) => Promise<void>;
+  appRelease: AppRelease | null;
+  checkingUpdates: boolean;
+  updatesChecked: boolean;
+  updateError: boolean;
+  checkUpdates: () => Promise<void>;
   aiUsage: AiUsage[];
   aiBusy: boolean;
   trackAi: <T>(
@@ -59,6 +68,51 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [aiUsage, setAiUsage] = useState<AiUsage[]>([]);
   const [aiBusy, setAiBusy] = useState(false);
   const aiInFlight = useRef(0);
+  const [appRelease, setAppRelease] = useState<AppRelease | null>(null);
+  const [checkingUpdates, setCheckingUpdates] = useState(true);
+  const [updatesChecked, setUpdatesChecked] = useState(false);
+  const [updateError, setUpdateError] = useState(false);
+  const updateLock = useRef(false);
+  async function checkUpdates() {
+    if (updateLock.current) return;
+    updateLock.current = true;
+    setCheckingUpdates(true);
+    setUpdateError(false);
+    try {
+      setAppRelease(await checkForUpdate());
+      setUpdatesChecked(true);
+    } catch {
+      setUpdateError(true);
+    } finally {
+      updateLock.current = false;
+      setCheckingUpdates(false);
+    }
+  }
+  useEffect(() => {
+    if (!ready) return;
+    let active = true;
+    updateLock.current = true;
+    void checkForUpdate()
+      .then((release) => {
+        if (active) {
+          setAppRelease(release);
+          setUpdatesChecked(true);
+        }
+      })
+      .catch(() => {
+        if (active) setUpdateError(true);
+      })
+      .finally(() => {
+        if (active) {
+          updateLock.current = false;
+          setCheckingUpdates(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [ready]);
+
   const reload = useCallback(
     () =>
       Promise.all([
@@ -130,6 +184,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await reload();
     }
   }
+  async function restoreBackup(backup: Backup) {
+    if (aiInFlight.current) throw new Error('AI request in progress');
+    await storage.replaceData(backup);
+    await reload();
+  }
   async function trackAi<T>(
     kind: AiUsage['kind'],
     request: (report: (tokens: TokenUsage) => void) => Promise<T>,
@@ -175,6 +234,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         deleteMeal,
         updateSettings,
         clear,
+        restoreBackup,
+        appRelease,
+        checkingUpdates,
+        updatesChecked,
+        updateError,
+        checkUpdates,
         aiUsage,
         aiBusy,
         trackAi,

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Meal Diary",
     "slug": "foss-nutrition-counter",
-    "version": "0.1.0",
+    "version": "0.2.0-beta.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -39,7 +39,8 @@
           "microphonePermission": false
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-sharing"
     ],
     "scheme": "mealdiary",
     "extra": {

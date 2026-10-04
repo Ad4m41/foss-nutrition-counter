@@ -42,3 +42,7 @@ The user approved a bright, calm diary inspired by Foodnoms, with warm cream sur
 ## Open Decisions
 
 Final public name and store distribution are undecided. Use “Meal Diary” / “Dziennik posiłków” as descriptive working titles.
+
+## Distribution and local data
+
+GitHub CI checks types, lint, tests, formatting and platform bundles. Version tags build signed standalone Android APKs through EAS and prepare draft releases with checksums. The app checks published releases on launch and lets users download updates. Beta and stable channels follow semantic versions. Local JSON backup includes photos and excludes API keys; confirmed restores replace diary data transactionally on native devices.

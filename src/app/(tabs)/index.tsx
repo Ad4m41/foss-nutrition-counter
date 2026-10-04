@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import {
   Image,
   Pressable,
@@ -15,9 +15,16 @@ import { localDay, moveDay, totals } from '../../core/nutrition';
 import { feedback } from '../../components/feedback';
 import { WaterTracker } from '../../components/WaterTracker';
 import { MacroDock } from '../../components/MacroDock';
-import { Body, IconButton, Page, fonts, useTheme } from '../../components/ui';
+import {
+  Body,
+  Button,
+  IconButton,
+  Page,
+  fonts,
+  useTheme,
+} from '../../components/ui';
 export default function Diary() {
-  const { meals, settings, t } = useApp();
+  const { meals, settings, appRelease, t } = useApp();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const daysInStrip =
@@ -30,10 +37,13 @@ export default function Diary() {
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
     [meals, day],
   );
+  const blurTarget = useRef<View>(null);
   const sum = totals(entries.flatMap((meal) => meal.ingredients));
   return (
     <Page
-      footer={<MacroDock day={day} value={sum} />}
+      footer={<MacroDock day={day} value={sum} blurTarget={blurTarget} />}
+      footerOverlay
+      blurTarget={blurTarget}
       footerInset={false}
       footerFullWidth
     >
@@ -88,6 +98,19 @@ export default function Diary() {
           onPress={() => setDay(moveDay(day, 1))}
         />
       </View>
+      {appRelease && (
+        <Button
+          title={`${t.updateAvailable}: ${appRelease.version}`}
+          secondary
+          icon="download-outline"
+          onPress={() =>
+            router.navigate({
+              pathname: '/(tabs)/settings',
+              params: { section: 'app' },
+            })
+          }
+        />
+      )}
       <View
         style={{
           flexDirection: 'row',

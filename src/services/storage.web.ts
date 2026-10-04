@@ -1,6 +1,7 @@
 import { validateWaterChange } from '../core/water';
 // Browser preview only. The API key lives in memory, never localStorage.
 import { Meal, Settings } from '../core/nutrition';
+import { Backup } from '../core/backup';
 import { AiUsage } from '../core/aiUsage';
 let key = '';
 const MEALS = 'meal-diary-meals';
@@ -77,4 +78,25 @@ export async function adjustWater(day: string, delta: number): Promise<number> {
   water[day] = Math.max(0, (water[day] ?? 0) + delta);
   localStorage.setItem('meal-diary-water', JSON.stringify(water));
   return water[day];
+}
+
+export async function replaceData(backup: Backup) {
+  const entries = {
+    [MEALS]: JSON.stringify(backup.meals),
+    [SETTINGS]: JSON.stringify(backup.settings),
+    'meal-diary-water': JSON.stringify(backup.water),
+    'meal-diary-ai-usage': JSON.stringify(backup.aiUsage),
+  };
+  const previous = Object.fromEntries(
+    Object.keys(entries).map((name) => [name, localStorage.getItem(name)]),
+  );
+  try {
+    for (const [name, value] of Object.entries(entries))
+      localStorage.setItem(name, value);
+  } catch (error) {
+    for (const name of Object.keys(entries)) localStorage.removeItem(name);
+    for (const [name, value] of Object.entries(previous))
+      if (value !== null) localStorage.setItem(name, value);
+    throw error;
+  }
 }

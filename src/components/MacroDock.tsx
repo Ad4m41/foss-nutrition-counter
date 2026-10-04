@@ -1,21 +1,41 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useColorScheme,
+} from 'react-native';
+import { BlurView } from 'expo-blur';
+import { feedback } from './feedback';
 import { router } from 'expo-router';
 import { useApp } from '../state/AppProvider';
 import { type Nutrients } from '../core/nutrition';
 import { ProgressTrack } from './ProgressTrack';
 import { fonts, useTheme } from './ui';
-export function MacroDock({ day, value }: { day: string; value: Nutrients }) {
+export function MacroDock({
+  day,
+  value,
+  blurTarget,
+}: {
+  day: string;
+  value: Nutrients;
+  blurTarget: React.RefObject<View | null>;
+}) {
   const { settings, t } = useApp();
   const colors = useTheme();
+  const dark = useColorScheme() === 'dark';
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={t.nutritionDetails}
       accessibilityHint={`${Math.round(value.kcal)} ${t.kcal}, ${t.protein} ${value.protein} g, ${t.carbs} ${value.carbs} g, ${t.fat} ${value.fat} g`}
-      onPress={() => router.push({ pathname: '/nutrition', params: { day } })}
+      onPress={() => {
+        feedback('press');
+        router.push({ pathname: '/nutrition', params: { day } });
+      }}
       style={({ pressed }) => ({
-        backgroundColor: colors.surface,
+        overflow: 'hidden',
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
         paddingHorizontal: 16,
@@ -23,6 +43,21 @@ export function MacroDock({ day, value }: { day: string; value: Nutrients }) {
         opacity: pressed ? 0.8 : 1,
       })}
     >
+      <BlurView
+        pointerEvents="none"
+        blurTarget={blurTarget}
+        blurMethod="dimezisBlurViewSdk31Plus"
+        intensity={18}
+        tint={dark ? 'dark' : 'light'}
+        style={StyleSheet.absoluteFill}
+      />
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          { backgroundColor: dark ? '#202A23CC' : '#FFFFFFCC' },
+        ]}
+      />
       <View
         style={{
           flexDirection: 'row',

@@ -289,13 +289,11 @@ test('answers send the original photo and description once, with untouched slide
     screen.getByLabelText(en.yourAnswer),
     'Brown rice',
   );
-  jest
-    .mocked(analyzePhoto)
-    .mockResolvedValueOnce({
-      ...estimate,
-      name: 'Brown rice',
-      questions: clarificationQuestions,
-    });
+  jest.mocked(analyzePhoto).mockResolvedValueOnce({
+    ...estimate,
+    name: 'Brown rice',
+    questions: clarificationQuestions,
+  });
   await fireEvent.press(screen.getByText(en.refineEstimate));
   await waitFor(() =>
     expect(screen.getByLabelText(en.name).props.value).toBe('Brown rice'),

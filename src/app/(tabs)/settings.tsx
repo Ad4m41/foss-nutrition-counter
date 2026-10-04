@@ -1,4 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Linking, Platform, Switch, View } from 'react-native';
 import { useApp } from '../../state/AppProvider';
@@ -14,15 +14,25 @@ import {
   useTheme,
 } from '../../components/ui';
 import { confirmAction } from '../../components/confirm';
-import { Segmented } from '../../components/Segmented';
+import { SettingsSectionBar } from '../../components/SettingsSectionBar';
 import { feedback } from '../../components/feedback';
 import { LanguageSelect } from '../../components/LanguageSelect';
+import { AppUpdates } from '../../components/AppUpdates';
+import { DataBackup } from '../../components/DataBackup';
 import { AiUsageHistory } from '../../components/AiUsageHistory';
 import { validRequestLimit } from '../../core/aiUsage';
 export default function SettingsScreen() {
   const { settings, apiKey, updateSettings, clear, aiBusy, t } = useApp();
   const colors = useTheme();
   const [section, setSection] = useState<'account' | 'app'>('account');
+  const { section: requestedSection } = useLocalSearchParams<{
+    section?: string;
+  }>();
+  useFocusEffect(
+    useCallback(() => {
+      if (requestedSection === 'app') setSection('app');
+    }, [requestedSection]),
+  );
   const [waterGoal, setWaterGoal] = useState(
     String(settings.waterGoal ?? 2000),
   );
@@ -55,6 +65,30 @@ export default function SettingsScreen() {
   const [key, setKey] = useState(apiKey);
   const language = settings.language;
   const [consent, setConsent] = useState(settings.consent);
+  useFocusEffect(
+    useCallback(() => {
+      setWaterGoal(String(settings.waterGoal ?? 2000));
+    }, [settings.waterGoal]),
+  );
+  useFocusEffect(
+    useCallback(() => {
+      setModel(settings.model);
+    }, [settings.model]),
+  );
+  useFocusEffect(
+    useCallback(() => {
+      setConsent(settings.consent);
+    }, [settings.consent]),
+  );
+  useFocusEffect(
+    useCallback(() => {
+      setAiLimit(
+        settings.aiDailyLimit === undefined
+          ? ''
+          : String(settings.aiDailyLimit),
+      );
+    }, [settings.aiDailyLimit]),
+  );
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -142,18 +176,17 @@ export default function SettingsScreen() {
     }
   }
   return (
-    <Page>
-      <View style={{ marginBottom: 24 }}>
-        <Segmented
-          options={[
-            { value: 'account', label: t.accountTab },
-            { value: 'app', label: t.appSettingsTab },
-          ]}
+    <Page
+      footer={
+        <SettingsSectionBar
           value={section}
           onChange={setSection}
           disabled={busy}
         />
-      </View>
+      }
+      footerInset={false}
+      footerFullWidth
+    >
       <View style={{ display: section === 'account' ? 'flex' : 'none' }}>
         <Button
           title={t.profile}
@@ -244,6 +277,7 @@ export default function SettingsScreen() {
           />
           <Body muted>{t.modelHelp}</Body>
         </View>
+        <AppUpdates />
         <Label>{t.language}</Label>
         <LanguageSelect disabled={busy} />
         <Label>{t.aiUsageTitle}</Label>
@@ -257,6 +291,7 @@ export default function SettingsScreen() {
         />
         <Body muted>{t.aiLimitHelp}</Body>
         <AiUsageHistory />
+        <DataBackup />
         <Label>{t.storage}</Label>
         <Body muted>{t.storageBody}</Body>
         <View

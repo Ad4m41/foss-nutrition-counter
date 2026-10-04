@@ -223,8 +223,31 @@ export const en = {
   model: 'Gemini model',
   modelHelp:
     'Use a model available to your project. Free limits can change. No automatic switch to another model.',
+  updates: 'Updates',
+  appVersion: 'Installed version',
+  updateAvailable: 'Update available',
+  upToDate: 'You have the latest available version.',
+  checkUpdates: 'Check for updates',
+  downloadUpdate: 'Download update',
+  viewRelease: 'View release',
+  releaseHistory: 'All releases',
+  updateError:
+    'Could not check or open the update. Check your connection and try again.',
+  updateHelp:
+    'Install the new APK over the existing app to keep your data. Do not uninstall first.',
+  backup: 'Data backup',
+  backupHelp:
+    'Export meals, photos, profile, water and AI history to a JSON file (up to 32 MB). Your API key is excluded. Keep the file somewhere private.',
+  exportBackup: 'Export backup',
+  importBackup: 'Restore backup',
+  restoreWarning:
+    'This replaces your diary, photos, profile, water and AI history with the backup. Your current API key stays on this device. Export a copy first if you want to keep the current data.',
+  backupRestored: 'Backup restored.',
+  backupExported: 'Backup file prepared. Save it using the share menu.',
+  backupError:
+    'Could not export or restore the backup. Check the file format, size (32 MB maximum) and free storage, then try again.',
   accountTab: 'Account',
-  appSettingsTab: 'App settings',
+  appSettingsTab: 'App',
   language: 'Language',
   systemLanguage: 'Use phone language',
   searchLanguage: 'Search languages',
@@ -518,8 +541,32 @@ export const pl: Record<keyof typeof en, string> = {
   model: 'Model Gemini',
   modelHelp:
     'Wybierz model dostępny w Twoim projekcie. Darmowe limity mogą się zmieniać. Aplikacja nie przełącza modelu automatycznie.',
+  updates: 'Aktualizacje',
+  appVersion: 'Zainstalowana wersja',
+  updateAvailable: 'Dostępna aktualizacja',
+  upToDate: 'Masz najnowszą dostępną wersję.',
+  checkUpdates: 'Sprawdź aktualizacje',
+  downloadUpdate: 'Pobierz aktualizację',
+  viewRelease: 'Otwórz wydanie',
+  releaseHistory: 'Wszystkie wydania',
+  updateError:
+    'Nie udało się sprawdzić lub otworzyć aktualizacji. Sprawdź połączenie i spróbuj ponownie.',
+  updateHelp:
+    'Zainstaluj nowe APK na obecną aplikację, aby zachować dane. Nie odinstalowuj jej wcześniej.',
+  backup: 'Kopia danych',
+  backupHelp:
+    'Eksportuj posiłki, zdjęcia, profil, wodę i historię AI do pliku JSON (do 32 MB). Klucz API nie jest eksportowany. Przechowuj plik w prywatnym miejscu.',
+  exportBackup: 'Eksportuj kopię',
+  importBackup: 'Przywróć kopię',
+  restoreWarning:
+    'To zastąpi dziennik, zdjęcia, profil, wodę i historię AI danymi z kopii. Obecny klucz API zostanie na tym urządzeniu. Najpierw wyeksportuj kopię, jeśli chcesz zachować obecne dane.',
+  backupRestored: 'Przywrócono kopię danych.',
+  backupExported:
+    'Przygotowano plik kopii. Zapisz go przez menu udostępniania.',
+  backupError:
+    'Nie udało się wyeksportować lub przywrócić kopii. Sprawdź format i rozmiar pliku (maksymalnie 32 MB) oraz wolne miejsce, a potem spróbuj ponownie.',
   accountTab: 'Konto',
-  appSettingsTab: 'Ustawienia aplikacji',
+  appSettingsTab: 'Aplikacja',
   language: 'Język',
   systemLanguage: 'Używaj języka telefonu',
   searchLanguage: 'Szukaj języka',

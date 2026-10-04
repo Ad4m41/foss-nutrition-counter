@@ -3,12 +3,19 @@ import * as SQLite from 'expo-sqlite';
 import * as SecureStore from 'expo-secure-store';
 import { Directory, File, Paths } from 'expo-file-system';
 import { Meal, Settings } from '../core/nutrition';
+import { randomUUID } from 'expo-crypto';
+import { Backup } from '../core/backup';
 import { AiUsage } from '../core/aiUsage';
 
 let database: Promise<SQLite.SQLiteDatabase> | undefined;
 async function db() {
   database ??= (async () => {
     const connection = await SQLite.openDatabaseAsync('meals.db');
+    const version = await connection.getFirstAsync<{ user_version: number }>(
+      'PRAGMA user_version',
+    );
+    if ((version?.user_version ?? 0) > 3)
+      throw new Error('Newer database schema');
     await connection.execAsync(`PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS meals (id TEXT PRIMARY KEY NOT NULL, day TEXT NOT NULL, payload TEXT NOT NULL);
       CREATE INDEX IF NOT EXISTS meals_day ON meals(day);
@@ -146,4 +153,69 @@ export async function adjustWater(day: string, delta: number): Promise<number> {
     day,
   );
   return row?.ml ?? 0;
+}
+
+/** Write photos first, then swap all database rows in one exclusive transaction. */
+export async function replaceData(backup: Backup) {
+  const connection = await db();
+  const previous = await listMeals();
+  const staged: File[] = [];
+  const meals: Meal[] = [];
+  try {
+    for (const meal of backup.meals) {
+      if (!meal.photoUri) {
+        meals.push(meal);
+        continue;
+      }
+      const directory = photoDirectory();
+      directory.create({ idempotent: true, intermediates: true });
+      const file = new File(
+        directory,
+        `${randomUUID()}.${meal.photoUri.startsWith('data:image/png') ? 'png' : 'jpg'}`,
+      );
+      staged.push(file);
+      file.write(meal.photoUri.split(',')[1], { encoding: 'base64' });
+      meals.push({ ...meal, photoUri: file.uri });
+    }
+    await connection.withExclusiveTransactionAsync(async (tx) => {
+      await tx.execAsync(
+        'DELETE FROM meals; DELETE FROM settings; DELETE FROM water; DELETE FROM ai_usage;',
+      );
+      for (const meal of meals)
+        await tx.runAsync(
+          'INSERT INTO meals (id, day, payload) VALUES (?, ?, ?)',
+          meal.id,
+          meal.day,
+          JSON.stringify(meal),
+        );
+      await tx.runAsync(
+        'INSERT INTO settings (id, payload) VALUES (1, ?)',
+        JSON.stringify(backup.settings),
+      );
+      for (const [day, ml] of Object.entries(backup.water))
+        await tx.runAsync('INSERT INTO water (day, ml) VALUES (?, ?)', day, ml);
+      for (const entry of backup.aiUsage)
+        await tx.runAsync(
+          'INSERT INTO ai_usage (id, payload) VALUES (?, ?)',
+          entry.id,
+          JSON.stringify(entry),
+        );
+    });
+  } catch (error) {
+    for (const file of staged) {
+      try {
+        if (file.exists) file.delete();
+      } catch {}
+    }
+    throw error;
+  }
+  // Old photos are removed only after a successful database commit.
+  for (const meal of previous) {
+    try {
+      if (meal.photoUri) {
+        const file = new File(meal.photoUri);
+        if (file.exists) file.delete();
+      }
+    } catch {}
+  }
 }

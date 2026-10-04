@@ -1,3 +1,7 @@
+jest.mock('../src/services/releases', () => ({
+  checkForUpdate: jest.fn().mockResolvedValue(null),
+  installedVersion: () => '0.2.0-beta.1',
+}));
 import React from 'react';
 import {
   fireEvent,
@@ -28,6 +32,7 @@ jest.mock('../src/state/AppProvider', () => ({
 }));
 jest.mock('expo-router', () => ({
   router: { push: jest.fn() },
+  useLocalSearchParams: () => ({}),
   useFocusEffect: (callback: () => void) =>
     require('react').useEffect(callback, [callback]),
 }));
@@ -56,9 +61,7 @@ test('tabs reveal relevant settings and save only the current section', async ()
     screen.getByLabelText(`${en.goal} (${en.kcal})`),
     '2200',
   );
-  await fireEvent.press(
-    screen.getByRole('button', { name: en.appSettingsTab }),
-  );
+  await fireEvent.press(screen.getByRole('tab', { name: en.appSettingsTab }));
   expect(screen.queryByLabelText(`${en.goal} (${en.kcal})`)).toBeNull();
   await fireEvent.changeText(
     screen.getByLabelText(en.model),
@@ -71,7 +74,7 @@ test('tabs reveal relevant settings and save only the current section', async ()
       'saved-key',
     ),
   );
-  await fireEvent.press(screen.getByRole('button', { name: en.accountTab }));
+  await fireEvent.press(screen.getByRole('tab', { name: en.accountTab }));
   expect(screen.getByLabelText(`${en.goal} (${en.kcal})`).props.value).toBe(
     '2200',
   );

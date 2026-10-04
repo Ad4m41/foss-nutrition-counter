@@ -1,3 +1,7 @@
+jest.mock('../src/services/releases', () => ({
+  checkForUpdate: jest.fn().mockResolvedValue(null),
+  installedVersion: () => '0.2.0-beta.1',
+}));
 import React from 'react';
 import { Text } from 'react-native';
 import {

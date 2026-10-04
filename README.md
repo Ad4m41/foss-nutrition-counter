@@ -96,7 +96,7 @@ Nutrition values describe each ingredient’s entered portion, not 100 g. Changi
 - Mobile: meals and preferences in SQLite; compressed photos in the app’s documents directory; API key in Expo SecureStore. No account, backend, analytics or ads.
 - Analysis sends the selected JPEG and optional description directly to Google after consent. The whole diary and unrelated photos are not sent. Free-tier terms may allow Google to use submitted data for product improvement. Read [Google’s API terms](https://ai.google.dev/gemini-api/terms).
 - AI results are estimates. Photos cannot establish exact weight or hidden ingredients. Manual logging remains available without a key or internet.
-- Delete a meal to remove its stored photo. **Delete all local data** removes meals, retained photos, preferences and the key. There is no backup/export feature in this MVP; OS-level device backups follow platform behavior.
+- Delete a meal to remove its stored photo. **Delete all local data** removes meals, retained photos, preferences and the key. Settings → App supports versioned JSON backup/export and restoration, including photos and excluding API keys. Restoring replaces local diary data after confirmation.
 - Browser preview: localStorage replaces SQLite and the key stays in memory until refresh. Browser storage may fill sooner than mobile storage. Do not use the preview as your only diary.
 
 ## Development
@@ -127,3 +127,11 @@ Automated tests mock Gemini, native photo picking and secure storage. Service re
 Application code: **AGPL-3.0-only**, see [LICENSE](LICENSE). The Expo scaffold’s original MIT notice is retained in `assets/EXPO-TEMPLATE-LICENSE.txt`. Dependency licenses remain their respective authors’ licenses. This project is independent of Fitatu.
 
 Settings has Account and App settings sub-tabs. Account contains the local profile and nutrition targets; App settings contains language, AI configuration, usage and local data controls. Language flags are bundled image assets. Short haptics acknowledge buttons and selection changes, limited to one pulse per 80 ms; unavailable haptics never block actions.
+
+## Releases and updates
+
+See [RELEASING.md](RELEASING.md) for version tags, CI, signed APK builds and publishing. GitHub Actions checks every push/PR; a version tag triggers EAS and prepares a draft release with an APK and SHA-256 checksum. Publish after device testing. The app checks public releases at startup, shows an update notice in the diary and offers a download action in Settings → App. Stable installations ignore beta releases. Install each APK over the existing app to retain data.
+
+Backups export meals, embedded photos, profile, goals, water and AI usage (32 MB maximum). They exclude API keys; restoration preserves the current device key and requires AI consent again. Export from Expo Go and restore into the standalone app to migrate data.
+
+The macro dock softly blurs scrolling content behind it at intensity 18. Android 12+ uses the efficient blur implementation; older Android versions use a translucent fallback. Text and progress rails remain sharp.
