@@ -2,11 +2,9 @@ import React, { useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '../state/AppProvider';
-import { OtterMascot } from './OtterMascot';
-import { otterState } from '../core/otter';
 import { ProgressTrack } from './ProgressTrack';
 import { Body, Button, Notice, fonts, useTheme } from './ui';
-export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
+export function WaterTracker({ day }: { day: string }) {
   const { water, adjustWater, settings, t } = useApp();
   const colors = useTheme();
   const [lastDrink, setLastDrink] = useState<{
@@ -75,13 +73,6 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
             </Text>
           </Text>
         </View>
-        <View
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-          pointerEvents="none"
-        >
-          <OtterMascot {...otterState(kcal, settings.goal, ml, goal)} />
-        </View>
       </View>
       <ProgressTrack
         value={ml}
@@ -130,7 +121,6 @@ export function WaterTracker({ day, kcal }: { day: string; kcal: number }) {
       </Pressable>
       {help && (
         <View style={{ gap: 8 }}>
-          <Body muted>{t.otterHelp}</Body>
           <Body muted>{t.waterHelp}</Body>
         </View>
       )}

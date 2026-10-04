@@ -60,7 +60,7 @@ typography:
     fontWeight: 600
   macro-value:
     fontFamily: 'Manrope_800ExtraBold'
-    fontSize: '19px'
+    fontSize: '16px'
     fontWeight: 800
   age-value:
     fontFamily: 'Manrope_800ExtraBold'
@@ -112,8 +112,8 @@ components:
   macro-dock:
     backgroundColor: '{colors.light-surface}'
     textColor: '{colors.light-text}'
-    rounded: '{rounded.surface}'
-    padding: '14px'
+    rounded: '16px 16px 0 0'
+    padding: '9px 16px'
   add-action:
     backgroundColor: '{colors.light-accent}'
     textColor: '{colors.light-accent-text}'
@@ -140,7 +140,7 @@ components:
 
 Use warm cream pages, evergreen ink and apricot add controls for a calm, food-first mobile diary. Bundle Manrope for headings, labels and figures. Keep meal photos and nutrition legible in both system color schemes.
 
-This document records the implemented source and approved visual direction. Browser captures support layout review; Android/iOS rendering, wheel gestures and Rive playback still need device review. Keep surface composition decisions in `.impeccable/surfaces/mobile.md`.
+This document records the implemented source and approved visual direction. Browser captures support layout review; Android/iOS rendering and wheel gestures still need device review. Keep surface composition decisions in `.impeccable/surfaces/mobile.md`.
 
 **Key Characteristics:**
 
@@ -175,7 +175,7 @@ Warm cream covers the page; white surfaces group controls and totals. Evergreen 
 
 Bundle Manrope Regular (400), SemiBold (600), Bold (700) and ExtraBold (800) through the root font loader’s package imports. Use the family aliases in `fonts` from `ui.tsx`; the app loads the font assets before navigation.
 
-Use ExtraBold for screen headings (32), macro totals (19), age values (40) and estimated calories (36). Profile headings use a 40-unit line height and −0.7 tracking. Use Bold for section titles (19–21) and meal names (18), Regular for body text (15/24), and SemiBold for field labels (13). Macro labels and units use 11; date weekdays use 10. Some notices and supporting nutrition labels retain platform text in the current source.
+Use ExtraBold for screen headings (32), macro totals (16), age values (40) and estimated calories (36). Profile headings use a 40-unit line height and −0.7 tracking. Use Bold for section titles (19–21) and meal names (18), Regular for body text (15/24), and SemiBold for field labels (13). Macro labels and units use 11; date weekdays use 10. Some notices and supporting nutrition labels retain platform text in the current source.
 
 **The Stable Numbers Rule.** Use tabular numbers for nutrition, water totals and the age wheel.
 
@@ -183,7 +183,7 @@ Use ExtraBold for screen headings (32), macro totals (19), age values (40) and e
 
 Use a single scrolling column with 24-unit page padding and a centered content width capped at 560. Keep footer actions outside the scroll region. Respect device safe areas and the keyboard. Measurements in this document are React Native layout units; frontmatter uses px for portable previews.
 
-The diary has five date cells when available content width is below 360 and seven otherwise. Cells are 64 units tall; this switch keeps date targets at least 48 units wide on reviewed phone widths. Keep the fixed four-column macro strip above the custom tab bar. Large text can increase content height; preserve scrolling and wrapping.
+The diary has five date cells when available content width is below 360 and seven otherwise. Cells are 64 units tall; this switch keeps date targets at least 48 units wide on reviewed phone widths. Keep the fixed four-column macro strip flush against the custom tab bar, spanning the screen with rounded top corners only. Large text can increase content height; preserve scrolling and wrapping.
 
 ## Elevation & Depth
 
@@ -198,10 +198,13 @@ Use softly rounded fields and controls, with larger corners for containers and s
 - **Buttons:** Primary evergreen, secondary leaf tint and danger rose tint. Minimum height 52, 14-by-18 padding and 12-unit corners. Pressed opacity is 0.8; loading and disabled opacity is 0.55. Icon controls have 48-unit targets.
 - **Fields and notices:** Visible labels above white or forest fields, a one-unit border, 50-unit minimum height and 10-unit corners. Notices use tint or danger surface, 16-unit padding and 12-unit corners. Error notices announce their text.
 - **Dates and meal rows:** Selected dates use primary/on-primary roles. Meal rows stay open with thin dividers, food photos or a restaurant placeholder, a visible calorie line and compact macro units.
-- **Macro dock:** Four equal columns for energy, protein, carbohydrates and fat, each with a labeled colored rail. Tap the surface to open all nutrient details. A missing optional macro goal leaves its rail empty and shows grams without a target. Progress caps the fill while preserving the actual value in text.
-- **Navigation and add sheet:** Diary and settings flank the central apricot add action. Open the camera/manual sheet before entering a meal, retaining the selected diary date. Tab targets are 64 units tall and the bar includes the bottom safe-area inset.
+- **Macro dock:** Four equal columns for energy, protein, carbohydrates and fat, each with a labeled colored rail. Tap the surface to open all nutrient details. A missing optional macro goal leaves its rail empty and shows grams without a target. Below a goal, the rail shows progress toward it. Above a goal, the rail represents the consumed amount: the nutrient color occupies goal/consumed and the excess color occupies (consumed−goal)/consumed. Display actual intake, goal and numeric excess. The strip uses 16-unit values and 9-unit vertical padding.
+- **Navigation and add sheet:** Diary and settings flank the central apricot add action. Open the add sheet with AI meal entry as the primary action, then manual entry and product checks; retain the selected diary date for a meal. Selected tabs show a tinted icon background and filled icon. Press scale animates over 110 ms and selection over 220 ms, respecting reduced motion. Tab targets are 64 units tall and the bar includes the bottom safe-area inset.
+- **Meal input and questions:** Default to photo and/or description, with camera and gallery controls sharing equal-width columns. Keep the manual editor behind an explicit alternative or the AI result. Ask only for material uncertainty, with at most three labeled recommended/optional questions. Use the existing segmented control for yes/no/unknown, the bundled native slider for numeric amounts, and a multiline field for text. Untouched sliders do not submit a value. Keep skip and refine actions in the footer; every question is skippable. Failed refinement preserves the answers and the provisional result.
+- **Product check:** A dedicated screen accepts text and optional label photo, then presents the explanation with strengths, concerns, allergens, uncertainty and advice. Changing input clears the old explanation. Loading, cancel, consent, key, quota, local-limit and network states preserve the input.
+- **AI usage:** Settings includes a daily request limit, reported token totals and expandable history rows, revealed in batches of 20. Missing token counts stay explicitly unknown.
 - **Profile:** Three steps cover body data, five activity levels and a goal. The 18–100 age wheel shows five rows, snaps at a row height of 56 scaled with text size, and exposes adjustable accessibility actions plus 48-unit increment/decrement buttons. Sex selection uses a two-part segmented control. Activity offers a stepped slider and five labeled buttons; the selected detail includes PAL. Keep continue/save reachable in the footer.
-- **Water:** A blue-tinted container groups the numeric total, goal rail, quick additions, undo and expandable guidance. The 100-by-106 otter is decorative to assistive technology. Supported native builds animate it; web, Expo Go, reduced motion and inactive views use the bundled still.
+- **Water:** A blue-tinted container groups the numeric total, goal rail, quick additions, undo and expandable guidance.
 
 Use system reduced motion for the segmented selection (240 ms), progress rails (420 ms) and add-sheet entrance (260 ms). Remove the age wheel’s cylinder transforms and animated scrolling when reduced motion is on. Keep its controls usable.
 
@@ -222,5 +225,4 @@ Sidecar HTML/CSS specimens translate the native components for the design panel.
 
 - Don't replace bundled Manrope with platform typography for the main hierarchy.
 - Don't invent personalized macro targets or fill absent goals.
-- Don't describe the otter’s changing shape as the user’s body weight.
 - Don't treat web captures or sidecar specimens as native device approval.

@@ -31,7 +31,11 @@ export default function Diary() {
   );
   const sum = totals(entries.flatMap((meal) => meal.ingredients));
   return (
-    <Page footer={<MacroDock day={day} value={sum} />} footerInset={false}>
+    <Page
+      footer={<MacroDock day={day} value={sum} />}
+      footerInset={false}
+      footerFullWidth
+    >
       <View
         style={{
           paddingTop: insets.top + 4,
@@ -283,7 +287,7 @@ export default function Diary() {
           borderRadius: 16,
         }}
       >
-        <WaterTracker day={day} kcal={sum.kcal} />
+        <WaterTracker day={day} />
       </View>
     </Page>
   );

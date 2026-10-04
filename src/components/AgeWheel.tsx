@@ -11,14 +11,11 @@ import {
 import Animated, {
   Extrapolation,
   interpolate,
-  useAnimatedScrollHandler,
-  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   type SharedValue,
   useReducedMotion,
 } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { fonts, useTheme } from './ui';
@@ -109,29 +106,26 @@ export function AgeWheel({
   const initial = value ?? 30;
   const offset = useSharedValue((initial - 18) * height);
   const ref = useRef<ScrollView>(null);
-  const initialized = useSharedValue(false);
   const selected = useRef(initial);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (settleTimer.current) clearTimeout(settleTimer.current);
-    },
-    [],
-  );
-  const rowHeight = useRef(0);
+  // Keep the native initial position stable across controlled value updates.
+  const [initialOffset] = useState(() => ({
+    x: 0,
+    y: (initial - 18) * height,
+  }));
+  const rowHeight = useRef(height);
   const [preview, setPreview] = useState(initial);
   const reduced = useReducedMotion();
-  const scrolling = useAnimatedScrollHandler((event) => {
-    offset.value = event.contentOffset.y;
-  });
   useEffect(() => {
     const next = value ?? 30;
     if (rowHeight.current !== height || selected.current !== next) {
-      ref.current?.scrollTo({ y: (next - 18) * height, animated: false });
+      const y = (next - 18) * height;
+      ref.current?.scrollTo({ y, animated: false });
+      offset.set(y);
       rowHeight.current = height;
       selected.current = next;
+      setPreview(next);
     }
-  }, [value, height]);
+  }, [value, height, offset]);
   const commit = useCallback(
     (age: number) => {
       if (disabled || age === selected.current) return;
@@ -142,19 +136,13 @@ export function AgeWheel({
     },
     [disabled, onChange],
   );
-  useAnimatedReaction(
-    () =>
-      initialized.value
-        ? Math.min(100, Math.max(18, 18 + Math.round(offset.value / height)))
-        : null,
-    (age, previous) => {
-      if (age !== null && previous !== null && age !== previous)
-        scheduleOnRN(commit, age);
-    },
-  );
+  function scrolling(event: NativeSyntheticEvent<NativeScrollEvent>) {
+    const y = event.nativeEvent.contentOffset.y;
+    offset.set(y);
+    commit(Math.min(100, Math.max(18, 18 + Math.round(y / height))));
+  }
   function choose(age: number, animate = true) {
     if (disabled) return;
-    if (settleTimer.current) clearTimeout(settleTimer.current);
     ref.current?.scrollTo({
       y: (age - 18) * height,
       animated: animate && !reduced,
@@ -165,13 +153,6 @@ export function AgeWheel({
       selected.current = age;
     }
     onChange(age);
-  }
-  function settle(event: NativeSyntheticEvent<NativeScrollEvent>) {
-    const age = Math.min(
-      100,
-      Math.max(18, 18 + Math.round(event.nativeEvent.contentOffset.y / height)),
-    );
-    choose(age, false);
   }
   return (
     <View style={{ marginVertical: 12 }}>
@@ -217,13 +198,8 @@ export function AgeWheel({
           }}
         />
         <Animated.ScrollView
+          testID="age-wheel-scroll"
           ref={ref}
-          onContentSizeChange={() => {
-            const y = (selected.current - 18) * height;
-            ref.current?.scrollTo({ y, animated: false });
-            offset.set(y);
-            initialized.set(true);
-          }}
           nestedScrollEnabled
           showsVerticalScrollIndicator={false}
           scrollEnabled={!disabled}
@@ -232,21 +208,9 @@ export function AgeWheel({
           bounces={false}
           scrollEventThrottle={16}
           onScroll={scrolling}
-          onMomentumScrollEnd={settle}
-          onMomentumScrollBegin={() => {
-            if (settleTimer.current) clearTimeout(settleTimer.current);
-          }}
-          onScrollEndDrag={(event) => {
-            const y = event.nativeEvent.contentOffset.y;
-            if (settleTimer.current) clearTimeout(settleTimer.current);
-            settleTimer.current = setTimeout(() => {
-              choose(
-                Math.min(100, Math.max(18, 18 + Math.round(y / height))),
-                false,
-              );
-            }, 120);
-          }}
-          contentOffset={{ x: 0, y: (initial - 18) * height }}
+          onMomentumScrollEnd={scrolling}
+          onScrollEndDrag={scrolling}
+          contentOffset={initialOffset}
           contentContainerStyle={{ paddingVertical: height * 2 }}
         >
           {ages.map((age, index) => (

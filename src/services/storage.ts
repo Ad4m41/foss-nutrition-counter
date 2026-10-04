@@ -3,6 +3,7 @@ import * as SQLite from 'expo-sqlite';
 import * as SecureStore from 'expo-secure-store';
 import { Directory, File, Paths } from 'expo-file-system';
 import { Meal, Settings } from '../core/nutrition';
+import { AiUsage } from '../core/aiUsage';
 
 let database: Promise<SQLite.SQLiteDatabase> | undefined;
 async function db() {
@@ -13,7 +14,8 @@ async function db() {
       CREATE INDEX IF NOT EXISTS meals_day ON meals(day);
       CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id = 1), payload TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS water (day TEXT PRIMARY KEY NOT NULL, ml INTEGER NOT NULL CHECK(ml >= 0));
-      PRAGMA user_version = 2;`);
+      CREATE TABLE IF NOT EXISTS ai_usage (id TEXT PRIMARY KEY NOT NULL, payload TEXT NOT NULL);
+      PRAGMA user_version = 3;`);
     return connection;
   })();
   try {
@@ -103,7 +105,25 @@ export async function clearStorage() {
   ).withTransactionAsync(async () => {
     await (await db()).runAsync('DELETE FROM meals');
     await (await db()).runAsync('DELETE FROM settings');
+    await (await db()).runAsync('DELETE FROM water');
+    await (await db()).runAsync('DELETE FROM ai_usage');
   });
+}
+
+export async function readAiUsage(): Promise<AiUsage[]> {
+  const rows = await (
+    await db()
+  ).getAllAsync<{ payload: string }>('SELECT payload FROM ai_usage');
+  return rows.map((row) => JSON.parse(row.payload));
+}
+export async function writeAiUsage(entry: AiUsage) {
+  await (
+    await db()
+  ).runAsync(
+    'INSERT OR REPLACE INTO ai_usage (id, payload) VALUES (?, ?)',
+    entry.id,
+    JSON.stringify(entry),
+  );
 }
 
 export async function readWater(): Promise<Record<string, number>> {

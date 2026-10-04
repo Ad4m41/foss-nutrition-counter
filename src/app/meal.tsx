@@ -5,6 +5,7 @@ import { useNavigation, usePreventRemove } from 'expo-router/react-navigation';
 import { randomUUID } from 'expo-crypto';
 import {
   AnalysisError,
+  Analysis,
   Ingredient,
   localDay,
   Meal,
@@ -34,6 +35,14 @@ import {
 import { confirmAction } from '../components/confirm';
 import { disposePhoto, pickPhoto } from '../services/photos';
 import { analyzePhoto } from '../services/gemini';
+import {
+  ClarificationQuestion,
+  MealClarification,
+  QuestionAnswers,
+  hasQuestionAnswers,
+} from '../core/clarification';
+import { MealQuestions } from '../components/MealQuestions';
+import { PhotoActions } from '../components/PhotoActions';
 type DraftIngredient = {
   baseGrams: number;
   id: string;
@@ -72,12 +81,26 @@ export default function MealScreen() {
     id?: string;
     day?: string;
     capture?: string;
+    mode?: string;
   }>();
-  const { meals, apiKey, settings, t, saveMeal, deleteMeal, updateSettings } =
-    useApp();
+  const {
+    meals,
+    apiKey,
+    settings,
+    t,
+    saveMeal,
+    deleteMeal,
+    updateSettings,
+    trackAi,
+  } = useApp();
   const colors = useTheme();
   const navigation = useNavigation();
   const original = meals.find((item) => item.id === params.id);
+  const [phase, setPhase] = useState<'input' | 'questions' | 'review'>(() =>
+    original || params.mode === 'manual' ? 'review' : 'input',
+  );
+  const [questions, setQuestions] = useState<ClarificationQuestion[]>([]);
+  const [answers, setAnswers] = useState<QuestionAnswers>({});
   const [id] = useState(() => original?.id ?? randomUUID());
   const [name, setName] = useState(original?.name ?? '');
   const [day, setDay] = useState(
@@ -112,6 +135,8 @@ export default function MealScreen() {
     source,
     photoUri,
     description,
+    questions,
+    answers,
   });
   const [initial] = useState(snapshot);
   const dirty = initial !== snapshot;
@@ -190,14 +215,14 @@ export default function MealScreen() {
     // Launch the camera once for the explicit add-from-camera action.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.capture]);
-  async function analyze() {
+  async function analyze(clarification?: MealClarification) {
     if (lock.current) return;
     if (!apiKey) {
       setMessage(t.keyMissing);
       return;
     }
-    if (!photoData) {
-      setMessage(t.noPhoto);
+    if (!photoData && !description.trim()) {
+      setMessage(t.mealInputMissing);
       return;
     }
     lock.current = true;
@@ -213,9 +238,14 @@ export default function MealScreen() {
           ))
         )
           return;
-        await updateSettings({ ...settings, consent: true });
+        try {
+          await updateSettings({ ...settings, consent: true });
+        } catch {
+          throw new AnalysisError('storage');
+        }
       }
       if (
+        !clarification &&
         ingredients.some((item) => item.name.trim()) &&
         !(await confirmAction(
           t.analyze,
@@ -228,18 +258,23 @@ export default function MealScreen() {
       setBusy('analysis');
       setMessage('');
       controller.current = new AbortController();
-      const result = await analyzePhoto({
-        key: apiKey,
-        model: settings.model,
-        base64: photoData,
-        description,
-        language: settings.language,
-        signal: controller.current.signal,
-      });
-      setName(result.name);
-      setIngredients(result.ingredients.map(toDraft));
-      setNotes(result.notes);
-      setSource('ai');
+      const result = await trackAi('meal', (onUsage) =>
+        analyzePhoto({
+          key: apiKey,
+          model: settings.model,
+          base64: photoData || undefined,
+          description,
+          language: settings.language,
+          signal: controller.current!.signal,
+          onUsage,
+          clarification,
+        }),
+      );
+      applyEstimate(result);
+      const followUpQuestions = clarification ? [] : (result.questions ?? []);
+      setQuestions(followUpQuestions);
+      setAnswers({});
+      setPhase(followUpQuestions.length ? 'questions' : 'review');
     } catch (error) {
       if (!controller.current?.signal.aborted) {
         const code = error instanceof AnalysisError ? error.code : null;
@@ -252,13 +287,30 @@ export default function MealScreen() {
           invalid: t.invalidError,
           noFood: t.noFoodError,
           server: t.serverError,
+          localLimit: t.localLimitError,
+          storage: t.aiStorageError,
         };
-        setMessage(code ? messages[code] : t.storageError);
+        setMessage(code ? messages[code] : t.analysisError);
       }
     } finally {
       lock.current = false;
       setBusy(null);
     }
+  }
+  function applyEstimate(result: Analysis) {
+    setName(result.name);
+    setIngredients(result.ingredients.map(toDraft));
+    setNotes(result.notes);
+    setSource('ai');
+  }
+  function skipQuestions() {
+    setMessage('');
+    setNotes((current) =>
+      [current, t.questionsSkippedNote].filter(Boolean).join('\n'),
+    );
+    setQuestions([]);
+    setAnswers({});
+    setPhase('review');
   }
   async function save() {
     if (lock.current) return;
@@ -340,91 +392,149 @@ export default function MealScreen() {
   return (
     <Page
       footer={
-        <Button
-          title={t.save}
-          loading={busy === 'save'}
-          disabled={!!busy}
-          icon="checkmark"
-          onPress={() => {
-            void save();
-          }}
-        />
+        phase === 'questions' ? (
+          <View>
+            <Button
+              title={
+                busy === 'analysis' ? t.refiningEstimate : t.refineEstimate
+              }
+              loading={busy === 'analysis'}
+              disabled={!!busy || !hasQuestionAnswers(answers)}
+              icon="sparkles-outline"
+              onPress={() => {
+                void analyze({ questions, answers });
+              }}
+            />
+            <Button
+              title={t.skipQuestions}
+              secondary
+              disabled={!!busy}
+              onPress={skipQuestions}
+            />
+          </View>
+        ) : phase === 'input' ? (
+          <Button
+            title={busy === 'analysis' ? t.analyzing : t.analyze}
+            loading={busy === 'analysis'}
+            disabled={!!busy || !apiKey}
+            icon="sparkles-outline"
+            onPress={() => {
+              void analyze();
+            }}
+          />
+        ) : (
+          <Button
+            title={t.save}
+            loading={busy === 'save'}
+            disabled={!!busy}
+            icon="checkmark"
+            onPress={() => {
+              void save();
+            }}
+          />
+        )
       }
     >
       <Stack.Screen options={{ title: original ? t.editMeal : t.addMeal }} />
-      {!original && (
-        <>
-          {photoUri && (
-            <Image
-              source={{ uri: photoUri }}
-              accessibilityLabel={t.photo}
-              style={{
-                width: '100%',
-                height: 220,
-                borderRadius: 16,
-                marginBottom: 16,
-              }}
-            />
-          )}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-            <Button
-              title={t.camera}
-              icon="camera-outline"
+      {!original &&
+        phase !== 'questions' &&
+        (phase === 'input' || source === 'manual') && (
+          <>
+            <Body>{t.aiMealIntro}</Body>
+            <View style={{ marginTop: 12, marginBottom: 16 }}>
+              <Body muted>
+                {new Date(`${day}T12:00:00`).toLocaleDateString(
+                  settings.language,
+                )}
+              </Body>
+            </View>
+            {photoUri && (
+              <Image
+                source={{ uri: photoUri }}
+                accessibilityLabel={t.photo}
+                style={{
+                  width: '100%',
+                  height: 220,
+                  borderRadius: 16,
+                  marginBottom: 16,
+                }}
+              />
+            )}
+            <PhotoActions
               disabled={!!busy}
-              onPress={() => {
+              onCamera={() => {
                 void photo(true);
               }}
-            />
-            <Button
-              title={t.gallery}
-              icon="images-outline"
-              secondary
-              disabled={!!busy}
-              onPress={() => {
+              onGallery={() => {
                 void photo(false);
               }}
             />
-          </View>
-          {photoUri && (
             <View style={{ marginTop: 16 }}>
               <Field
-                label={t.description}
-                placeholder={t.descriptionHint}
+                label={t.mealDescription}
+                placeholder={t.mealDescriptionHint}
                 value={description}
                 onChangeText={setDescription}
                 multiline
+                maxLength={6000}
                 editable={!busy}
               />
-              <Button
-                title={busy === 'analysis' ? t.analyzing : t.analyze}
-                icon="sparkles-outline"
-                loading={busy === 'analysis'}
-                disabled={!!busy || !photoData}
-                onPress={() => {
-                  void analyze();
-                }}
-              />
-              {busy === 'analysis' && (
+              {phase === 'review' && (
                 <Button
-                  title={t.cancel}
+                  title={busy === 'analysis' ? t.analyzing : t.analyze}
+                  icon="sparkles-outline"
+                  loading={busy === 'analysis'}
+                  disabled={!!busy || !apiKey}
+                  onPress={() => {
+                    void analyze();
+                  }}
+                />
+              )}
+              {phase === 'input' && (
+                <Button
+                  title={t.manual}
                   secondary
-                  onPress={() => controller.current?.abort()}
+                  disabled={!!busy}
+                  icon="create-outline"
+                  onPress={() => setPhase('review')}
                 />
               )}
             </View>
-          )}
-          {!apiKey && (
-            <>
-              <Body muted>{t.keyMissing}</Body>
-              <Button
-                title={t.openSettings}
-                secondary
-                disabled={!!busy}
-                onPress={() => router.push('/settings')}
-              />
-            </>
-          )}
-        </>
+            {!apiKey && (
+              <>
+                <Body muted>{t.keyMissing}</Body>
+                <Button
+                  title={t.openSettings}
+                  secondary
+                  disabled={!!busy}
+                  onPress={() => router.push('/settings')}
+                />
+              </>
+            )}
+          </>
+        )}
+      {message ? <Notice error text={message} /> : null}
+      {busy === 'analysis' && (
+        <Button
+          title={t.cancel}
+          secondary
+          onPress={() => controller.current?.abort()}
+        />
+      )}
+      {phase === 'questions' && (
+        <MealQuestions
+          questions={questions}
+          answers={answers}
+          onChange={setAnswers}
+          disabled={!!busy}
+        />
+      )}
+      {phase === 'review' && source === 'ai' && !original && photoUri && (
+        <Image
+          source={{ uri: photoUri }}
+          accessibilityLabel={t.photo}
+          style={{ width: '100%', height: 180, borderRadius: 16 }}
+        />
       )}
       {original?.photoUri && (
         <Image
@@ -433,137 +543,152 @@ export default function MealScreen() {
           style={{ width: '100%', height: 180, borderRadius: 16 }}
         />
       )}
-      {source === 'ai' ? (
-        <Notice text={t.estimate} />
-      ) : (
-        <Label>{t.manual}</Label>
-      )}
-      {message ? <Notice error text={message} /> : null}
-      <Field
-        label={t.name}
-        value={name}
-        onChangeText={setName}
-        editable={!busy}
-      />
-      <Field
-        label={t.date}
-        value={day}
-        onChangeText={setDay}
-        placeholder={t.dateHint}
-        autoCapitalize="none"
-        maxLength={10}
-        editable={!busy}
-      />
-      <Label>{t.ingredients}</Label>
-      <Body muted>{t.amountHelp}</Body>
-      {ingredients.map((item, index) => (
-        <View
-          key={item.id}
-          style={{
-            paddingTop: 20,
-            paddingBottom: 10,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.line,
-          }}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <Field
-              label={t.ingredient}
-              value={item.name}
-              onChangeText={(text) => changeIngredient(index, 'name', text)}
-              editable={!busy}
-            />
-            <IconButton
-              label={t.removeIngredient}
-              icon="trash-outline"
-              disabled={!!busy}
-              onPress={() =>
-                setIngredients((current) =>
-                  current.filter((_, i) => i !== index),
-                )
-              }
-            />
-          </View>
-          <View
-            style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 12 }}
-          >
-            {(
-              [
-                'grams',
-                ...requiredNutrientKeys,
-                ...(expanded[item.id] ? additionalNutrientKeys : []),
-              ] as const
-            ).map((key) => (
+      {phase === 'review' && (
+        <View>
+          {source === 'ai' ? (
+            <Notice text={t.estimate} />
+          ) : (
+            <Label>{t.manual}</Label>
+          )}
+          <Field
+            label={t.name}
+            value={name}
+            onChangeText={setName}
+            editable={!busy}
+          />
+          <Field
+            label={t.date}
+            value={day}
+            onChangeText={setDay}
+            placeholder={t.dateHint}
+            autoCapitalize="none"
+            maxLength={10}
+            editable={!busy}
+          />
+          <Label>{t.ingredients}</Label>
+          <Body muted>{t.amountHelp}</Body>
+          {ingredients.map((item, index) => (
+            <View
+              key={item.id}
+              style={{
+                paddingTop: 20,
+                paddingBottom: 10,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.line,
+              }}
+            >
               <View
-                key={key}
-                style={{ minWidth: 120, flexGrow: 1, flexBasis: '43%' }}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
               >
                 <Field
-                  label={
-                    key === 'grams'
-                      ? t.grams
-                      : key === 'kcal'
-                        ? t.kcal
-                        : `${t[key]} (g)`
-                  }
-                  value={item[key]}
-                  placeholder={
-                    additionalNutrientKeys.some((nutrient) => nutrient === key)
-                      ? t.unknown
-                      : undefined
-                  }
-                  keyboardType="decimal-pad"
-                  onChangeText={(text) => changeIngredient(index, key, text)}
+                  label={t.ingredient}
+                  value={item.name}
+                  onChangeText={(text) => changeIngredient(index, 'name', text)}
                   editable={!busy}
                 />
+                <IconButton
+                  label={t.removeIngredient}
+                  icon="trash-outline"
+                  disabled={!!busy}
+                  onPress={() =>
+                    setIngredients((current) =>
+                      current.filter((_, i) => i !== index),
+                    )
+                  }
+                />
               </View>
-            ))}
-          </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  columnGap: 12,
+                }}
+              >
+                {(
+                  [
+                    'grams',
+                    ...requiredNutrientKeys,
+                    ...(expanded[item.id] ? additionalNutrientKeys : []),
+                  ] as const
+                ).map((key) => (
+                  <View
+                    key={key}
+                    style={{ minWidth: 120, flexGrow: 1, flexBasis: '43%' }}
+                  >
+                    <Field
+                      label={
+                        key === 'grams'
+                          ? t.grams
+                          : key === 'kcal'
+                            ? t.kcal
+                            : `${t[key]} (g)`
+                      }
+                      value={item[key]}
+                      placeholder={
+                        additionalNutrientKeys.some(
+                          (nutrient) => nutrient === key,
+                        )
+                          ? t.unknown
+                          : undefined
+                      }
+                      keyboardType="decimal-pad"
+                      onChangeText={(text) =>
+                        changeIngredient(index, key, text)
+                      }
+                      editable={!busy}
+                    />
+                  </View>
+                ))}
+              </View>
+              <Button
+                title={expanded[item.id] ? t.lessNutrition : t.moreNutrition}
+                secondary
+                icon={expanded[item.id] ? 'chevron-up' : 'chevron-down'}
+                onPress={() =>
+                  setExpanded((current) => ({
+                    ...current,
+                    [item.id]: !current[item.id],
+                  }))
+                }
+              />
+              {expanded[item.id] && <Body muted>{t.unknownHelp}</Body>}
+            </View>
+          ))}
           <Button
-            title={expanded[item.id] ? t.lessNutrition : t.moreNutrition}
+            title={t.addIngredient}
             secondary
-            icon={expanded[item.id] ? 'chevron-up' : 'chevron-down'}
+            icon="add"
+            disabled={!!busy}
             onPress={() =>
-              setExpanded((current) => ({
+              setIngredients((current) => [
                 ...current,
-                [item.id]: !current[item.id],
-              }))
+                toDraft(newIngredient(randomUUID())),
+              ])
             }
           />
-          {expanded[item.id] && <Body muted>{t.unknownHelp}</Body>}
+          {notes ? (
+            <>
+              <Label>{t.notes}</Label>
+              <Text
+                style={{ color: colors.muted, fontSize: 15, lineHeight: 23 }}
+              >
+                {notes}
+              </Text>
+            </>
+          ) : null}
+          <Nutrition value={sum} heading={t.summary} />
+          {original && (
+            <Button
+              title={t.delete}
+              danger
+              disabled={!!busy}
+              icon="trash-outline"
+              onPress={() => {
+                void remove();
+              }}
+            />
+          )}
         </View>
-      ))}
-      <Button
-        title={t.addIngredient}
-        secondary
-        icon="add"
-        disabled={!!busy}
-        onPress={() =>
-          setIngredients((current) => [
-            ...current,
-            toDraft(newIngredient(randomUUID())),
-          ])
-        }
-      />
-      {notes ? (
-        <>
-          <Label>{t.notes}</Label>
-          <Text style={{ color: colors.muted, fontSize: 15, lineHeight: 23 }}>
-            {notes}
-          </Text>
-        </>
-      ) : null}
-      <Nutrition value={sum} heading={t.summary} />
-      {original && (
-        <Button
-          title={t.delete}
-          danger
-          disabled={!!busy}
-          icon="trash-outline"
-          onPress={() => {
-            void remove();
-          }}
-        />
       )}
     </Page>
   );

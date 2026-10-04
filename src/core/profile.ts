@@ -40,3 +40,23 @@ export function energyEstimate(p: Profile) {
     pal: activityLevels[p.activity],
   };
 }
+
+/** Editable starting macros: protein scales with weight/activity/goal;
+ * fat supplies 30% of energy, carbohydrates fill the remaining energy.
+ * Protein range informed by ISSN: https://doi.org/10.1186/s12970-017-0177-8
+ * The energy cap preserves a balanced allocation for extreme valid profiles.
+ */
+export function nutritionEstimate(p: Profile) {
+  const energy = energyEstimate(p);
+  if (!energy) return null;
+  const gramsPerKg = Math.min(
+    2,
+    1.2 + p.activity * 0.15 + (p.objective === 'maintain' ? 0 : 0.2),
+  );
+  const protein = Math.round(
+    Math.min(p.weight * gramsPerKg, (energy.goal * 0.35) / 4),
+  );
+  const fat = Math.round((energy.goal * 0.3) / 9);
+  const carbs = Math.round((energy.goal - protein * 4 - fat * 9) / 4);
+  return { ...energy, macroGoals: { protein, carbs, fat } };
+}

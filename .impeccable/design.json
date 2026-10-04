@@ -608,11 +608,11 @@
     },
     {
       "name": "Macro dock",
-      "kind": "card",
+      "kind": "custom",
       "refersTo": "macro-dock",
-      "description": "Four labeled rails; sample totals and targets illustrate user-supplied goals.",
-      "html": "<button class=\"ds-macros\" aria-label=\"Nutrition details\"><span class=\"ds-macro\"><span>Energy</span><strong>640</strong><span class=\"ds-rail\"><span style=\"width:32%;background:#A6533B\"></span></span><span>/ 2000 kcal</span></span><span class=\"ds-macro\"><span>Protein</span><strong>32</strong><span class=\"ds-rail\"><span style=\"width:32%;background:#437F97\"></span></span><span>/ 100 g</span></span><span class=\"ds-macro\"><span>Carbs</span><strong>70</strong><span class=\"ds-rail\"><span style=\"width:0%;background:#907445\"></span></span><span>g</span></span><span class=\"ds-macro\"><span>Fat</span><strong>26</strong><span class=\"ds-rail\"><span style=\"width:52%;background:#94608D\"></span></span><span>/ 50 g</span></span></button>",
-      "css": ".ds-macros {display:flex;gap:12px;width:100%;padding:14px;border:0;border-radius:16px;background:white;color:#263C32;text-align:left;font:400 11px Manrope,system-ui;} .ds-macro {display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;color:#58645C;} .ds-macro strong {color:#263C32;font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;} .ds-rail {display:block;height:5px;border-radius:4px;background:#E6E5DD;overflow:hidden;} .ds-rail span {display:block;height:5px;border-radius:4px;} .ds-macros:hover {opacity:.9;} .ds-macros:active {opacity:.8;} .ds-macros:focus-visible {outline:2px solid #284F3E;outline-offset:3px;}"
+      "description": "Compact full-width strip joined to navigation; a goal of 80 g against 100 g consumed is 80% nutrient color and 20% excess.",
+      "html": "<button class=\"ds-macros\" aria-label=\"Nutrition details\"><span class=\"ds-macro\"><span>Energy</span><strong>640</strong><span class=\"ds-rail\"><span style=\"width:32%;background:#A6533B\"></span></span><span>/ 2000 kcal</span></span><span class=\"ds-macro\"><span>Protein</span><strong>100</strong><span class=\"ds-rail\"><span style=\"width:80%;background:#437F97\"></span><span style=\"width:20%;background:#AB2634\"></span></span><span>/ 80 g · +20</span></span><span class=\"ds-macro\"><span>Carbs</span><strong>70</strong><span class=\"ds-rail\"><span style=\"width:0%;background:#907445\"></span></span><span>g</span></span><span class=\"ds-macro\"><span>Fat</span><strong>26</strong><span class=\"ds-rail\"><span style=\"width:52%;background:#94608D\"></span></span><span>/ 50 g</span></span></button>",
+      "css": ".ds-macros {display:flex;gap:12px;width:100%;padding:9px 16px;border:0;border-radius:16px 16px 0 0;background:white;color:#263C32;text-align:left;font:400 11px Manrope,system-ui;} .ds-macro {display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;color:#58645C;} .ds-macro strong {color:#263C32;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;} .ds-rail {display:flex;height:5px;border-radius:4px;background:#E6E5DD;overflow:hidden;} .ds-rail span {display:block;height:5px;} .ds-macros:hover {opacity:.9;} .ds-macros:active {opacity:.8;} .ds-macros:focus-visible {outline:2px solid #284F3E;outline-offset:3px;}"
     },
     {
       "name": "Diary navigation",
@@ -620,7 +620,7 @@
       "refersTo": "add-action",
       "description": "Browser translation of two tabs and central add action; native safe-area padding omitted.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Main\"><button class=\"ds-tab ds-current\" aria-current=\"page\">Diary</button><button class=\"ds-add\" aria-label=\"Add meal\"><svg width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M12 4v16M4 12h16\"/></svg></button><button class=\"ds-tab\">Settings</button></nav>",
-      "css": ".ds-nav {display:flex;align-items:center;padding:0 24px 8px;border-top:1px solid #E6E5DD;background:#FAF7F2;} .ds-tab {flex:1;min-height:64px;border:0;background:transparent;color:#58645C;font:600 12px Manrope,system-ui;} .ds-current {color:#284F3E;font-weight:700;} .ds-add {display:flex;align-items:center;justify-content:center;width:58px;height:58px;margin:0 18px;border:0;border-radius:18px;background:#F1BE9B;color:#543727;} .ds-tab:hover,.ds-add:hover {opacity:.9;} .ds-add:active {transform:scale(.94);} .ds-tab:focus-visible,.ds-add:focus-visible {outline:2px solid #284F3E;outline-offset:2px;}"
+      "css": ".ds-nav {display:flex;align-items:center;padding:0 24px 8px;border-top:1px solid #E6E5DD;background:#FFFFFF;} .ds-tab {flex:1;min-height:64px;border:0;background:transparent;color:#58645C;font:600 12px Manrope,system-ui;} .ds-current {color:#284F3E;font-weight:700;background:#E7EDE5;border-radius:12px;} .ds-add {display:flex;align-items:center;justify-content:center;width:58px;height:58px;margin:0 18px;border:0;border-radius:18px;background:#F1BE9B;color:#543727;} .ds-tab:hover,.ds-add:hover {opacity:.9;} .ds-tab:active,.ds-add:active {transform:scale(.94);} .ds-tab:focus-visible,.ds-add:focus-visible {outline:2px solid #284F3E;outline-offset:2px;}"
     },
     {
       "name": "Sex segmented control",
@@ -641,14 +641,14 @@
       "name": "Water container",
       "kind": "card",
       "refersTo": "water-container",
-      "description": "Sample numeric total and goal track; preview omits the bundled decorative otter.",
+      "description": "Sample numeric water total and goal track.",
       "html": "<section class=\"ds-water\"><strong>Water</strong><p>750 <span>/ 2000 ml</span></p><div class=\"ds-water-rail\"><div></div></div><button>+ 250 ml</button><button>+ 500 ml</button></section>",
       "css": ".ds-water {padding:18px;border-radius:16px;background:#E5F2F2;color:#263C32;font:700 19px Manrope,system-ui;} .ds-water p {font-size:24px;font-variant-numeric:tabular-nums;} .ds-water p span {color:#58645C;font-size:15px;font-weight:400;} .ds-water-rail {height:5px;background:#E6E5DD;border-radius:4px;overflow:hidden;} .ds-water-rail div {height:5px;width:37.5%;background:#267B8D;} .ds-water button {min-height:52px;margin:6px 12px 6px 0;padding:14px 18px;border:0;border-radius:12px;background:#E7EDE5;color:#284F3E;font:700 16px Manrope,system-ui;} .ds-water button:hover {opacity:.9;} .ds-water button:active {opacity:.8;} .ds-water button:focus-visible {outline:2px solid #284F3E;outline-offset:2px;}"
     }
   ],
   "narrative": {
     "northStar": "The Warm Meal Journal",
-    "overview": "Use warm cream pages, evergreen ink and apricot add controls for a calm, food-first mobile diary. Bundle Manrope for headings, labels and figures. Keep meal photos and nutrition legible in both system color schemes.\n\nThis document records the implemented source and approved visual direction. Browser captures support layout review; Android/iOS rendering, wheel gestures and Rive playback still need device review. Keep surface composition decisions in `.impeccable/surfaces/mobile.md`.",
+    "overview": "Use warm cream pages, evergreen ink and apricot add controls for a calm, food-first mobile diary. Bundle Manrope for headings, labels and figures. Keep meal photos and nutrition legible in both system color schemes.\n\nThis document records the implemented source and approved visual direction. Browser captures support layout review; Android/iOS rendering and wheel gestures still need device review. Keep surface composition decisions in `.impeccable/surfaces/mobile.md`.",
     "keyCharacteristics": [
       "Warm cream and paired evergreen themes.",
       "Bundled Manrope with tabular nutrition figures.",
@@ -678,7 +678,6 @@
     "donts": [
       "Don't replace bundled Manrope with platform typography for the main hierarchy.",
       "Don't invent personalized macro targets or fill absent goals.",
-      "Don't describe the otter’s changing shape as the user’s body weight.",
       "Don't treat web captures or sidecar specimens as native device approval."
     ]
   }

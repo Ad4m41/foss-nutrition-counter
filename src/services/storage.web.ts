@@ -1,6 +1,7 @@
 import { validateWaterChange } from '../core/water';
 // Browser preview only. The API key lives in memory, never localStorage.
 import { Meal, Settings } from '../core/nutrition';
+import { AiUsage } from '../core/aiUsage';
 let key = '';
 const MEALS = 'meal-diary-meals';
 const SETTINGS = 'meal-diary-settings';
@@ -47,7 +48,21 @@ export async function clearStorage() {
   localStorage.removeItem(MEALS);
   localStorage.removeItem(SETTINGS);
   localStorage.removeItem('meal-diary-water');
+  localStorage.removeItem('meal-diary-ai-usage');
   key = '';
+}
+
+export async function readAiUsage(): Promise<AiUsage[]> {
+  return JSON.parse(localStorage.getItem('meal-diary-ai-usage') || '[]');
+}
+export async function writeAiUsage(entry: AiUsage) {
+  const history: AiUsage[] = JSON.parse(
+    localStorage.getItem('meal-diary-ai-usage') || '[]',
+  );
+  localStorage.setItem(
+    'meal-diary-ai-usage',
+    JSON.stringify([...history.filter((item) => item.id !== entry.id), entry]),
+  );
 }
 
 export async function readWater(): Promise<Record<string, number>> {

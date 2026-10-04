@@ -68,6 +68,7 @@ function Navigation() {
             <Stack.Screen name="nutrition" options={{ title: t.dailyTotal }} />
             <Stack.Screen name="profile" options={{ title: t.profile }} />
             <Stack.Screen name="meal" options={{ title: t.addMeal }} />
+            <Stack.Screen name="product" options={{ title: t.checkProduct }} />
           </Stack>
         </ProfileGate>
       </KeyGate>

@@ -73,10 +73,12 @@ export function Page({
   children,
   footer,
   footerInset = true,
+  footerFullWidth = false,
 }: {
   children: React.ReactNode;
   footer?: React.ReactNode;
   footerInset?: boolean;
+  footerFullWidth?: boolean;
 }) {
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -97,13 +99,21 @@ export function Page({
       {footer && (
         <View
           style={{
-            paddingHorizontal: 24,
-            paddingTop: 8,
-            paddingBottom: footerInset ? Math.max(12, insets.bottom) : 12,
+            paddingHorizontal: footerFullWidth ? 0 : 24,
+            paddingTop: footerFullWidth ? 0 : 8,
+            paddingBottom: footerFullWidth
+              ? 0
+              : footerInset
+                ? Math.max(12, insets.bottom)
+                : 12,
             backgroundColor: colors.bg,
           }}
         >
-          <View style={styles.content}>{footer}</View>
+          {footerFullWidth ? (
+            footer
+          ) : (
+            <View style={styles.content}>{footer}</View>
+          )}
         </View>
       )}
     </KeyboardAvoidingView>
@@ -161,6 +171,7 @@ export function Button({
   danger = false,
   disabled = false,
   loading = false,
+  compact = false,
 }: {
   title: string;
   onPress: () => void;
@@ -169,6 +180,7 @@ export function Button({
   danger?: boolean;
   disabled?: boolean;
   loading?: boolean;
+  compact?: boolean;
 }) {
   const colors = useTheme();
   const foreground = danger
@@ -185,6 +197,7 @@ export function Button({
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
+        compact && { paddingHorizontal: 10, gap: 6, minHeight: 56 },
         {
           backgroundColor: danger
             ? colors.dangerBg
@@ -203,7 +216,7 @@ export function Button({
       <Text
         style={{
           color: foreground,
-          fontSize: 16,
+          fontSize: compact ? 14 : 16,
           fontWeight: '600',
           fontFamily: fonts.bold,
           flexShrink: 1,

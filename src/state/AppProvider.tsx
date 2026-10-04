@@ -4,16 +4,27 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from 'react';
-import { getLocales } from 'expo-localization';
-import { DEFAULT_MODEL, Meal, Settings } from '../core/nutrition';
+import { getLocales, useLocales } from 'expo-localization';
+import { randomUUID } from 'expo-crypto';
+import {
+  AnalysisError,
+  DEFAULT_MODEL,
+  Meal,
+  Settings,
+} from '../core/nutrition';
+import { AiUsage, TokenUsage, createAiTracker } from '../core/aiUsage';
+import { nutritionEstimate } from '../core/profile';
 import { translations } from '../core/i18n';
 import * as storage from '../services/storage';
+const tracker = createAiTracker(storage);
 const defaults = (): Settings => ({
   goal: 2000,
   model: DEFAULT_MODEL,
   language: getLocales()[0]?.languageCode === 'pl' ? 'pl' : 'en',
   consent: false,
+  languageMode: 'system',
 });
 type Context = {
   meals: Meal[];
@@ -28,15 +39,26 @@ type Context = {
   deleteMeal: (meal: Meal) => Promise<void>;
   updateSettings: (settings: Settings, key?: string) => Promise<void>;
   clear: () => Promise<void>;
+  aiUsage: AiUsage[];
+  aiBusy: boolean;
+  trackAi: <T>(
+    kind: AiUsage['kind'],
+    request: (report: (tokens: TokenUsage) => void) => Promise<T>,
+  ) => Promise<T>;
 };
 const AppContext = createContext<Context | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const locales = useLocales();
+  const deviceLanguage = locales[0]?.languageCode === 'pl' ? 'pl' : 'en';
   const [meals, setMeals] = useState<Meal[]>([]);
   const [water, setWater] = useState<Record<string, number>>({});
   const [settings, setSettings] = useState(defaults);
   const [apiKey, setApiKey] = useState('');
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
+  const [aiUsage, setAiUsage] = useState<AiUsage[]>([]);
+  const [aiBusy, setAiBusy] = useState(false);
+  const aiInFlight = useRef(0);
   const reload = useCallback(
     () =>
       Promise.all([
@@ -44,11 +66,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         storage.readSettings(),
         storage.readKey(),
         storage.readWater(),
+        storage.readAiUsage(),
       ])
-        .then(([entries, prefs, key, drinks]) => {
+        .then(async ([entries, prefs, key, drinks, usage]) => {
           setMeals(entries);
           setWater(drinks);
-          setSettings(prefs ?? defaults());
+          setAiUsage(usage);
+          let loaded = prefs ?? defaults();
+          // Populate targets for profiles saved before automatic macros existed.
+          if (loaded.profile && loaded.macroGoals === undefined) {
+            const estimate = nutritionEstimate(loaded.profile);
+            if (estimate) {
+              loaded = {
+                ...loaded,
+                goal: estimate.goal,
+                macroGoals: estimate.macroGoals,
+              };
+              await storage.writeSettings(loaded);
+            }
+          }
+          setSettings(loaded);
           setApiKey(key ?? '');
           setReady(true);
           setError(false);
@@ -86,10 +123,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setWater((current) => ({ ...current, [day]: ml }));
   }
   async function clear() {
+    if (aiInFlight.current) throw new Error('AI request in progress');
     try {
       await storage.clearStorage();
     } finally {
       await reload();
+    }
+  }
+  async function trackAi<T>(
+    kind: AiUsage['kind'],
+    request: (report: (tokens: TokenUsage) => void) => Promise<T>,
+  ): Promise<T> {
+    if (!apiKey.trim()) throw new AnalysisError('key');
+    if (!/^[a-zA-Z0-9._-]+$/.test(settings.model))
+      throw new AnalysisError('model');
+    aiInFlight.current += 1;
+    setAiBusy(true);
+    try {
+      return await tracker({
+        id: randomUUID(),
+        kind,
+        model: settings.model,
+        limit: settings.aiDailyLimit,
+        request,
+        onChange: (entry) =>
+          setAiUsage((current) => [
+            ...current.filter((item) => item.id !== entry.id),
+            { ...entry },
+          ]),
+      });
+    } finally {
+      aiInFlight.current -= 1;
+      setAiBusy(aiInFlight.current > 0);
     }
   }
   return (
@@ -98,7 +163,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         meals,
         water,
         adjustWater,
-        settings,
+        settings:
+          settings.languageMode === 'manual'
+            ? settings
+            : { ...settings, language: deviceLanguage },
         apiKey,
         ready,
         error,
@@ -107,6 +175,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         deleteMeal,
         updateSettings,
         clear,
+        aiUsage,
+        aiBusy,
+        trackAi,
       }}
     >
       {children}

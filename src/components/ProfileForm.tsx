@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Profile, energyEstimate } from '../core/profile';
+import { Profile, nutritionEstimate } from '../core/profile';
 import { parseNumber } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
 import { AgeWheel } from './AgeWheel';
@@ -49,7 +49,7 @@ export function ProfileForm({
     activity,
     objective,
   };
-  const estimate = energyEstimate(profile);
+  const estimate = nutritionEstimate(profile);
   async function save(skip = false) {
     if (lock.current) return;
     if (!skip && !estimate) {
@@ -63,7 +63,13 @@ export function ProfileForm({
       await updateSettings({
         ...settings,
         profileSetupDone: true,
-        ...(skip ? {} : { profile, goal: estimate!.goal }),
+        ...(skip
+          ? {}
+          : {
+              profile,
+              goal: estimate!.goal,
+              macroGoals: estimate!.macroGoals,
+            }),
       });
       onDone?.();
     } catch {
@@ -218,14 +224,6 @@ export function ProfileForm({
         )}
         {step === 1 && (
           <>
-            <View style={{ alignItems: 'center', paddingVertical: 8 }}>
-              <Image
-                source={require('../../assets/otter/otter.png')}
-                accessible={false}
-                style={{ width: 155, height: 165 }}
-                resizeMode="contain"
-              />
-            </View>
             <View style={{ paddingVertical: 18 }}>
               <Slider
                 accessibilityLabel={t.activity}
@@ -409,6 +407,19 @@ export function ProfileForm({
                 >
                   {estimate.goal} <Text style={{ fontSize: 18 }}>kcal</Text>
                 </Text>
+                <View style={{ gap: 6, marginBottom: 16 }}>
+                  {(['protein', 'carbs', 'fat'] as const).map((key) => (
+                    <Text
+                      key={key}
+                      style={{
+                        fontFamily: fonts.medium,
+                        color: colors.onPrimary,
+                      }}
+                    >
+                      {t[key]}: {estimate.macroGoals[key]} g
+                    </Text>
+                  ))}
+                </View>
                 <Text
                   style={{
                     fontFamily: fonts.body,

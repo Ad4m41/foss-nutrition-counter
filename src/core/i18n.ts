@@ -1,5 +1,92 @@
 import { Language } from './nutrition';
 export const en = {
+  aiMealIntro:
+    'Add a photo or describe your meal. AI will prepare portions and nutrition for you to review.',
+  mealDescription: 'Meal description (optional with a photo)',
+  mealDescriptionHint: 'For example: a bowl of rice with chicken, about 350 g',
+  mealInputMissing: 'Add a photo or describe the meal first.',
+  aiQuestionsTitle: 'AI has a few questions',
+  questionsSkippedNote:
+    'AI clarification questions were skipped; the estimate retains uncertain assumptions.',
+  aiQuestionsHelp:
+    'These details could improve the estimate. Every question can be skipped, including recommended ones. Sending answers uses one more AI request; skipping uses the current estimate.',
+  questionRecommended: 'Recommended · more accurate estimate',
+  questionOptional: 'Optional',
+  questionUnanswered: 'No answer yet. Move the slider or confirm a value.',
+  yourAnswer: 'Your answer',
+  useSliderValue: 'Use this value',
+  skipQuestion: 'Skip this question',
+  skipQuestions: 'Skip · use the estimate',
+  refineEstimate: 'Use answers and estimate',
+  refiningEstimate: 'Updating the estimate…',
+  yes: 'Yes',
+  no: 'No',
+  dontKnow: 'Not sure',
+  analysisError:
+    'Could not run the AI analysis. Your input is still here. Try again.',
+  aiStorageError:
+    'Could not save analysis settings or AI usage history on this device. Your input is still here; try again.',
+
+  addAction: 'Add or check',
+  checkProduct: 'Check product',
+  productIntro:
+    'Enter a name or ingredients, or photograph the ingredients and nutrition label. This check does not add a meal to your diary.',
+  productDescription: 'Product name, ingredients or label details',
+  productHint: 'For example: natural yogurt, or paste the ingredients',
+  productPhoto: 'Product label photo',
+  productAnalyze: 'Check',
+  productAnalyzing: 'Checking the product…',
+  productInputMissing:
+    'Enter a product name or ingredients, or add a label photo.',
+  productKeyMissing: 'Add your Gemini key in Settings to check a product.',
+  productConsentTitle: 'Send product details to Google?',
+  productConsentBody:
+    'Gemini will receive the text and any selected photo to explain this product. Google may use free-tier data to improve its products. The analysis can be wrong; compare it with the label.',
+  productEstimate:
+    'AI explanation · verify the label. Allergen information may be incomplete; an empty list does not mean allergen-free.',
+  productStrengths: 'What it offers',
+  productConcerns: 'What to watch for',
+  productAllergens: 'Allergens in the supplied information',
+  productUncertainties: 'What is missing or uncertain',
+  productAdvice: 'How it can fit into your meals',
+  productNoObservations:
+    'No supported observations in the supplied information.',
+  productInvalidError:
+    'Gemini did not return a usable product explanation. Try a clearer label or add ingredients.',
+  productNoFoodError:
+    'Could not recognize a food product. Add its name or a clearer label photo.',
+  removePhoto: 'Remove photo',
+  aiUsageTitle: 'AI usage',
+  aiDailyLimit: 'Daily analysis limit',
+  aiLimitHint: 'Blank = no local limit',
+  aiLimitHelp:
+    'A limit for meal and product analyses on this device. Follow-up answers, failed and cancelled attempts count too. Resets at local midnight. Save settings to apply it.',
+  invalidAiLimit:
+    'Enter a positive whole number for the analysis limit, or leave it blank.',
+  localLimitError:
+    'You have reached the daily analysis limit set in this app. Change it in Settings or try tomorrow.',
+  aiUsageHelp:
+    'Local history from this app, not your entire AI Studio account. Counts start here; key checks are excluded. Token counts come from Google responses. Missing counts stay unknown; totals include only reported counts, not estimated billing.',
+  aiRequestsToday: 'Analyses today',
+  aiTokensToday: 'Reported tokens today',
+  aiTokensAll: 'Reported tokens in history',
+  aiInputTokens: 'Input',
+  aiOutputTokens: 'Output',
+  aiThinkingTokens: 'Thinking',
+  aiCachedTokens: 'Cached input',
+  aiTotalTokens: 'Total',
+  aiHistory: 'Analysis history',
+  aiHistoryEmpty: 'Your meal and product analyses will appear here.',
+  aiUsageUnknown: 'Attempts without reported token counts',
+  aiStatusPending: 'Result unknown / in progress',
+  aiStatusSuccess: 'Completed',
+  aiStatusError: 'Failed',
+  aiStatusCancelled: 'Cancelled',
+  aiMeal: 'Meal analysis',
+  aiProduct: 'Product check',
+  aiMoreHistory: 'Show more history',
+  license: 'License: AGPL-3.0-only',
+
   continue: 'Continue',
   back: 'Back',
   profileBodyTitle: 'A little about you',
@@ -11,10 +98,10 @@ export const en = {
   shortProtein: 'Protein',
   shortFat: 'Fat',
   nutritionDetails: 'Open daily nutrition details',
-  waterInfo: 'About your otter and water goal',
+  waterInfo: 'About your water goal',
   macroGoals: 'Daily macro goals',
   macroGoalsHelp:
-    'Optional gram targets. Leave a field blank to track intake without a target.',
+    'Calculated from your profile. You can adjust them here or leave a field blank to track without a target.',
   invalidMacroGoals:
     'Enter positive numbers for macro goals, or leave them blank.',
 
@@ -53,8 +140,6 @@ export const en = {
     'Enter an age from 18–100, height from 100–250 cm and weight from 30–350 kg, then choose sex.',
   skipProfile: 'Set up later',
   saveProfile: 'Save profile',
-  otterHelp:
-    'Your otter reacts to logged food and water. Its shape does not represent your weight.',
   water: 'Water',
   waterGoal: 'Daily water goal (ml)',
   waterHelp:
@@ -112,7 +197,7 @@ export const en = {
   descriptionHint: 'For example: 200 g rice, a tablespoon of oil',
   replaceIngredientsBody:
     'A new analysis will replace the current ingredients and nutrition. Continue?',
-  analyze: 'Estimate nutrition',
+  analyze: 'Estimate',
   analyzing: 'Looking at your meal…',
   estimate: 'AI estimate · check the ingredients and portions',
   name: 'Meal name',
@@ -139,20 +224,23 @@ export const en = {
   modelHelp:
     'Use a model available to your project. Free limits can change. No automatic switch to another model.',
   language: 'Language',
+  systemLanguage: 'Use phone language',
+  searchLanguage: 'Search languages',
+  noLanguages: 'No matching languages',
   saveSettings: 'Save settings',
   saved: 'Saved',
   storage: 'Your data',
   storageBody:
-    'Meals and photos stay on this device. Photo analysis sends the selected photo and description to Google.',
+    'Meals, photos and AI usage history stay on this device. Analysis sends the selected photo and text to Google.',
   clear: 'Delete all local data',
   clearBody:
-    'Remove all meals, photos, settings and the API key? This cannot be undone.',
-  consentTitle: 'Send this photo to Google?',
+    'Remove all meals, photos, water, AI history, settings and the API key? This cannot be undone.',
+  consentTitle: 'Send analysis data to Google?',
   consentBody:
-    'Gemini will receive the photo and your description to estimate nutrition. Google may use free-tier data to improve its products. Estimates can be wrong; check the result before saving.',
-  allow: 'Allow photo analysis',
+    'Gemini will receive the selected photo and text to estimate meal nutrition or explain a product. Google may use free-tier data to improve its products. Estimates can be wrong; check the result before saving.',
+  allow: 'Allow analysis',
   privacy: 'Read Google’s terms',
-  consentLabel: 'Allow Gemini photo analysis',
+  consentLabel: 'Allow Gemini analysis',
   keyMissing: 'Add your Gemini key in Settings, or enter this meal manually.',
   openSettings: 'Open settings',
   invalidForm:
@@ -187,7 +275,7 @@ export const en = {
   summary: 'Meal total',
   amountHelp:
     'Nutrition values are for this portion. Changing grams scales them.',
-  ai: 'Photo estimate',
+  ai: 'AI estimate',
   manualSource: 'Manual entry',
   noKeySaved: 'No key saved',
   keySaved: 'Key saved',
@@ -203,6 +291,94 @@ export const en = {
   aiTerms: 'Google API terms',
 };
 export const pl: Record<keyof typeof en, string> = {
+  aiMealIntro:
+    'Dodaj zdjęcie lub opisz posiłek. AI przygotuje porcje i wartości odżywcze do sprawdzenia.',
+  mealDescription: 'Opis posiłku (opcjonalny przy zdjęciu)',
+  mealDescriptionHint: 'Np. miska ryżu z kurczakiem, około 350 g',
+  mealInputMissing: 'Najpierw dodaj zdjęcie lub opisz posiłek.',
+  aiQuestionsTitle: 'AI ma jeszcze kilka pytań',
+  questionsSkippedNote:
+    'Pominięto pytania uzupełniające AI; szacunek nadal opiera się na niepewnych założeniach.',
+  aiQuestionsHelp:
+    'Te szczegóły mogą poprawić szacunek. Każde pytanie możesz pominąć, również zalecane. Wysłanie odpowiedzi zużyje jeszcze jedno zapytanie AI; pominięcie użyje obecnego szacunku.',
+  questionRecommended: 'Zalecane · dokładniejszy szacunek',
+  questionOptional: 'Opcjonalne',
+  questionUnanswered:
+    'Jeszcze bez odpowiedzi. Przesuń suwak lub potwierdź wartość.',
+  yourAnswer: 'Twoja odpowiedź',
+  useSliderValue: 'Użyj tej wartości',
+  skipQuestion: 'Pomiń to pytanie',
+  skipQuestions: 'Pomiń · użyj szacunku',
+  refineEstimate: 'Uwzględnij odpowiedzi i oszacuj',
+  refiningEstimate: 'Aktualizuję szacunek…',
+  yes: 'Tak',
+  no: 'Nie',
+  dontKnow: 'Nie wiem',
+  analysisError:
+    'Nie udało się uruchomić analizy AI. Dane zostały zachowane. Spróbuj ponownie.',
+  aiStorageError:
+    'Nie udało się zapisać ustawień analizy lub historii AI na tym urządzeniu. Dane zostały zachowane; spróbuj ponownie.',
+
+  addAction: 'Dodaj lub sprawdź',
+  checkProduct: 'Sprawdź produkt',
+  productIntro:
+    'Wpisz nazwę lub skład albo zrób zdjęcie składu i tabeli wartości odżywczych. Sprawdzenie nie dodaje posiłku do dziennika.',
+  productDescription: 'Nazwa produktu, skład lub dane z etykiety',
+  productHint: 'Np. jogurt naturalny albo wklej skład',
+  productPhoto: 'Zdjęcie etykiety produktu',
+  productAnalyze: 'Sprawdź',
+  productAnalyzing: 'Sprawdzam produkt…',
+  productInputMissing:
+    'Wpisz nazwę lub skład produktu albo dodaj zdjęcie etykiety.',
+  productKeyMissing:
+    'Dodaj klucz Gemini w Ustawieniach, aby sprawdzić produkt.',
+  productConsentTitle: 'Wysłać dane produktu do Google?',
+  productConsentBody:
+    'Gemini otrzyma tekst i wybrane zdjęcie, aby opisać ten produkt. Google może używać danych z darmowej wersji do ulepszania usług. Analiza może być błędna; porównaj ją z etykietą.',
+  productEstimate:
+    'Opis AI · sprawdź etykietę. Dane o alergenach mogą być niepełne; pusta lista nie oznacza ich braku.',
+  productStrengths: 'Co wnosi do diety',
+  productConcerns: 'Na co zwrócić uwagę',
+  productAllergens: 'Alergeny w podanych danych',
+  productUncertainties: 'Brakujące dane i niepewności',
+  productAdvice: 'Jak uwzględnić go w posiłkach',
+  productNoObservations: 'Brak potwierdzonych informacji w podanych danych.',
+  productInvalidError:
+    'Gemini nie zwróciło poprawnego opisu produktu. Spróbuj czytelniejszej etykiety lub dodaj skład.',
+  productNoFoodError:
+    'Nie rozpoznano produktu spożywczego. Podaj nazwę lub czytelniejsze zdjęcie etykiety.',
+  removePhoto: 'Usuń zdjęcie',
+  aiUsageTitle: 'Użycie AI',
+  aiDailyLimit: 'Dzienny limit analiz',
+  aiLimitHint: 'Puste pole = bez lokalnego limitu',
+  aiLimitHelp:
+    'Limit analiz posiłków i produktów na tym urządzeniu. Analizy po odpowiedziach, błędne i anulowane próby też się liczą. Reset o lokalnej północy. Zapisz ustawienia, aby zastosować limit.',
+  invalidAiLimit:
+    'Podaj dodatnią liczbę całkowitą jako limit analiz albo zostaw pole puste.',
+  localLimitError:
+    'Osiągnięto dzienny limit analiz ustawiony w aplikacji. Zmień go w Ustawieniach lub spróbuj jutro.',
+  aiUsageHelp:
+    'Historia lokalna tej aplikacji, a nie całego konta AI Studio. Liczymy od teraz; sprawdzanie klucza nie jest wliczane. Tokeny pochodzą z odpowiedzi Google. Brakujące dane pozostają nieznane; sumy obejmują tylko zgłoszone tokeny i nie są wyceną kosztów.',
+  aiRequestsToday: 'Analizy dzisiaj',
+  aiTokensToday: 'Zgłoszone tokeny dzisiaj',
+  aiTokensAll: 'Zgłoszone tokeny w historii',
+  aiInputTokens: 'Wejście',
+  aiOutputTokens: 'Wyjście',
+  aiThinkingTokens: 'Rozumowanie',
+  aiCachedTokens: 'Wejście z pamięci podręcznej',
+  aiTotalTokens: 'Łącznie',
+  aiHistory: 'Historia analiz',
+  aiHistoryEmpty: 'Tutaj pojawią się analizy posiłków i produktów.',
+  aiUsageUnknown: 'Próby bez zgłoszonej liczby tokenów',
+  aiStatusPending: 'W trakcie / wynik nieznany',
+  aiStatusSuccess: 'Zakończono',
+  aiStatusError: 'Błąd',
+  aiStatusCancelled: 'Anulowano',
+  aiMeal: 'Analiza posiłku',
+  aiProduct: 'Sprawdzenie produktu',
+  aiMoreHistory: 'Pokaż starsze analizy',
+  license: 'Licencja: AGPL-3.0-only',
+
   continue: 'Dalej',
   back: 'Wstecz',
   profileBodyTitle: 'Poznajmy się',
@@ -214,10 +390,10 @@ export const pl: Record<keyof typeof en, string> = {
   shortProtein: 'Białko',
   shortFat: 'Tłuszcz',
   nutritionDetails: 'Otwórz szczegóły wartości odżywczych dnia',
-  waterInfo: 'O wydrze i celu wody',
+  waterInfo: 'O celu wody',
   macroGoals: 'Dzienne cele makro',
   macroGoalsHelp:
-    'Opcjonalne cele w gramach. Puste pole pozwala śledzić spożycie bez celu.',
+    'Obliczane z Twojego profilu. Możesz je tutaj zmienić lub zostawić puste pole, aby śledzić spożycie bez celu.',
   invalidMacroGoals:
     'Podaj dodatnie wartości celów makro albo zostaw pola puste.',
   profile: 'Twój profil',
@@ -256,8 +432,6 @@ export const pl: Record<keyof typeof en, string> = {
     'Podaj wiek 18–100 lat, wzrost 100–250 cm i wagę 30–350 kg oraz wybierz płeć.',
   skipProfile: 'Uzupełnię później',
   saveProfile: 'Zapisz profil',
-  otterHelp:
-    'Wydra reaguje na zapisane jedzenie i wodę. Jej sylwetka nie przedstawia Twojej wagi.',
   water: 'Woda',
   waterGoal: 'Dzienny cel wody (ml)',
   waterHelp:
@@ -316,7 +490,7 @@ export const pl: Record<keyof typeof en, string> = {
   descriptionHint: 'Np. 200 g ryżu, łyżka oleju',
   replaceIngredientsBody:
     'Nowa analiza zastąpi obecne składniki i wartości. Kontynuować?',
-  analyze: 'Oszacuj wartości',
+  analyze: 'Oszacuj',
   analyzing: 'Sprawdzam Twój posiłek…',
   estimate: 'Szacunek AI · sprawdź składniki i porcje',
   name: 'Nazwa posiłku',
@@ -343,20 +517,23 @@ export const pl: Record<keyof typeof en, string> = {
   modelHelp:
     'Wybierz model dostępny w Twoim projekcie. Darmowe limity mogą się zmieniać. Aplikacja nie przełącza modelu automatycznie.',
   language: 'Język',
+  systemLanguage: 'Używaj języka telefonu',
+  searchLanguage: 'Szukaj języka',
+  noLanguages: 'Brak pasujących języków',
   saveSettings: 'Zapisz ustawienia',
   saved: 'Zapisano',
   storage: 'Twoje dane',
   storageBody:
-    'Posiłki i zdjęcia zostają na tym urządzeniu. Analiza zdjęcia wysyła wybrane zdjęcie i opis do Google.',
+    'Posiłki, zdjęcia i historia użycia AI zostają na tym urządzeniu. Analiza wysyła wybrane zdjęcie i tekst do Google.',
   clear: 'Usuń wszystkie dane lokalne',
   clearBody:
-    'Usunąć wszystkie posiłki, zdjęcia, ustawienia i klucz API? Tej operacji nie można cofnąć.',
-  consentTitle: 'Wysłać zdjęcie do Google?',
+    'Usunąć wszystkie posiłki, zdjęcia, wodę, historię AI, ustawienia i klucz API? Tej operacji nie można cofnąć.',
+  consentTitle: 'Wysłać dane analizy do Google?',
   consentBody:
-    'Gemini otrzyma zdjęcie i opis, aby oszacować wartości odżywcze. Google może używać danych z darmowego poziomu do ulepszania swoich produktów. Sprawdź wynik przed zapisaniem: szacunki mogą być błędne.',
-  allow: 'Zezwól na analizę zdjęć',
+    'Gemini otrzyma wybrane zdjęcie i tekst, aby oszacować wartości posiłku lub opisać produkt. Google może używać danych z darmowego poziomu do ulepszania swoich produktów. Sprawdź wynik przed zapisaniem: szacunki mogą być błędne.',
+  allow: 'Zezwól na analizę',
   privacy: 'Przeczytaj warunki Google',
-  consentLabel: 'Zezwalaj na analizę zdjęć przez Gemini',
+  consentLabel: 'Zezwalaj na analizę przez Gemini',
   keyMissing: 'Dodaj klucz Gemini w Ustawieniach lub wpisz posiłek ręcznie.',
   openSettings: 'Otwórz ustawienia',
   invalidForm:
@@ -390,7 +567,7 @@ export const pl: Record<keyof typeof en, string> = {
   summary: 'Razem w posiłku',
   amountHelp:
     'Wartości dotyczą tej porcji. Zmiana gramów przelicza je proporcjonalnie.',
-  ai: 'Szacunek ze zdjęcia',
+  ai: 'Szacunek AI',
   manualSource: 'Wpis ręczny',
   noKeySaved: 'Brak zapisanego klucza',
   keySaved: 'Klucz zapisany',

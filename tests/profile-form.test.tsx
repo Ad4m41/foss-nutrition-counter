@@ -54,6 +54,7 @@ test('saves profile and calculated target while preserving manual mode', async (
     expect(mockSave).toHaveBeenCalledWith(
       expect.objectContaining({
         goal: 2884,
+        macroGoals: { protein: 136, carbs: 369, fat: 96 },
         skipKeySetup: true,
         profileSetupDone: true,
         profile: expect.objectContaining({

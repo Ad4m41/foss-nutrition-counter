@@ -22,7 +22,7 @@ npm start
 
 If LAN access fails, run `npx expo start --go --tunnel`. Keep the computer and development server running. See [Expo's device instructions](https://docs.expo.dev/get-started/start-developing/).
 
-Logging, key setup, the profile slider and water controls work in Expo Go; the otter is static there. Animated Rive requires native modules available in a development or standalone build. Expo Go does not apply this project's app icon or custom permission descriptions. For a standalone app, or an SDK mismatch you cannot resolve in Expo Go, use a development build:
+Logging, product checks, key setup, the profile slider and water controls work in Expo Go. Expo Go does not apply this project's app icon or custom permission descriptions. For a standalone app, or an SDK mismatch you cannot resolve in Expo Go, use a development build:
 
 ```sh
 npx expo run:android
@@ -54,17 +54,33 @@ Open the completed build link on your Android phone, download the APK and allow 
 
 ## Profile, goals and water
 
-After key setup, complete three steps: body details with a scrolling age wheel and sex selector, one of five daily activity levels, then maintain, lose or gain weight. You can skip profile setup or edit it later in Settings. The calorie estimate uses [Mifflin–St Jeor](https://pubmed.ncbi.nlm.nih.gov/2305711/?format=pubmed), multiplied by an estimated PAL. The five app bands are 1.4, 1.6, 1.8, 2.0 and 2.2; they are coarse defaults within the [NIDDK activity range](https://www.niddk.nih.gov/bwp), not measured activity or a clinical model. Lose/gain applies an editable starting adjustment of −10%/+10%. The estimate supports adults aged 18–100, excluding pregnancy and breastfeeding.
+After key setup, complete three steps: body details with a scrolling age wheel and sex selector, one of five daily activity levels, then maintain, lose or gain weight. You can skip profile setup or edit it later in Settings. The calorie estimate uses [Mifflin–St Jeor](https://pubmed.ncbi.nlm.nih.gov/2305711/?format=pubmed), multiplied by an estimated PAL. The five app bands are 1.4, 1.6, 1.8, 2.0 and 2.2; they are coarse defaults within the [NIDDK activity range](https://www.niddk.nih.gov/bwp), not measured activity or a clinical model. Lose/gain applies an editable starting adjustment of −10%/+10%. The estimate supports adults aged 18–100, excluding pregnancy and breastfeeding. Saving a profile sets calories and all three macro targets together. Protein uses an editable app default of 1.2–2.0 g/kg depending on activity and goal (capped at 35% of energy); the exercise range is informed by the [ISSN position stand](https://doi.org/10.1186/s12970-017-0177-8). Fat supplies 30% of energy, and carbohydrates fill the remainder; gram targets are rounded. These are starting estimates, adjustable in Settings. Existing profiles without macro targets receive calculated targets once on loading.
 
-The diary keeps kcal, protein, carbohydrates and fat above the bottom navigation. Tap this summary for all eight nutrients. Use the central add button for a photo or manual entry on the selected day. Set optional protein, carbohydrate and fat targets in Settings; blank targets stay unset.
+Language follows the phone by default, including changes reported by Expo localization. The searchable flag selector switches and saves the language immediately. Selecting a language enables manual mode; the phone-language switch restores automatic mode.
 
-The diary records water per selected day. Add 250 or 500 ml, or undo the last addition in the current session. Set your water goal in Settings; 2,000 ml is an editable default, not an individualized recommendation. Reset removes profile, water, meals, photos and the key. The diary includes an otter: native Rive animates breathing, blinking, body width based on logged food, and a droplet based on logged water. Its appearance does not estimate your body weight. Expo Go, web, reduced motion and runtime errors use a bundled still. Rive needs a new development or preview build; an OTA update cannot add its native modules. See [the asset source](assets/otter/README.md).
+The diary keeps kcal, protein, carbohydrates and fat in a compact strip joined to the bottom navigation, with full-width surfaces and rounded top corners. Above a goal, rails scale to the consumed amount: 100 g against an 80 g goal shows 80% in the nutrient color and 20% as excess, alongside the actual values. Tap this summary for all eight nutrients. Use the central add button to start AI meal entry on the selected day; manual entry is a secondary option. Set optional protein, carbohydrate and fat targets in Settings; blank targets stay unset.
+
+The diary records water per selected day. Add 250 or 500 ml, or undo the last addition in the current session. Set your water goal in Settings; 2,000 ml is an editable default, not an individualized recommendation. Reset removes profile, water, meals, photos, AI history and the key.
+
+## AI meal entry and clarification
+
+**Add meal** starts with a photo and/or meal description, with camera and gallery controls in two equal columns. Tap **Estimate**. The portion editor appears after the result; manual entry remains available through **Enter manually**. A description alone can be analyzed when there is no photo.
+
+When missing details materially affect the estimate, AI may return up to three **recommended** or **optional** questions alongside a provisional estimate. Questions use yes/no, a numeric slider with units, or text. Confident results open review directly. Every question can be skipped, including recommended ones. An untouched slider stays unanswered until moved or explicitly confirmed; “no” and zero remain actual answers. **Skip · use the estimate** opens the first result without another API call and retains an uncertainty note. **Use answers and estimate** sends the original photo/description plus the supplied answers for one refinement, counted in the AI request limit/history. Skipped answers remain unknown. Refinement never opens another round of questions. Failures preserve the answers and allow retry or using the initial estimate.
+
+## Check a product and track Gemini usage
+
+Open the central **+** button and choose **Check product**. Enter a product name or ingredients, or select/take a photo of its ingredients and nutrition label. Gemini explains nutritional strengths, concerns, supplied allergen information, missing data and practical meal context. Name-only input gives general category information, not verified brand-specific facts. The analysis does not add a meal; check label facts, especially allergens. Product photos are temporary and removed when replaced or leaving the screen.
+
+In **Settings → AI usage**, set an optional positive whole-number daily analysis limit and save settings; blank disables the local limit. Meal and product analyses share the same counter. Every reserved attempt counts, including clarification refinements, errors, cancellations and requests interrupted by closing the app. The limit resets at local midnight. Reservations are persisted before sending and serialized to prevent simultaneous actions bypassing the limit. A storage failure prevents dispatch; manual logging stays available. Key authentication checks do not count toward this analysis limit.
+
+History records request time, model, type, status and Google's reported input, output, thinking, cached-input and total token counts. Missing metadata stays unknown, including network failures; displayed sums include reported values only. Pending entries after a restart have an unknown result and still count. Total tokens come directly from `usageMetadata`, rather than adding fields with overlapping meanings. This is local app history starting with this feature, not a synchronized AI Studio account report, billing estimate, or enforcement of Google's project quota. Usage via other devices/apps is not included. Reset deletes this history with the rest of the local data. No keys, prompts or photos are stored in usage entries.
 
 ## Configure Gemini
 
 1. Create a project and API key in [Google AI Studio](https://aistudio.google.com/apikey).
 2. Paste the key on the opening screen and tap **Check key and continue**. You can change it and the model later in **Settings**.
-3. Add a photo, optionally describe hidden ingredients or a known portion, and tap **Estimate nutrition**.
+3. Add a photo, optionally describe hidden ingredients or a known portion, and tap **Estimate**.
 4. Review ingredient names, grams and nutrition values. Save only after checking them.
 
 The app checks saved keys at launch and after returning from the background, using Google's model-list endpoint without generating content. Rate limits (HTTP 429) allow entry. Rejected keys return to setup; offline or server errors preserve access with a saved key. A new key must pass the check or receive HTTP 429 before saving. **Continue without a key** clears the key and remembers manual mode. Adding a key in Settings re-enables checking. Web previews retain keys only in memory, so refreshing requires re-entry unless manual mode was selected.
@@ -100,7 +116,7 @@ Use TypeScript, two-space indentation and Prettier. Add tests for portion arithm
 
 ## Verification limits
 
-Automated tests mock Gemini, native photo picking and secure storage. They do not establish model accuracy or native permission behavior. Before a release, test on both platforms: camera and gallery, denied permissions, restart persistence, offline manual entry, dark mode, large text, unsaved changes, and deleting photos/data. Test Gemini with your own project key and a meal whose weight you know.
+Automated tests mock Gemini, native photo picking and secure storage. Service regressions also exercise React Native's AbortController implementation, which does not provide `signal.throwIfAborted()`; analysis checks `signal.aborted` directly. Runtime analysis errors are distinguished from local storage errors. They do not establish model accuracy or native permission behavior. Before a release, test on both platforms: camera and gallery, denied permissions, restart persistence, offline manual entry, dark mode, large text, unsaved changes, and deleting photos/data. Test Gemini with your own project key and a meal whose weight you know.
 
 ## Dependency audit
 
@@ -108,4 +124,4 @@ Automated tests mock Gemini, native photo picking and secure storage. They do no
 
 ## License
 
-Application code: **GPL-3.0-only**, see [LICENSE](LICENSE). The Expo scaffold’s original MIT notice is retained in `assets/EXPO-TEMPLATE-LICENSE.txt`. Dependency licenses remain their respective authors’ licenses. This project is independent of Fitatu.
+Application code: **AGPL-3.0-only**, see [LICENSE](LICENSE). The Expo scaffold’s original MIT notice is retained in `assets/EXPO-TEMPLATE-LICENSE.txt`. Dependency licenses remain their respective authors’ licenses. This project is independent of Fitatu.

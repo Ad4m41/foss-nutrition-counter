@@ -10,7 +10,10 @@ import { en } from '../src/core/i18n';
 import { AnalysisError } from '../src/core/nutrition';
 import { analyzePhoto } from '../src/services/gemini';
 import { pickPhoto } from '../src/services/photos';
-const mockParams: { day: string; capture?: string } = { day: '2026-10-02' };
+import { validateQuestions } from '../src/core/clarification';
+const mockParams: { day: string; capture?: string; mode?: string } = {
+  day: '2026-10-02',
+};
 const mockSaveMeal = jest.fn();
 const mockBack = jest.fn();
 const mockConfirm = jest.fn();
@@ -27,6 +30,7 @@ const mockApp = {
   saveMeal: mockSaveMeal,
   deleteMeal: jest.fn(),
   updateSettings: jest.fn(),
+  trackAi: (_kind: unknown, request: () => Promise<unknown>) => request(),
 };
 jest.mock('../src/state/AppProvider', () => ({ useApp: () => mockApp }));
 jest.mock('expo-router', () => ({
@@ -53,6 +57,13 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ bottom: 0 }),
 }));
 jest.mock('@expo/vector-icons/Ionicons', () => 'Icon');
+jest.mock('react-native-worklets', () =>
+  require('react-native-worklets/src/mock'),
+);
+jest.mock('react-native-reanimated', () =>
+  require('react-native-reanimated/mock'),
+);
+jest.mock('@react-native-community/slider', () => 'Slider');
 jest.mock('../src/services/photos', () => ({
   pickPhoto: jest.fn(),
   disposePhoto: jest.fn(),
@@ -63,6 +74,7 @@ jest.mock('../src/components/confirm', () => ({
 }));
 beforeEach(() => {
   delete mockParams.capture;
+  delete mockParams.mode;
   jest.mocked(pickPhoto).mockClear();
   mockSaveMeal.mockReset();
   jest.mocked(analyzePhoto).mockReset();
@@ -128,6 +140,7 @@ test('photo analysis remains a draft; edited portions persist once', async () =>
 });
 test('analysis failure preserves photo and manual draft for retry', async () => {
   jest.mocked(analyzePhoto).mockRejectedValue(new AnalysisError('network'));
+  mockParams.mode = 'manual';
   await render(<MealScreen />);
   await fireEvent.changeText(screen.getByLabelText(en.name), 'Lunch');
   await getPhoto();
@@ -150,6 +163,7 @@ test('declining photo consent sends no analysis request', async () => {
 });
 test('manual logging works without calling Gemini', async () => {
   mockSaveMeal.mockResolvedValue(undefined);
+  mockParams.mode = 'manual';
   await render(<MealScreen />);
   await fireEvent.changeText(screen.getByLabelText(en.name), 'Lunch');
   await fireEvent.changeText(screen.getByLabelText(en.ingredient), 'Rice');
@@ -162,6 +176,7 @@ test('manual logging works without calling Gemini', async () => {
 });
 test('a persistence failure keeps the meal draft for retry', async () => {
   mockSaveMeal.mockRejectedValue(new Error('disk full'));
+  mockParams.mode = 'manual';
   await render(<MealScreen />);
   await fireEvent.changeText(screen.getByLabelText(en.name), 'Lunch');
   await fireEvent.changeText(screen.getByLabelText(en.ingredient), 'Rice');
@@ -173,8 +188,169 @@ test('a persistence failure keeps the meal draft for retry', async () => {
 
 test('add-from-camera opens the camera once and keeps the selected day', async () => {
   mockParams.capture = 'camera';
+  mockParams.mode = 'manual';
   await render(<MealScreen />);
   await waitFor(() => expect(pickPhoto).toHaveBeenCalledWith(true));
   expect(pickPhoto).toHaveBeenCalledTimes(1);
   expect(screen.getByLabelText(en.date).props.value).toBe('2026-10-02');
+});
+
+const estimate = {
+  name: 'Rice',
+  notes: 'Portion estimated.',
+  ingredients: [
+    {
+      id: 'rice',
+      name: 'Rice',
+      grams: 200,
+      kcal: 260,
+      protein: 5,
+      carbs: 56,
+      fat: 1,
+      saturatedFat: null,
+      sugars: null,
+      fiber: null,
+      salt: null,
+    },
+  ],
+};
+const clarificationQuestions = validateQuestions([
+  {
+    id: 'oil',
+    type: 'yesNo',
+    prompt: 'Was oil added?',
+    reason: 'Oil affects energy.',
+    priority: 'recommended',
+  },
+  {
+    id: 'portion',
+    type: 'slider',
+    prompt: 'How many grams?',
+    reason: 'Portion size is unclear.',
+    priority: 'optional',
+    min: 0,
+    max: 500,
+    step: 5,
+    unit: 'g',
+  },
+  {
+    id: 'food',
+    type: 'text',
+    prompt: 'Which kind of rice?',
+    reason: 'The variety is unclear.',
+    priority: 'optional',
+  },
+]);
+async function startQuestions() {
+  jest
+    .mocked(analyzePhoto)
+    .mockResolvedValueOnce({ ...estimate, questions: clarificationQuestions });
+  await render(<MealScreen />);
+  await getPhoto();
+  await fireEvent.changeText(
+    screen.getByLabelText(en.mealDescription),
+    'Rice with vegetables',
+  );
+  await fireEvent.press(screen.getByText(en.analyze));
+  await screen.findByText(en.aiQuestionsTitle);
+}
+test('new meals start with AI input and keep the manual form out of the way', async () => {
+  await render(<MealScreen />);
+  expect(screen.getByLabelText(en.mealDescription)).toBeTruthy();
+  expect(screen.queryByLabelText(en.ingredient)).toBeNull();
+  expect(screen.queryByText(en.save)).toBeNull();
+  await fireEvent.press(screen.getByText(en.manual));
+  expect(screen.getByLabelText(en.ingredient)).toBeTruthy();
+});
+test('recommended questions can be skipped without a second request or losing the estimate', async () => {
+  mockSaveMeal.mockResolvedValue(undefined);
+  await startQuestions();
+  expect(screen.getByText(en.questionRecommended)).toBeTruthy();
+  expect(
+    screen.getByRole('button', { name: en.refineEstimate }).props
+      .accessibilityState.disabled,
+  ).toBe(true);
+  await fireEvent.press(screen.getByText(en.skipQuestions));
+  expect(screen.getByLabelText(en.name).props.value).toBe('Rice');
+  expect(analyzePhoto).toHaveBeenCalledTimes(1);
+  await fireEvent.press(screen.getByText(en.save));
+  await waitFor(() => expect(mockSaveMeal).toHaveBeenCalledTimes(1));
+  expect(mockSaveMeal.mock.calls[0][0]).toMatchObject({
+    source: 'ai',
+    name: 'Rice',
+    notes: expect.stringContaining(en.questionsSkippedNote),
+  });
+});
+test('answers send the original photo and description once, with untouched slider omitted', async () => {
+  await startQuestions();
+  expect(screen.getByText(en.questionUnanswered)).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: en.no }));
+  await fireEvent.changeText(
+    screen.getByLabelText(en.yourAnswer),
+    'Brown rice',
+  );
+  jest
+    .mocked(analyzePhoto)
+    .mockResolvedValueOnce({
+      ...estimate,
+      name: 'Brown rice',
+      questions: clarificationQuestions,
+    });
+  await fireEvent.press(screen.getByText(en.refineEstimate));
+  await waitFor(() =>
+    expect(screen.getByLabelText(en.name).props.value).toBe('Brown rice'),
+  );
+  const second = jest.mocked(analyzePhoto).mock.calls[1][0];
+  expect(second).toMatchObject({
+    base64: 'image',
+    description: 'Rice with vegetables',
+    clarification: { answers: { oil: false, food: 'Brown rice' } },
+  });
+  expect(second.clarification?.answers).not.toHaveProperty('portion');
+  expect(analyzePhoto).toHaveBeenCalledTimes(2);
+  expect(screen.queryByText(en.aiQuestionsTitle)).toBeNull();
+});
+test('failed refinement preserves answers and still allows skipping to the first estimate', async () => {
+  await startQuestions();
+  await fireEvent.changeText(
+    screen.getByLabelText(en.yourAnswer),
+    'Brown rice',
+  );
+  jest
+    .mocked(analyzePhoto)
+    .mockRejectedValueOnce(new AnalysisError('localLimit'));
+  await fireEvent.press(screen.getByText(en.refineEstimate));
+  await screen.findByText(en.localLimitError);
+  expect(screen.getByLabelText(en.yourAnswer).props.value).toBe('Brown rice');
+  await fireEvent.press(screen.getByText(en.skipQuestions));
+  expect(screen.getByLabelText(en.name).props.value).toBe('Rice');
+});
+test('an explicit zero on the slider is kept as an answer', async () => {
+  await startQuestions();
+  await fireEvent(screen.getByLabelText('How many grams?'), 'valueChange', 0);
+  jest.mocked(analyzePhoto).mockResolvedValueOnce(estimate);
+  await fireEvent.press(screen.getByText(en.refineEstimate));
+  await screen.findByLabelText(en.name);
+  expect(
+    jest.mocked(analyzePhoto).mock.calls[1][0].clarification?.answers,
+  ).toEqual({ portion: 0 });
+});
+test('text-only meal input can run AI and bypasses the questions step when confident', async () => {
+  jest
+    .mocked(analyzePhoto)
+    .mockResolvedValueOnce({ ...estimate, questions: [] });
+  await render(<MealScreen />);
+  await fireEvent.changeText(
+    screen.getByLabelText(en.mealDescription),
+    '200 g cooked rice',
+  );
+  await fireEvent.press(screen.getByText(en.analyze));
+  await screen.findByLabelText(en.name);
+  expect(analyzePhoto).toHaveBeenCalledWith(
+    expect.objectContaining({
+      base64: undefined,
+      description: '200 g cooked rice',
+    }),
+  );
+  expect(screen.queryByText(en.aiQuestionsTitle)).toBeNull();
 });

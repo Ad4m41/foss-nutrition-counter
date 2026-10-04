@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { Linking, Platform, Switch, View } from 'react-native';
 import { useApp } from '../../state/AppProvider';
 import { macroKeys, parseMacroGoals } from '../../core/macroGoals';
-import { Language, parseNumber } from '../../core/nutrition';
+import { parseNumber } from '../../core/nutrition';
 import {
   Body,
   Button,
@@ -14,8 +14,11 @@ import {
   useTheme,
 } from '../../components/ui';
 import { confirmAction } from '../../components/confirm';
+import { LanguageSelect } from '../../components/LanguageSelect';
+import { AiUsageHistory } from '../../components/AiUsageHistory';
+import { validRequestLimit } from '../../core/aiUsage';
 export default function SettingsScreen() {
-  const { settings, apiKey, updateSettings, clear, t } = useApp();
+  const { settings, apiKey, updateSettings, clear, aiBusy, t } = useApp();
   const colors = useTheme();
   const [waterGoal, setWaterGoal] = useState(
     String(settings.waterGoal ?? 2000),
@@ -28,20 +31,38 @@ export default function SettingsScreen() {
     fat: settings.macroGoals?.fat ? String(settings.macroGoals.fat) : '',
   }));
   const [goal, setGoal] = useState(String(settings.goal));
+  const [aiLimit, setAiLimit] = useState(
+    settings.aiDailyLimit === undefined ? '' : String(settings.aiDailyLimit),
+  );
   useFocusEffect(
     useCallback(() => {
       setGoal(String(settings.goal));
-    }, [settings.goal]),
+      setMacroDraft({
+        protein: settings.macroGoals?.protein
+          ? String(settings.macroGoals.protein)
+          : '',
+        carbs: settings.macroGoals?.carbs
+          ? String(settings.macroGoals.carbs)
+          : '',
+        fat: settings.macroGoals?.fat ? String(settings.macroGoals.fat) : '',
+      });
+    }, [settings.goal, settings.macroGoals]),
   );
   const [model, setModel] = useState(settings.model);
   const [key, setKey] = useState(apiKey);
-  const [language, setLanguage] = useState<Language>(settings.language);
+  const language = settings.language;
   const [consent, setConsent] = useState(settings.consent);
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
   async function save() {
+    const aiDailyLimit = aiLimit.trim() ? parseNumber(aiLimit) : undefined;
+    if (!validRequestLimit(aiDailyLimit)) {
+      setError(true);
+      setMessage(t.invalidAiLimit);
+      return;
+    }
     const value = parseNumber(goal);
     const water = parseNumber(waterGoal);
     const macroGoals = parseMacroGoals(macroDraft);
@@ -75,6 +96,7 @@ export default function SettingsScreen() {
           language,
           consent,
           skipKeySetup: !key.trim(),
+          aiDailyLimit,
         },
         key,
       );
@@ -100,6 +122,7 @@ export default function SettingsScreen() {
       setModel('gemini-3.5-flash-lite');
       setKey('');
       setConsent(false);
+      setAiLimit('');
       setError(false);
       setMessage(t.resetDone);
     } catch {
@@ -199,20 +222,18 @@ export default function SettingsScreen() {
         <Body muted>{t.modelHelp}</Body>
       </View>
       <Label>{t.language}</Label>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-        <Button
-          title="Polski"
-          secondary={language !== 'pl'}
-          disabled={busy}
-          onPress={() => setLanguage('pl')}
-        />
-        <Button
-          title="English"
-          secondary={language !== 'en'}
-          disabled={busy}
-          onPress={() => setLanguage('en')}
-        />
-      </View>
+      <LanguageSelect disabled={busy} />
+      <Label>{t.aiUsageTitle}</Label>
+      <Field
+        label={t.aiDailyLimit}
+        value={aiLimit}
+        onChangeText={setAiLimit}
+        placeholder={t.aiLimitHint}
+        keyboardType="number-pad"
+        editable={!busy && !aiBusy}
+      />
+      <Body muted>{t.aiLimitHelp}</Body>
+      <AiUsageHistory />
       <Label>{t.storage}</Label>
       <Body muted>{t.storageBody}</Body>
       <View
@@ -261,6 +282,7 @@ export default function SettingsScreen() {
       <Button
         title={t.saveSettings}
         loading={busy}
+        disabled={aiBusy}
         onPress={() => {
           void save();
         }}
@@ -269,13 +291,21 @@ export default function SettingsScreen() {
         <Button
           title={t.clear}
           danger
-          disabled={busy}
+          disabled={busy || aiBusy}
           icon="trash-outline"
           onPress={() => {
             void removeAll();
           }}
         />
       </View>
+      <Button
+        title={t.license}
+        secondary
+        icon="open-outline"
+        onPress={() => {
+          void Linking.openURL('https://www.gnu.org/licenses/agpl-3.0.html');
+        }}
+      />
     </Page>
   );
 }

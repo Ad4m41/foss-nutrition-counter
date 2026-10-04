@@ -1,4 +1,5 @@
 import { Profile } from './profile';
+import { ClarificationQuestion, validateQuestions } from './clarification';
 export type Language = 'pl' | 'en';
 export const requiredNutrientKeys = [
   'kcal',
@@ -40,6 +41,7 @@ export type Meal = {
 export type Settings = {
   goal: number;
   language: Language;
+  languageMode?: 'system' | 'manual';
   model: string;
   consent: boolean;
   skipKeySetup?: boolean;
@@ -47,6 +49,7 @@ export type Settings = {
   profileSetupDone?: boolean;
   waterGoal?: number;
   macroGoals?: Partial<Record<'protein' | 'carbs' | 'fat', number>>;
+  aiDailyLimit?: number;
 };
 export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 export function totals(items: Nutrients[]): Nutrients {
@@ -137,7 +140,9 @@ export class AnalysisError extends Error {
       | 'timeout'
       | 'invalid'
       | 'noFood'
-      | 'server',
+      | 'server'
+      | 'storage'
+      | 'localLimit',
   ) {
     super(code);
   }
@@ -146,6 +151,7 @@ export type Analysis = {
   name: string;
   ingredients: Ingredient[];
   notes: string;
+  questions?: ClarificationQuestion[];
 };
 export function validateAnalysis(value: unknown): Analysis {
   if (!value || typeof value !== 'object') throw new AnalysisError('invalid');
@@ -172,5 +178,11 @@ export function validateAnalysis(value: unknown): Analysis {
       throw new AnalysisError('invalid');
     return item;
   });
-  return { name: data.name.trim(), ingredients, notes: data.notes };
+  let questions: ClarificationQuestion[];
+  try {
+    questions = validateQuestions(data.questions);
+  } catch {
+    throw new AnalysisError('invalid');
+  }
+  return { name: data.name.trim(), ingredients, notes: data.notes, questions };
 }

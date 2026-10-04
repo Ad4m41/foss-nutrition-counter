@@ -1,4 +1,10 @@
-import { analyzePhoto, checkApiKey } from '../src/services/gemini';
+import {
+  analyzePhoto,
+  analyzeProduct,
+  checkApiKey,
+} from '../src/services/gemini';
+import { AbortController as NativeAbortController } from 'abort-controller';
+import { validateQuestions } from '../src/core/clarification';
 const options = {
   key: 'test-key',
   model: 'gemini-3.5-flash-lite',
@@ -29,6 +35,234 @@ const fetchMock = jest.fn();
 beforeEach(() => {
   globalThis.fetch = fetchMock;
   fetchMock.mockReset();
+});
+test('can analyze with the AbortSignal used by React Native, which has no throwIfAborted', async () => {
+  const controller = new NativeAbortController();
+  expect('throwIfAborted' in controller.signal).toBe(false);
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
+    }),
+  });
+  await expect(
+    analyzePhoto({ ...options, signal: controller.signal as AbortSignal }),
+  ).resolves.toMatchObject({ name: 'Rice' });
+});
+test('reports Google usage even when generated nutrition is unusable', async () => {
+  const onUsage = jest.fn();
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [],
+      usageMetadata: {
+        promptTokenCount: 10,
+        totalTokenCount: 13,
+        thoughtsTokenCount: 3,
+      },
+    }),
+  });
+  await expect(analyzePhoto({ ...options, onUsage })).rejects.toMatchObject({
+    code: 'invalid',
+  });
+  expect(onUsage).toHaveBeenCalledWith({
+    input: 10,
+    output: null,
+    thinking: 3,
+    cached: null,
+    total: 13,
+  });
+});
+test('checks a text-only product using structured output without an image', async () => {
+  const product = {
+    isFood: true,
+    name: 'Yogurt',
+    summary: 'General information',
+    strengths: [],
+    concerns: [],
+    allergens: [],
+    uncertainties: ['No label supplied'],
+    advice: 'Read the label',
+  };
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [
+        {
+          content: {
+            parts: [
+              { thought: true, text: 'ignore' },
+              { text: JSON.stringify(product) },
+            ],
+          },
+        },
+      ],
+    }),
+  });
+  expect(
+    await analyzeProduct({
+      ...options,
+      base64: undefined,
+      description: 'Yogurt',
+    }),
+  ).toMatchObject({ name: 'Yogurt' });
+  const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+  expect(body.contents[0].parts).toEqual([{ text: 'Yogurt' }]);
+  expect(body.generationConfig.responseJsonSchema.required).toContain(
+    'uncertainties',
+  );
+});
+test('never sends a pre-cancelled request', async () => {
+  const controller = new AbortController();
+  controller.abort();
+  await expect(
+    analyzePhoto({ ...options, signal: controller.signal }),
+  ).rejects.toBeDefined();
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+test('checks a product with a native signal and reports its tokens', async () => {
+  const controller = new NativeAbortController();
+  const onUsage = jest.fn();
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [
+        {
+          content: {
+            parts: [
+              {
+                text: JSON.stringify({
+                  isFood: true,
+                  name: 'Yogurt',
+                  summary: 'Summary',
+                  strengths: [],
+                  concerns: [],
+                  allergens: [],
+                  uncertainties: [],
+                  advice: 'Read the label',
+                }),
+              },
+            ],
+          },
+        },
+      ],
+      usageMetadata: { totalTokenCount: 12 },
+    }),
+  });
+  await expect(
+    analyzeProduct({
+      ...options,
+      signal: controller.signal as AbortSignal,
+      onUsage,
+    }),
+  ).resolves.toMatchObject({ name: 'Yogurt' });
+  expect(onUsage).toHaveBeenCalledWith(expect.objectContaining({ total: 12 }));
+});
+test('a cancelled native signal never sends a request', async () => {
+  const controller = new NativeAbortController();
+  controller.abort();
+  await expect(
+    analyzePhoto({ ...options, signal: controller.signal as AbortSignal }),
+  ).rejects.toMatchObject({ name: 'AbortError' });
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+test('initial estimates may include questions only when useful', async () => {
+  const question = {
+    id: 'oil',
+    type: 'yesNo',
+    prompt: 'Was oil added?',
+    reason: 'Hidden oil changes energy.',
+    priority: 'recommended',
+    min: null,
+    max: null,
+    step: null,
+    unit: '',
+  };
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [
+        {
+          content: {
+            parts: [
+              { text: JSON.stringify({ ...output, questions: [question] }) },
+            ],
+          },
+        },
+      ],
+    }),
+  });
+  expect((await analyzePhoto(options)).questions).toMatchObject([
+    { id: 'oil', type: 'yesNo', priority: 'recommended' },
+  ]);
+  const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+  expect(
+    body.generationConfig.responseJsonSchema.properties.questions.maxItems,
+  ).toBe(3);
+});
+test('follow-up sends original context and answers, keeps skips unknown, and cannot start a question loop', async () => {
+  const questions = validateQuestions([
+    {
+      id: 'oil',
+      type: 'yesNo',
+      prompt: 'Was oil added?',
+      reason: 'Energy',
+      priority: 'recommended',
+    },
+    {
+      id: 'portion',
+      type: 'slider',
+      prompt: 'Portion?',
+      reason: 'Weight',
+      priority: 'optional',
+      min: 0,
+      max: 500,
+      step: 5,
+      unit: 'g',
+    },
+  ]);
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [
+        {
+          content: {
+            parts: [{ text: JSON.stringify({ ...output, questions }) }],
+          },
+        },
+      ],
+    }),
+  });
+  const result = await analyzePhoto({
+    ...options,
+    description: 'Rice',
+    clarification: { questions, answers: { oil: false } },
+  });
+  expect(result.questions).toEqual([]);
+  const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+  const parts = body.contents[0].parts;
+  expect(parts[0].inlineData.data).toBe(options.base64);
+  expect(parts[1].text).toBe('Rice');
+  expect(parts[2].text).toContain('"answer":false');
+  expect(parts[2].text).toContain('"answer":null');
+  expect(body.systemInstruction.parts[0].text).toContain(
+    'do NOT ask further questions',
+  );
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+test('can estimate a description without a photo', async () => {
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
+    }),
+  });
+  await expect(
+    analyzePhoto({ ...options, base64: undefined, description: '200 g rice' }),
+  ).resolves.toMatchObject({ name: 'Rice' });
+  expect(JSON.parse(fetchMock.mock.calls[0][1].body).contents[0].parts).toEqual(
+    [{ text: '200 g rice' }],
+  );
 });
 test('sends the key in a header and asks for structured portion nutrition', async () => {
   fetchMock.mockResolvedValue({

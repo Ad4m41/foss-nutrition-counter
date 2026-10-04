@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
-import Animated, { SlideInDown, ReduceMotion } from 'react-native-reanimated';
+import Animated, {
+  SlideInDown,
+  ReduceMotion,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { router, Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,11 +22,11 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { day } = useDiaryDay();
   const [adding, setAdding] = useState(false);
-  function add(mode: 'camera' | 'manual') {
+  function add(mode: 'ai' | 'manual') {
     setAdding(false);
     router.push({
       pathname: '/meal',
-      params: { day, ...(mode === 'camera' ? { capture: 'camera' } : {}) },
+      params: { day, mode },
     });
   }
   const tab = (
@@ -32,10 +38,11 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
     if (!route) return null;
     const focused = state.index === index;
     return (
-      <Pressable
-        accessibilityRole="tab"
-        accessibilityLabel={label}
-        accessibilityState={{ selected: focused }}
+      <NavigationTab
+        focused={focused}
+        icon={icon}
+        selectedIcon={index === 0 ? 'journal' : 'options'}
+        label={label}
         onPress={() => {
           const event = navigation.emit({
             type: 'tabPress',
@@ -48,36 +55,14 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
         onLongPress={() =>
           navigation.emit({ type: 'tabLongPress', target: route.key })
         }
-        style={{
-          flex: 1,
-          minHeight: 64,
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 5,
-        }}
-      >
-        <Ionicons
-          name={icon}
-          size={23}
-          color={focused ? colors.primary : colors.muted}
-        />
-        <Text
-          style={{
-            fontFamily: focused ? fonts.bold : fonts.medium,
-            color: focused ? colors.primary : colors.muted,
-            fontSize: 12,
-          }}
-        >
-          {label}
-        </Text>
-      </Pressable>
+      />
     );
   };
   return (
     <>
       <View
         style={{
-          backgroundColor: colors.bg,
+          backgroundColor: colors.surface,
           borderTopWidth: 1,
           borderTopColor: colors.line,
           paddingBottom: Math.max(8, insets.bottom),
@@ -96,7 +81,7 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
           {tab(0, 'journal-outline', t.diary)}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={t.addMeal}
+            accessibilityLabel={t.addAction}
             onPress={() => setAdding(true)}
             style={({ pressed }) => ({
               width: 58,
@@ -156,18 +141,27 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
                   marginBottom: 20,
                 }}
               >
-                {t.addMeal}
+                {t.addAction}
               </Text>
               <Button
-                title={t.camera}
-                icon="camera-outline"
-                onPress={() => add('camera')}
+                title={t.addMeal}
+                icon="sparkles-outline"
+                onPress={() => add('ai')}
               />
               <Button
                 title={t.manual}
                 icon="create-outline"
                 secondary
                 onPress={() => add('manual')}
+              />
+              <Button
+                title={t.checkProduct}
+                icon="search-outline"
+                secondary
+                onPress={() => {
+                  setAdding(false);
+                  router.push('/product');
+                }}
               />
               <Button
                 title={t.cancel}
@@ -179,5 +173,100 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
         </Modal>
       )}
     </>
+  );
+}
+
+function NavigationTab({
+  focused,
+  icon,
+  selectedIcon,
+  label,
+  onPress,
+  onLongPress,
+}: {
+  focused: boolean;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  selectedIcon: React.ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
+  const colors = useTheme();
+  const selected = useSharedValue(focused ? 1 : 0);
+  const scale = useSharedValue(1);
+  useEffect(() => {
+    selected.value = withTiming(focused ? 1 : 0, {
+      duration: 220,
+      reduceMotion: ReduceMotion.System,
+    });
+  }, [focused, selected]);
+  const highlight = useAnimatedStyle(() => ({
+    opacity: selected.value,
+    transform: [{ scaleX: 0.65 + selected.value * 0.35 }],
+  }));
+  const feedback = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { translateY: -selected.value * 2 }],
+  }));
+  const press = (value: number) => {
+    scale.set(
+      withTiming(value, {
+        duration: 110,
+        reduceMotion: ReduceMotion.System,
+      }),
+    );
+  };
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: focused }}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      onPressIn={() => press(0.9)}
+      onPressOut={() => press(1)}
+      style={{
+        flex: 1,
+        minHeight: 64,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Animated.View style={[{ alignItems: 'center', gap: 3 }, feedback]}>
+        <View
+          style={{
+            width: 64,
+            height: 32,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                inset: 0,
+                borderRadius: 12,
+                backgroundColor: colors.tint,
+              },
+              highlight,
+            ]}
+          />
+          <Ionicons
+            name={focused ? selectedIcon : icon}
+            size={23}
+            color={focused ? colors.primary : colors.muted}
+          />
+        </View>
+        <Text
+          style={{
+            fontFamily: focused ? fonts.bold : fonts.medium,
+            color: focused ? colors.primary : colors.muted,
+            fontSize: 12,
+          }}
+        >
+          {label}
+        </Text>
+      </Animated.View>
+    </Pressable>
   );
 }
