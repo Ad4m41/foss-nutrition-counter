@@ -10,6 +10,7 @@ import Animated, {
 import { router, Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { feedback } from './feedback';
 import { useApp } from '../state/AppProvider';
 import { useDiaryDay } from '../state/DiaryProvider';
 import { fonts, useTheme, Button } from './ui';
@@ -41,7 +42,7 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
       <NavigationTab
         focused={focused}
         icon={icon}
-        selectedIcon={index === 0 ? 'journal' : 'options'}
+        selectedIcon={index === 0 ? 'restaurant' : 'options'}
         label={label}
         onPress={() => {
           const event = navigation.emit({
@@ -78,11 +79,14 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
             paddingHorizontal: 24,
           }}
         >
-          {tab(0, 'journal-outline', t.diary)}
+          {tab(0, 'restaurant-outline', t.diary)}
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t.addAction}
-            onPress={() => setAdding(true)}
+            onPress={() => {
+              feedback('press');
+              setAdding(true);
+            }}
             style={({ pressed }) => ({
               width: 58,
               height: 58,
@@ -204,7 +208,7 @@ function NavigationTab({
     opacity: selected.value,
     transform: [{ scaleX: 0.65 + selected.value * 0.35 }],
   }));
-  const feedback = useAnimatedStyle(() => ({
+  const pressStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateY: -selected.value * 2 }],
   }));
   const press = (value: number) => {
@@ -220,7 +224,10 @@ function NavigationTab({
       accessibilityRole="tab"
       accessibilityLabel={label}
       accessibilityState={{ selected: focused }}
-      onPress={onPress}
+      onPress={() => {
+        feedback();
+        onPress();
+      }}
       onLongPress={onLongPress}
       onPressIn={() => press(0.9)}
       onPressOut={() => press(1)}
@@ -231,7 +238,7 @@ function NavigationTab({
         justifyContent: 'center',
       }}
     >
-      <Animated.View style={[{ alignItems: 'center', gap: 3 }, feedback]}>
+      <Animated.View style={[{ alignItems: 'center', gap: 3 }, pressStyle]}>
         <View
           style={{
             width: 64,

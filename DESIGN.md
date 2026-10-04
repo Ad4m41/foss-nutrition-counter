@@ -204,7 +204,10 @@ Use softly rounded fields and controls, with larger corners for containers and s
 - **Product check:** A dedicated screen accepts text and optional label photo, then presents the explanation with strengths, concerns, allergens, uncertainty and advice. Changing input clears the old explanation. Loading, cancel, consent, key, quota, local-limit and network states preserve the input.
 - **AI usage:** Settings includes a daily request limit, reported token totals and expandable history rows, revealed in batches of 20. Missing token counts stay explicitly unknown.
 - **Profile:** Three steps cover body data, five activity levels and a goal. The 18–100 age wheel shows five rows, snaps at a row height of 56 scaled with text size, and exposes adjustable accessibility actions plus 48-unit increment/decrement buttons. Sex selection uses a two-part segmented control. Activity offers a stepped slider and five labeled buttons; the selected detail includes PAL. Keep continue/save reachable in the footer.
-- **Water:** A blue-tinted container groups the numeric total, goal rail, quick additions, undo and expandable guidance.
+- **Water:** A blue-tinted top container groups the numeric total, goal rail and expandable guidance. Equal-width +250 ml / −250 ml controls sit below it, separated by an 8-unit gap. Outside bottom corners match the 16-unit container corners; inside corners are 6 units. Subtraction is disabled at zero.
+- **Settings:** Account and App settings share the existing segmented control. Account contains profile and targets; App settings contains AI, language and local data controls. Each sub-tab saves its own fields. Flags use bundled raster images, not emoji.
+- **Feedback:** Brief selection ticks for stepped sliders, segments and tabs, light impacts for buttons. Rate-limit pulses to 80 ms; unsupported devices retain normal actions.
+- **Meal details:** Keep the extra-nutrient disclosure above its fields and provide another collapse action beneath them. Separate estimation notes from meal totals by 24 units.
 
 Use system reduced motion for the segmented selection (240 ms), progress rails (420 ms) and add-sheet entrance (260 ms). Remove the age wheel’s cylinder transforms and animated scrolling when reduced motion is on. Keep its controls usable.
 

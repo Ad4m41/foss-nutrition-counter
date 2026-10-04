@@ -17,7 +17,7 @@ import Animated, {
   useReducedMotion,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import { feedback } from './feedback';
 import { fonts, useTheme } from './ui';
 const ages = Array.from({ length: 83 }, (_, i) => i + 18);
 function WheelNumber({
@@ -132,7 +132,7 @@ export function AgeWheel({
       selected.current = age;
       setPreview(age);
       onChange(age);
-      void Haptics.selectionAsync().catch(() => {});
+      feedback();
     },
     [disabled, onChange],
   );
@@ -149,7 +149,7 @@ export function AgeWheel({
     });
     setPreview(age);
     if (age !== selected.current) {
-      void Haptics.selectionAsync().catch(() => {});
+      feedback();
       selected.current = age;
     }
     onChange(age);

@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { ClarificationQuestion, QuestionAnswers } from '../core/clarification';
 import { useApp } from '../state/AppProvider';
+import { feedback } from './feedback';
 import { Segmented } from './Segmented';
 import { Body, Button, Field, Label, fonts, useTheme } from './ui';
 
@@ -111,9 +112,11 @@ export function MealQuestions({
                   maximumValue={question.max}
                   step={question.step}
                   value={sliderValue}
-                  onValueChange={(value) =>
-                    set(question.id, Math.round(value * 1000) / 1000)
-                  }
+                  onValueChange={(value) => {
+                    const next = Math.round(value * 1000) / 1000;
+                    if (next !== answer) feedback();
+                    set(question.id, next);
+                  }}
                   minimumTrackTintColor={colors.primary}
                   maximumTrackTintColor={colors.line}
                   thumbTintColor={colors.primary}

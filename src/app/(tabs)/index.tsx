@@ -12,6 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '../../state/AppProvider';
 import { useDiaryDay } from '../../state/DiaryProvider';
 import { localDay, moveDay, totals } from '../../core/nutrition';
+import { feedback } from '../../components/feedback';
 import { WaterTracker } from '../../components/WaterTracker';
 import { MacroDock } from '../../components/MacroDock';
 import { Body, IconButton, Page, fonts, useTheme } from '../../components/ui';
@@ -113,7 +114,10 @@ export default function Diary() {
                 day: 'numeric',
                 month: 'long',
               })}
-              onPress={() => setDay(date)}
+              onPress={() => {
+                if (date !== day) feedback();
+                setDay(date);
+              }}
               style={({ pressed }) => ({
                 flex: 1,
                 minHeight: 64,
@@ -282,9 +286,6 @@ export default function Diary() {
       <View
         style={{
           marginTop: 26,
-          backgroundColor: colors.waterTint,
-          padding: 18,
-          borderRadius: 16,
         }}
       >
         <WaterTracker day={day} />

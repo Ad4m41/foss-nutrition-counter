@@ -604,13 +604,7 @@ export default function MealScreen() {
                   columnGap: 12,
                 }}
               >
-                {(
-                  [
-                    'grams',
-                    ...requiredNutrientKeys,
-                    ...(expanded[item.id] ? additionalNutrientKeys : []),
-                  ] as const
-                ).map((key) => (
+                {(['grams', ...requiredNutrientKeys] as const).map((key) => (
                   <View
                     key={key}
                     style={{ minWidth: 120, flexGrow: 1, flexBasis: '43%' }}
@@ -624,13 +618,6 @@ export default function MealScreen() {
                             : `${t[key]} (g)`
                       }
                       value={item[key]}
-                      placeholder={
-                        additionalNutrientKeys.some(
-                          (nutrient) => nutrient === key,
-                        )
-                          ? t.unknown
-                          : undefined
-                      }
                       keyboardType="decimal-pad"
                       onChangeText={(text) =>
                         changeIngredient(index, key, text)
@@ -642,6 +629,8 @@ export default function MealScreen() {
               </View>
               <Button
                 title={expanded[item.id] ? t.lessNutrition : t.moreNutrition}
+                expanded={!!expanded[item.id]}
+                disabled={!!busy}
                 secondary
                 icon={expanded[item.id] ? 'chevron-up' : 'chevron-down'}
                 onPress={() =>
@@ -651,7 +640,49 @@ export default function MealScreen() {
                   }))
                 }
               />
-              {expanded[item.id] && <Body muted>{t.unknownHelp}</Body>}
+              {expanded[item.id] && (
+                <View style={{ paddingTop: 16 }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      columnGap: 12,
+                    }}
+                  >
+                    {additionalNutrientKeys.map((key) => (
+                      <View
+                        key={key}
+                        style={{ minWidth: 120, flexGrow: 1, flexBasis: '43%' }}
+                      >
+                        <Field
+                          label={`${t[key]} (g)`}
+                          value={item[key]}
+                          placeholder={t.unknown}
+                          keyboardType="decimal-pad"
+                          onChangeText={(text) =>
+                            changeIngredient(index, key, text)
+                          }
+                          editable={!busy}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                  <Body muted>{t.unknownHelp}</Body>
+                  <View style={{ marginTop: 12 }}>
+                    <Button
+                      title={t.lessNutrition}
+                      secondary
+                      icon="chevron-up"
+                      onPress={() =>
+                        setExpanded((current) => ({
+                          ...current,
+                          [item.id]: false,
+                        }))
+                      }
+                    />
+                  </View>
+                </View>
+              )}
             </View>
           ))}
           <Button
@@ -676,7 +707,9 @@ export default function MealScreen() {
               </Text>
             </>
           ) : null}
-          <Nutrition value={sum} heading={t.summary} />
+          <View style={{ marginTop: 24 }}>
+            <Nutrition value={sum} heading={t.summary} />
+          </View>
           {original && (
             <Button
               title={t.delete}

@@ -41,7 +41,9 @@ test('phone language is the default; choosing English immediately translates and
     </AppProvider>,
   );
   await waitFor(() => expect(screen.getByText(pl.goal)).toBeTruthy());
-  await fireEvent.press(screen.getByRole('button', { name: '🇵🇱 Polski' }));
+  await fireEvent.press(
+    screen.getByRole('button', { name: `${pl.language}: Polski` }),
+  );
   await fireEvent.changeText(
     screen.getByLabelText(pl.searchLanguage),
     'angielski',
@@ -86,7 +88,9 @@ test('failed language persistence keeps the current language and shows the error
     </AppProvider>,
   );
   await waitFor(() => expect(screen.getByText(pl.goal)).toBeTruthy());
-  await fireEvent.press(screen.getByRole('button', { name: '🇵🇱 Polski' }));
+  await fireEvent.press(
+    screen.getByRole('button', { name: `${pl.language}: Polski` }),
+  );
   await fireEvent.press(screen.getByRole('button', { name: 'English' }));
   await waitFor(() =>
     expect(screen.getAllByText(pl.storageError).length).toBeGreaterThan(0),

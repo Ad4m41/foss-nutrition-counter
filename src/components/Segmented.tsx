@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { feedback } from './feedback';
 import { fonts, useTheme } from './ui';
 export function Segmented<T extends string>({
   options,
@@ -66,7 +67,10 @@ export function Segmented<T extends string>({
           accessibilityLabel={option.label}
           accessibilityState={{ selected: value === option.value, disabled }}
           disabled={disabled}
-          onPress={() => onChange(option.value)}
+          onPress={() => {
+            if (value !== option.value) feedback();
+            onChange(option.value);
+          }}
           style={{
             flex: 1,
             paddingHorizontal: 8,

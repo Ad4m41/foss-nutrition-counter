@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { Modal, Pressable, Switch, Text, View } from 'react-native';
+import { Image, Modal, Pressable, Switch, Text, View } from 'react-native';
+import { feedback } from './feedback';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Language } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
 import { Body, Button, Field, Notice, fonts, useTheme } from './ui';
@@ -8,13 +10,13 @@ const languages = [
   {
     code: 'pl' as const,
     name: 'Polski',
-    flag: '🇵🇱',
+    flag: require('../../assets/flags/pl.png'),
     search: 'polski polish poland',
   },
   {
     code: 'en' as const,
     name: 'English',
-    flag: '🇬🇧',
+    flag: require('../../assets/flags/en.png'),
     search: 'english angielski',
   },
 ];
@@ -30,6 +32,7 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
   const selected = languages.find((item) => item.code === settings.language)!;
   async function change(language: Language, system = false) {
     if (lock.current || disabled) return;
+    feedback();
     lock.current = true;
     setBusy(true);
     setError(false);
@@ -50,7 +53,14 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
   return (
     <View style={{ gap: 12 }}>
       <Button
-        title={`${selected.flag} ${selected.name}`}
+        title={selected.name}
+        accessibilityLabel={`${t.language}: ${selected.name}`}
+        leading={
+          <Image
+            source={selected.flag}
+            style={{ width: 30, height: 20, borderRadius: 3 }}
+          />
+        }
         icon="chevron-down"
         secondary
         disabled={disabled || busy}
@@ -129,6 +139,9 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
                     void change(item.code);
                   }}
                   style={({ pressed }) => ({
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 12,
                     minHeight: 52,
                     padding: 12,
                     borderRadius: 12,
@@ -139,16 +152,27 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
                     opacity: pressed ? 0.7 : 1,
                   })}
                 >
+                  <Image
+                    source={item.flag}
+                    style={{ width: 30, height: 20, borderRadius: 3 }}
+                  />
                   <Text
                     style={{
                       fontFamily: fonts.bold,
                       color: colors.text,
                       fontSize: 17,
+                      flex: 1,
                     }}
                   >
-                    {item.flag} {item.name}
-                    {item.code === settings.language ? ' ✓' : ''}
+                    {item.name}
                   </Text>
+                  {item.code === settings.language && (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={22}
+                      color={colors.primary}
+                    />
+                  )}
                 </Pressable>
               ))}
             {!languages.some((item) =>

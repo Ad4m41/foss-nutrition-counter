@@ -60,7 +60,7 @@ Language follows the phone by default, including changes reported by Expo locali
 
 The diary keeps kcal, protein, carbohydrates and fat in a compact strip joined to the bottom navigation, with full-width surfaces and rounded top corners. Above a goal, rails scale to the consumed amount: 100 g against an 80 g goal shows 80% in the nutrient color and 20% as excess, alongside the actual values. Tap this summary for all eight nutrients. Use the central add button to start AI meal entry on the selected day; manual entry is a secondary option. Set optional protein, carbohydrate and fat targets in Settings; blank targets stay unset.
 
-The diary records water per selected day. Add 250 or 500 ml, or undo the last addition in the current session. Set your water goal in Settings; 2,000 ml is an editable default, not an individualized recommendation. Reset removes profile, water, meals, photos, AI history and the key.
+The diary records water per selected day. Use the +250 ml and −250 ml controls beneath the water card. Subtraction stops at zero. Set your water goal in Settings; 2,000 ml is an editable default, not an individualized recommendation. Reset removes profile, water, meals, photos, AI history and the key.
 
 ## AI meal entry and clarification
 
@@ -125,3 +125,5 @@ Automated tests mock Gemini, native photo picking and secure storage. Service re
 ## License
 
 Application code: **AGPL-3.0-only**, see [LICENSE](LICENSE). The Expo scaffold’s original MIT notice is retained in `assets/EXPO-TEMPLATE-LICENSE.txt`. Dependency licenses remain their respective authors’ licenses. This project is independent of Fitatu.
+
+Settings has Account and App settings sub-tabs. Account contains the local profile and nutrition targets; App settings contains language, AI configuration, usage and local data controls. Language flags are bundled image assets. Short haptics acknowledge buttons and selection changes, limited to one pulse per 80 ms; unavailable haptics never block actions.

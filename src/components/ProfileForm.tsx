@@ -6,6 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Profile, nutritionEstimate } from '../core/profile';
 import { parseNumber } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
+import { feedback } from './feedback';
 import { AgeWheel } from './AgeWheel';
 import { Segmented } from './Segmented';
 import {
@@ -238,7 +239,10 @@ export function ProfileForm({
                 maximumValue={4}
                 step={1}
                 disabled={busy}
-                onValueChange={setActivity}
+                onValueChange={(value) => {
+                  if (value !== activity) feedback();
+                  setActivity(value);
+                }}
                 minimumTrackTintColor={colors.primary}
                 maximumTrackTintColor={colors.line}
                 thumbTintColor={colors.primary}
@@ -260,7 +264,10 @@ export function ProfileForm({
                       disabled: busy,
                     }}
                     disabled={busy}
-                    onPress={() => setActivity(level)}
+                    onPress={() => {
+                      if (level !== activity) feedback();
+                      setActivity(level);
+                    }}
                     style={{
                       minWidth: 48,
                       minHeight: 48,
@@ -324,7 +331,10 @@ export function ProfileForm({
                   disabled: busy,
                 }}
                 disabled={busy}
-                onPress={() => setObjective(goal)}
+                onPress={() => {
+                  if (goal !== objective) feedback();
+                  setObjective(goal);
+                }}
                 style={({ pressed }) => ({
                   flexDirection: 'row',
                   alignItems: 'center',

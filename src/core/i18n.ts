@@ -223,6 +223,8 @@ export const en = {
   model: 'Gemini model',
   modelHelp:
     'Use a model available to your project. Free limits can change. No automatic switch to another model.',
+  accountTab: 'Account',
+  appSettingsTab: 'App settings',
   language: 'Language',
   systemLanguage: 'Use phone language',
   searchLanguage: 'Search languages',
@@ -516,6 +518,8 @@ export const pl: Record<keyof typeof en, string> = {
   model: 'Model Gemini',
   modelHelp:
     'Wybierz model dostępny w Twoim projekcie. Darmowe limity mogą się zmieniać. Aplikacja nie przełącza modelu automatycznie.',
+  accountTab: 'Konto',
+  appSettingsTab: 'Ustawienia aplikacji',
   language: 'Język',
   systemLanguage: 'Używaj języka telefonu',
   searchLanguage: 'Szukaj języka',

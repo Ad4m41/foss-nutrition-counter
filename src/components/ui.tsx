@@ -20,6 +20,7 @@ import {
   additionalNutrientKeys,
 } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
+import { feedback } from './feedback';
 const light = {
   bg: '#FAF7F2',
   surface: '#FFFFFF',
@@ -172,6 +173,9 @@ export function Button({
   disabled = false,
   loading = false,
   compact = false,
+  leading,
+  accessibilityLabel,
+  expanded,
 }: {
   title: string;
   onPress: () => void;
@@ -181,6 +185,9 @@ export function Button({
   disabled?: boolean;
   loading?: boolean;
   compact?: boolean;
+  leading?: React.ReactNode;
+  accessibilityLabel?: string;
+  expanded?: boolean;
 }) {
   const colors = useTheme();
   const foreground = danger
@@ -191,10 +198,17 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={title}
-      accessibilityState={{ disabled: disabled || loading, busy: loading }}
+      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityState={{
+        disabled: disabled || loading,
+        busy: loading,
+        expanded,
+      }}
       disabled={disabled || loading}
-      onPress={onPress}
+      onPress={() => {
+        feedback('press');
+        onPress();
+      }}
       style={({ pressed }) => [
         styles.button,
         compact && { paddingHorizontal: 10, gap: 6, minHeight: 56 },
@@ -208,6 +222,7 @@ export function Button({
         },
       ]}
     >
+      {!loading && leading}
       {loading ? (
         <ActivityIndicator color={foreground} />
       ) : icon ? (
@@ -245,7 +260,10 @@ export function IconButton({
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
-      onPress={onPress}
+      onPress={() => {
+        feedback('press');
+        onPress();
+      }}
       style={({ pressed }) => ({
         minWidth: 48,
         minHeight: 48,
