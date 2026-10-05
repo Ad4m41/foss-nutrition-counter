@@ -17,7 +17,7 @@ if (
   !url.startsWith('https://')
 )
   throw new Error('No successful matching APK build.');
-const name = `meal-diary-${tag.slice(1)}.apk`;
+const name = `nutrition-counter-${tag.slice(1)}.apk`;
 execFileSync(
   'curl',
   ['--fail', '--location', '--retry', '3', '--output', name, url],
@@ -56,7 +56,7 @@ if (existing) {
       '--draft',
       ...(tag.includes('-') ? ['--prerelease'] : []),
       '--title',
-      `Meal Diary ${tag.slice(1)}`,
+      `Nutrition Counter ${tag.slice(1)}`,
       '--generate-notes',
     ],
     { stdio: 'inherit' },

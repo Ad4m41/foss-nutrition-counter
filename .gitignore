@@ -51,5 +51,6 @@ coverage/
 
 # Release output
 /meal-diary-*.apk
+/nutrition-counter-*.apk
 /SHA256SUMS.txt
 /build.json
