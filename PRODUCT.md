@@ -41,7 +41,7 @@ The user approved a bright, calm diary inspired by Foodnoms, with warm cream sur
 
 ## Open Decisions
 
-Final public name and store distribution are undecided. Use “Meal Diary” / “Dziennik posiłków” as descriptive working titles.
+The public app name is “Nutrition Counter”. Store distribution is undecided.
 
 ## Distribution and local data
 

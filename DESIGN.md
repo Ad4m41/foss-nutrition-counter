@@ -1,5 +1,5 @@
 ---
-name: Meal Diary
+name: Nutrition Counter
 description: A warm mobile nutrition diary with evergreen ink and apricot actions.
 colors:
   light-bg: '#FAF7F2'
@@ -132,7 +132,7 @@ components:
     padding: '18px'
 ---
 
-# Design System: Meal Diary
+# Design System: Nutrition Counter
 
 ## Overview
 

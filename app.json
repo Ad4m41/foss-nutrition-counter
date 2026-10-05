@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Meal Diary",
+    "name": "Nutrition Counter",
     "slug": "foss-nutrition-counter",
     "version": "0.2.0-beta.1",
     "orientation": "portrait",
@@ -15,7 +15,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#175CB0",
+        "backgroundColor": "#055838",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
@@ -34,8 +34,8 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "Allow Meal Diary to photograph your meals.",
-          "photosPermission": "Allow Meal Diary to select a meal photo.",
+          "cameraPermission": "Allow Nutrition Counter to photograph your meals.",
+          "photosPermission": "Allow Nutrition Counter to select a meal photo.",
           "microphonePermission": false
         }
       ],

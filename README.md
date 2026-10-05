@@ -1,4 +1,4 @@
-# Meal Diary / Dziennik posiłków
+# Nutrition Counter
 
 Free and open-source nutrition tracker for Android and iOS. Log meals from photos with Gemini AI or enter them manually. Vibe coded with Codex. Track calories, protein, carbohydrates, fats, saturated fat, sugars, fiber and salt.
 
