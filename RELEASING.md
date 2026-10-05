@@ -4,6 +4,8 @@ Android APKs are distributed through GitHub Releases. EAS signs each build using
 
 ## Create a release
 
+Write every release title, section heading and note in English, including installation and verification instructions. Translate existing notes in place; preserve release tags and attached assets.
+
 1. Update `version` in `package.json`, the root entries in `package-lock.json`, and `expo.version` in `app.json` to the same semantic version, for example `0.2.0-beta.1`.
 2. Commit and push. Checks runs lint, types, tests, formatting, release config checks and Android/iOS/web bundle exports.
 3. Tag that commit and push the tag:
