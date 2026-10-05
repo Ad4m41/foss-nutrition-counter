@@ -43,3 +43,17 @@ export function disposePhoto(uri: string) {
     /* The OS may have already evicted this cache file. */
   }
 }
+
+/** Read a retained meal photo only when the user requests another estimate. */
+export async function photoBase64(uri: string): Promise<string> {
+  if (Platform.OS !== 'web') return new File(uri).base64();
+  const response = await fetch(uri);
+  if (!response.ok) throw new Error('photoError');
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '');
+    reader.onerror = () => reject(new Error('photoError'));
+    reader.readAsDataURL(blob);
+  });
+}

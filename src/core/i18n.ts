@@ -2,6 +2,14 @@ import { Language } from './nutrition';
 export const en = {
   aiMealIntro:
     'Add a photo or describe your meal. AI will prepare portions and nutrition for you to review.',
+  correctEstimate: 'Correct the estimate',
+  correctEstimateHelp:
+    'Tell AI what to change. Review the new estimate, then save the meal.',
+  estimateCorrection: 'What should be corrected?',
+  estimateCorrectionHint:
+    'For example: the cutlet is chicken, not pork. Keep the sides unchanged.',
+  reestimate: 'Estimate again',
+  startupLoading: 'Starting Nutrition Counter',
   mealDescription: 'Meal description (optional with a photo)',
   mealDescriptionHint: 'For example: a bowl of rice with chicken, about 350 g',
   mealInputMissing: 'Add a photo or describe the meal first.',
@@ -318,6 +326,14 @@ export const en = {
 export const pl: Record<keyof typeof en, string> = {
   aiMealIntro:
     'Dodaj zdjęcie lub opisz posiłek. AI przygotuje porcje i wartości odżywcze do sprawdzenia.',
+  correctEstimate: 'Popraw oszacowanie',
+  correctEstimateHelp:
+    'Powiedz AI, co zmienić. Sprawdź nowy wynik, a potem zapisz posiłek.',
+  estimateCorrection: 'Co poprawić?',
+  estimateCorrectionHint:
+    'Np. kotlet jest z kurczaka, nie ze schabu. Dodatki zostaw bez zmian.',
+  reestimate: 'Oszacuj ponownie',
+  startupLoading: 'Uruchamianie Nutrition Counter',
   mealDescription: 'Opis posiłku (opcjonalny przy zdjęciu)',
   mealDescriptionHint: 'Np. miska ryżu z kurczakiem, około 350 g',
   mealInputMissing: 'Najpierw dodaj zdjęcie lub opisz posiłek.',

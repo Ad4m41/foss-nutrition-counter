@@ -36,6 +36,7 @@ export function MacroDock({
       }}
       style={({ pressed }) => ({
         overflow: 'hidden',
+        backgroundColor: colors.surface,
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
         paddingHorizontal: 16,
@@ -55,7 +56,7 @@ export function MacroDock({
         pointerEvents="none"
         style={[
           StyleSheet.absoluteFill,
-          { backgroundColor: dark ? '#202A23CC' : '#FFFFFFCC' },
+          { backgroundColor: `${colors.surface}EB` },
         ]}
       />
       <View

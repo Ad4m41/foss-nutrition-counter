@@ -7,18 +7,24 @@ import {
 } from '@testing-library/react-native';
 import MealScreen from '../src/app/meal';
 import { en } from '../src/core/i18n';
-import { AnalysisError } from '../src/core/nutrition';
+import { AnalysisError, Meal } from '../src/core/nutrition';
 import { analyzePhoto } from '../src/services/gemini';
 import { pickPhoto } from '../src/services/photos';
 import { validateQuestions } from '../src/core/clarification';
-const mockParams: { day: string; capture?: string; mode?: string } = {
+const mockPrevented: Record<string, { preventRemove: boolean }> = {};
+const mockParams: {
+  day: string;
+  capture?: string;
+  mode?: string;
+  id?: string;
+} = {
   day: '2026-10-02',
 };
 const mockSaveMeal = jest.fn();
 const mockBack = jest.fn();
 const mockConfirm = jest.fn();
 const mockApp = {
-  meals: [],
+  meals: [] as Meal[],
   apiKey: 'key',
   settings: {
     goal: 2000,
@@ -42,10 +48,12 @@ jest.mock('expo-router', () => ({
   },
   Stack: { Screen: () => null },
   useLocalSearchParams: () => mockParams,
+  useRoute: () => ({ key: 'meal-route' }),
 }));
 jest.mock('expo-router/react-navigation', () => ({
   useNavigation: () => ({ dispatch: jest.fn() }),
   usePreventRemove: jest.fn(),
+  usePreventRemoveContext: () => ({ preventedRoutes: mockPrevented }),
 }));
 jest.mock('expo-crypto', () => ({
   randomUUID: (() => {
@@ -67,12 +75,16 @@ jest.mock('@react-native-community/slider', () => 'Slider');
 jest.mock('../src/services/photos', () => ({
   pickPhoto: jest.fn(),
   disposePhoto: jest.fn(),
+  photoBase64: jest.fn().mockResolvedValue('retained-image'),
 }));
 jest.mock('../src/services/gemini', () => ({ analyzePhoto: jest.fn() }));
 jest.mock('../src/components/confirm', () => ({
   confirmAction: (...args: unknown[]) => mockConfirm(...args),
 }));
 beforeEach(() => {
+  delete mockParams.id;
+  mockApp.meals = [];
+  delete mockPrevented['meal-route'];
   delete mockParams.capture;
   delete mockParams.mode;
   jest.mocked(pickPhoto).mockClear();
@@ -351,4 +363,92 @@ test('text-only meal input can run AI and bypasses the questions step when confi
     }),
   );
   expect(screen.queryByText(en.aiQuestionsTitle)).toBeNull();
+});
+
+test('successful save waits for the native removal guard before returning', async () => {
+  mockParams.mode = 'manual';
+  mockPrevented['meal-route'] = { preventRemove: true };
+  mockSaveMeal.mockResolvedValue(undefined);
+  const view = await render(<MealScreen />);
+  await fireEvent.changeText(screen.getByLabelText(en.name), 'Lunch');
+  await fireEvent.changeText(screen.getByLabelText(en.ingredient), 'Rice');
+  await fireEvent.press(screen.getByText(en.save));
+  await waitFor(() => expect(mockSaveMeal).toHaveBeenCalledTimes(1));
+  expect(mockBack).not.toHaveBeenCalled();
+  delete mockPrevented['meal-route'];
+  await view.rerender(<MealScreen />);
+  await waitFor(() => expect(mockBack).toHaveBeenCalledTimes(1));
+});
+
+test('saved meal correction sends retained photo and current portions; saves only on confirmation', async () => {
+  mockParams.id = 'saved-meal';
+  mockApp.meals = [
+    {
+      ...estimate,
+      id: 'saved-meal',
+      day: '2026-10-02',
+      createdAt: '2026-10-02T12:00:00Z',
+      source: 'ai',
+      photoUri: 'file:///retained.jpg',
+    },
+  ];
+  jest
+    .mocked(analyzePhoto)
+    .mockResolvedValue({ ...estimate, name: 'Chicken', questions: [] });
+  mockSaveMeal.mockResolvedValue(undefined);
+  await render(<MealScreen />);
+  await fireEvent.changeText(
+    screen.getByLabelText(en.estimateCorrection),
+    'Chicken, not pork. Keep 200 g.',
+  );
+  await fireEvent.press(screen.getByText(en.reestimate));
+  await waitFor(() =>
+    expect(screen.getByLabelText(en.name).props.value).toBe('Chicken'),
+  );
+  const sent = jest.mocked(analyzePhoto).mock.calls[0][0];
+  expect(sent.base64).toBe('retained-image');
+  expect(JSON.parse(sent.revision!)).toMatchObject({
+    correction: 'Chicken, not pork. Keep 200 g.',
+    previousEstimate: {
+      ingredients: [expect.objectContaining({ grams: 200 })],
+    },
+  });
+  expect(mockSaveMeal).not.toHaveBeenCalled();
+  await fireEvent.press(screen.getByText(en.save));
+  await waitFor(() =>
+    expect(mockSaveMeal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'saved-meal',
+        name: 'Chicken',
+        day: '2026-10-02',
+        createdAt: '2026-10-02T12:00:00Z',
+      }),
+    ),
+  );
+});
+
+test('failed correction preserves existing estimate and correction for retry', async () => {
+  mockParams.id = 'saved-meal';
+  mockApp.meals = [
+    {
+      ...estimate,
+      id: 'saved-meal',
+      day: '2026-10-02',
+      createdAt: '2026-10-02T12:00:00Z',
+      source: 'ai',
+    },
+  ];
+  jest.mocked(analyzePhoto).mockRejectedValue(new AnalysisError('network'));
+  await render(<MealScreen />);
+  await fireEvent.changeText(
+    screen.getByLabelText(en.estimateCorrection),
+    'Chicken, not pork',
+  );
+  await fireEvent.press(screen.getByText(en.reestimate));
+  await screen.findByText(en.networkError);
+  expect(screen.getByLabelText(en.name).props.value).toBe('Rice');
+  expect(screen.getByLabelText(en.estimateCorrection).props.value).toBe(
+    'Chicken, not pork',
+  );
+  expect(mockSaveMeal).not.toHaveBeenCalled();
 });

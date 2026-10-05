@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image, Text, View } from 'react-native';
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useNavigation, usePreventRemove } from 'expo-router/react-navigation';
+import { router, Stack, useLocalSearchParams, useRoute } from 'expo-router';
+import {
+  useNavigation,
+  usePreventRemove,
+  usePreventRemoveContext,
+} from 'expo-router/react-navigation';
 import { randomUUID } from 'expo-crypto';
 import {
   AnalysisError,
@@ -33,7 +37,7 @@ import {
   useTheme,
 } from '../components/ui';
 import { confirmAction } from '../components/confirm';
-import { disposePhoto, pickPhoto } from '../services/photos';
+import { disposePhoto, pickPhoto, photoBase64 } from '../services/photos';
 import { analyzePhoto } from '../services/gemini';
 import {
   ClarificationQuestion,
@@ -95,6 +99,8 @@ export default function MealScreen() {
   } = useApp();
   const colors = useTheme();
   const navigation = useNavigation();
+  const route = useRoute();
+  const { preventedRoutes } = usePreventRemoveContext();
   const original = meals.find((item) => item.id === params.id);
   const [phase, setPhase] = useState<'input' | 'questions' | 'review'>(() =>
     original || params.mode === 'manual' ? 'review' : 'input',
@@ -119,6 +125,8 @@ export default function MealScreen() {
   );
   const [photoUri, setPhotoUri] = useState(original?.photoUri);
   const [photoData, setPhotoData] = useState('');
+  const [correction, setCorrection] = useState('');
+  const [correctionContext, setCorrectionContext] = useState('');
   const [description, setDescription] = useState('');
   const [busy, setBusy] = useState<'photo' | 'analysis' | 'save' | null>(null);
   const lock = useRef(false);
@@ -135,6 +143,7 @@ export default function MealScreen() {
     source,
     photoUri,
     description,
+    correction,
     questions,
     answers,
   });
@@ -147,12 +156,6 @@ export default function MealScreen() {
     },
     [photoUri, original?.photoUri],
   );
-  useEffect(() => {
-    if (leaving) {
-      if (router.canGoBack()) router.back();
-      else router.replace('/');
-    }
-  }, [leaving]);
   usePreventRemove(!leaving && (dirty || busy !== null), async ({ data }) => {
     if (lock.current) {
       setMessage(t.pending);
@@ -161,6 +164,14 @@ export default function MealScreen() {
     if (await confirmAction(t.unsaved, t.discardBody, t.discard, t.cancel))
       navigation.dispatch(data.action);
   });
+  const nativeRemovalBlocked = !!preventedRoutes[route.key]?.preventRemove;
+  useEffect(() => {
+    // Wait for the navigator to commit removal of the native back guard.
+    // Popping earlier races react-native-screens after a successful save.
+    if (!leaving || nativeRemovalBlocked) return;
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  }, [leaving, nativeRemovalBlocked]);
   function changeIngredient(
     index: number,
     key: 'name' | 'grams' | keyof Nutrients,
@@ -215,13 +226,14 @@ export default function MealScreen() {
     // Launch the camera once for the explicit add-from-camera action.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.capture]);
-  async function analyze(clarification?: MealClarification) {
+  async function analyze(clarification?: MealClarification, revise = false) {
     if (lock.current) return;
     if (!apiKey) {
       setMessage(t.keyMissing);
       return;
     }
-    if (!photoData && !description.trim()) {
+    if (revise && !correction.trim()) return;
+    if (!revise && !correctionContext && !photoData && !description.trim()) {
       setMessage(t.mealInputMissing);
       return;
     }
@@ -245,6 +257,7 @@ export default function MealScreen() {
         }
       }
       if (
+        !revise &&
         !clarification &&
         ingredients.some((item) => item.name.trim()) &&
         !(await confirmAction(
@@ -258,11 +271,25 @@ export default function MealScreen() {
       setBusy('analysis');
       setMessage('');
       controller.current = new AbortController();
+      const revision = revise
+        ? JSON.stringify({
+            previousEstimate: {
+              name,
+              ingredients: ingredients.map(toIngredient),
+              notes,
+            },
+            correction: correction.trim(),
+          })
+        : correctionContext;
+      const image =
+        photoData ||
+        (photoUri && revision ? await photoBase64(photoUri) : undefined);
       const result = await trackAi('meal', (onUsage) =>
         analyzePhoto({
           key: apiKey,
           model: settings.model,
-          base64: photoData || undefined,
+          base64: image || undefined,
+          revision: revision || undefined,
           description,
           language: settings.language,
           signal: controller.current!.signal,
@@ -271,6 +298,10 @@ export default function MealScreen() {
         }),
       );
       applyEstimate(result);
+      if (revise) {
+        setCorrectionContext(revision);
+        setCorrection('');
+      }
       const followUpQuestions = clarification ? [] : (result.questions ?? []);
       setQuestions(followUpQuestions);
       setAnswers({});
@@ -545,6 +576,35 @@ export default function MealScreen() {
       )}
       {phase === 'review' && (
         <View>
+          {(original || source === 'ai') && (
+            <View style={{ marginVertical: 20, gap: 8 }}>
+              <View style={{ gap: 4 }}>
+                <Label compact>{t.correctEstimate}</Label>
+                <Body muted>{t.correctEstimateHelp}</Body>
+              </View>
+              <View style={{ marginTop: 4 }}>
+                <Field
+                  label={t.estimateCorrection}
+                  placeholder={t.estimateCorrectionHint}
+                  value={correction}
+                  onChangeText={setCorrection}
+                  multiline
+                  maxLength={6000}
+                  editable={!busy}
+                />
+              </View>
+              <Button
+                title={busy === 'analysis' ? t.analyzing : t.reestimate}
+                icon="sparkles-outline"
+                loading={busy === 'analysis'}
+                disabled={!!busy || !apiKey || !correction.trim()}
+                onPress={() => {
+                  void analyze(undefined, true);
+                }}
+              />
+              {!apiKey && <Body muted>{t.keyMissing}</Body>}
+            </View>
+          )}
           {source === 'ai' ? (
             <Notice text={t.estimate} />
           ) : (

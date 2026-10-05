@@ -110,7 +110,10 @@ export function Page({
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {blurTarget ? (
-        <BlurTargetView ref={blurTarget} style={{ flex: 1 }}>
+        <BlurTargetView
+          ref={blurTarget}
+          style={{ flex: 1, backgroundColor: colors.bg }}
+        >
           {content}
         </BlurTargetView>
       ) : (
@@ -153,9 +156,11 @@ export function Page({
 export function Label({
   children,
   large = false,
+  compact = false,
 }: {
   children: React.ReactNode;
   large?: boolean;
+  compact?: boolean;
 }) {
   const colors = useTheme();
   return (
@@ -165,8 +170,8 @@ export function Label({
         fontSize: large ? 30 : 19,
         fontFamily: fonts.bold,
         fontWeight: '700',
-        marginTop: 28,
-        marginBottom: 16,
+        marginTop: compact ? 0 : 28,
+        marginBottom: compact ? 0 : 16,
       }}
     >
       {children}

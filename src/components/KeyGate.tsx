@@ -3,6 +3,7 @@ import { AppState, Linking, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../state/AppProvider';
 import { checkApiKey, KeyStatus } from '../services/gemini';
+import { StartupScreen } from './StartupScreen';
 import { Body, Button, Field, Label, Notice, Page } from './ui';
 
 export function KeyGate({ children }: { children: React.ReactNode }) {
@@ -99,71 +100,85 @@ export function KeyGate({ children }: { children: React.ReactNode }) {
     <>
       {/* Keep navigation and meal drafts mounted during foreground validation. */}
       <View
-        style={{ flex: 1, display: allowed && !checking ? 'flex' : 'none' }}
+        style={{ flex: 1, opacity: allowed && !checking ? 1 : 0 }}
+        pointerEvents={allowed && !checking ? 'auto' : 'none'}
+        accessibilityElementsHidden={!allowed || checking}
+        importantForAccessibility={
+          !allowed || checking ? 'no-hide-descendants' : 'auto'
+        }
       >
         {children}
       </View>
-      {(!allowed || checking) && (
-        <Page>
-          <View style={{ paddingTop: insets.top + 24, gap: 12 }}>
-            <Label large>{t.setupTitle}</Label>
-            <Body muted>{t.setupBody}</Body>
-            <View style={{ marginTop: 24 }}>
-              <Field
-                label={t.key}
-                value={draft}
-                onChangeText={(value) => {
-                  setKeyDraft({ source: apiKey, value });
-                  setMessage('');
-                }}
-                secureTextEntry={!visible}
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder={t.keyHint}
-                editable={!busy && !checking}
-                onSubmitEditing={() => {
+      {checking && (
+        <View style={{ position: 'absolute', inset: 0 }}>
+          <StartupScreen />
+        </View>
+      )}
+      {!allowed && !checking && (
+        <View style={{ position: 'absolute', inset: 0 }}>
+          <Page>
+            <View style={{ paddingTop: insets.top + 24, gap: 12 }}>
+              <Label large>{t.setupTitle}</Label>
+              <Body muted>{t.setupBody}</Body>
+              <View style={{ marginTop: 24 }}>
+                <Field
+                  label={t.key}
+                  value={draft}
+                  onChangeText={(value) => {
+                    setKeyDraft({ source: apiKey, value });
+                    setMessage('');
+                  }}
+                  secureTextEntry={!visible}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholder={t.keyHint}
+                  editable={!busy && !checking}
+                  onSubmitEditing={() => {
+                    void submit();
+                  }}
+                />
+              </View>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                <Button
+                  title={visible ? t.hide : t.show}
+                  secondary
+                  onPress={() => setVisible(!visible)}
+                />
+                <Button
+                  title={t.getKey}
+                  secondary
+                  icon="open-outline"
+                  onPress={() => {
+                    void Linking.openURL('https://aistudio.google.com/apikey');
+                  }}
+                />
+              </View>
+              <Body muted>{t.keyCheckPrivacy}</Body>
+              {displayedMessage ? (
+                <Notice error text={displayedMessage} />
+              ) : null}
+              <Button
+                title={checking ? t.checkingKey : t.checkKey}
+                loading={busy || checking}
+                disabled={!draft.trim()}
+                onPress={() => {
                   void submit();
                 }}
               />
+              <View style={{ marginTop: 24, gap: 12 }}>
+                <Button
+                  title={t.skipKey}
+                  secondary
+                  disabled={busy}
+                  onPress={() => {
+                    void submit(true);
+                  }}
+                />
+                <Body muted>{t.skipKeyHelp}</Body>
+              </View>
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-              <Button
-                title={visible ? t.hide : t.show}
-                secondary
-                onPress={() => setVisible(!visible)}
-              />
-              <Button
-                title={t.getKey}
-                secondary
-                icon="open-outline"
-                onPress={() => {
-                  void Linking.openURL('https://aistudio.google.com/apikey');
-                }}
-              />
-            </View>
-            <Body muted>{t.keyCheckPrivacy}</Body>
-            {displayedMessage ? <Notice error text={displayedMessage} /> : null}
-            <Button
-              title={checking ? t.checkingKey : t.checkKey}
-              loading={busy || checking}
-              disabled={!draft.trim()}
-              onPress={() => {
-                void submit();
-              }}
-            />
-            <View style={{ marginTop: 24, gap: 12 }}>
-              <Button
-                title={t.skipKey}
-                secondary
-                disabled={busy}
-                onPress={() => {
-                  void submit(true);
-                }}
-              />
-              <Body muted>{t.skipKeyHelp}</Body>
-            </View>
-          </View>
-        </Page>
+          </Page>
+        </View>
       )}
     </>
   );

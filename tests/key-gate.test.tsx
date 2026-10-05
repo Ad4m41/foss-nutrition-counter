@@ -157,20 +157,20 @@ test.each(['limited', 'invalid'] as const)(
   },
 );
 
-test('failed skip resumes the aborted saved-key check', async () => {
+test('saved-key validation shows only the startup logo, then opens the diary', async () => {
   mockApp.apiKey = 'saved-key';
-  jest
-    .mocked(checkApiKey)
-    .mockImplementationOnce(
-      (_key, signal) =>
-        new Promise((resolve) => {
-          signal?.addEventListener('abort', () => resolve('unavailable'));
-        }),
-    )
-    .mockResolvedValue('valid');
-  mockUpdate.mockRejectedValue(new Error('storage failed'));
+  let finish: ((status: 'valid') => void) | undefined;
+  jest.mocked(checkApiKey).mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
   await mount();
-  await fireEvent.press(screen.getByRole('button', { name: en.skipKey }));
+  expect(screen.getByLabelText(en.startupLoading)).toBeTruthy();
+  expect(screen.queryByText(en.setupTitle)).toBeNull();
+  expect(screen.queryByLabelText(en.key)).toBeNull();
+  await act(async () => finish?.('valid'));
   await waitFor(() => expect(screen.getByText('Diary content')).toBeTruthy());
-  expect(checkApiKey).toHaveBeenCalledTimes(2);
+  expect(screen.queryByLabelText(en.startupLoading)).toBeNull();
 });

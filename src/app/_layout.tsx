@@ -6,9 +6,10 @@ import { Manrope_700Bold } from '@expo-google-fonts/manrope/700Bold';
 import { Manrope_800ExtraBold } from '@expo-google-fonts/manrope/800ExtraBold';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, useColorScheme, View } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import { AppProvider, useApp } from '../state/AppProvider';
-import { Body, Button, Notice, useTheme, fonts } from '../components/ui';
+import { Button, Notice, useTheme, fonts } from '../components/ui';
+import { StartupScreen } from '../components/StartupScreen';
 import { KeyGate } from '../components/KeyGate';
 import { ProfileGate } from '../components/ProfileForm';
 function Navigation() {
@@ -21,7 +22,9 @@ function Navigation() {
   });
   const colors = useTheme();
   const scheme = useColorScheme();
-  if (!ready || (!fontsReady && !fontError))
+  if ((!ready || (!fontsReady && !fontError)) && !error)
+    return <StartupScreen />;
+  if (!ready)
     return (
       <View
         style={{
@@ -43,10 +46,7 @@ function Navigation() {
             />
           </>
         ) : (
-          <>
-            <ActivityIndicator color={colors.primary} />
-            <Body>{t.loading}</Body>
-          </>
+          <StartupScreen />
         )}
       </View>
     );
