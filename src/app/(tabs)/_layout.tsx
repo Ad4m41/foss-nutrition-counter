@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useApp } from '../../state/AppProvider';
 import { DiaryProvider } from '../../state/DiaryProvider';
@@ -10,6 +11,7 @@ export default function TabLayout() {
   return (
     <DiaryProvider>
       <Tabs
+        detachInactiveScreens={Platform.OS !== 'android'}
         tabBar={(props) => <DiaryNavigation {...props} />}
         screenOptions={{
           headerStyle: { backgroundColor: colors.bg },

@@ -109,7 +109,7 @@ export function Page({
       style={{ flex: 1, backgroundColor: colors.bg }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {blurTarget ? (
+      {blurTarget && Platform.OS !== 'android' ? (
         <BlurTargetView
           ref={blurTarget}
           style={{ flex: 1, backgroundColor: colors.bg }}

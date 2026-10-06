@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -44,14 +45,16 @@ export function MacroDock({
         opacity: pressed ? 0.8 : 1,
       })}
     >
-      <BlurView
-        pointerEvents="none"
-        blurTarget={blurTarget}
-        blurMethod="dimezisBlurViewSdk31Plus"
-        intensity={18}
-        tint={dark ? 'dark' : 'light'}
-        style={StyleSheet.absoluteFill}
-      />
+      {Platform.OS !== 'android' && (
+        <BlurView
+          pointerEvents="none"
+          blurTarget={blurTarget}
+          blurMethod="dimezisBlurViewSdk31Plus"
+          intensity={18}
+          tint={dark ? 'dark' : 'light'}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       <View
         pointerEvents="none"
         style={[
