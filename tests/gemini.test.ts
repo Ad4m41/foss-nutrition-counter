@@ -19,6 +19,7 @@ const output = {
   ingredients: [
     {
       name: 'Rice',
+      quantity: 1,
       grams: 200,
       kcal: 260,
       protein: 5,
@@ -377,3 +378,102 @@ describe('key authentication', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+test.each([
+  ['5 kajzerek', 'Roll', 5, 60, 170, 300, 850],
+  [
+    '2 duże pizze tureckie. Zdjęcie pokazuje 1/3 jednej pizzy.',
+    'Turkish pizza',
+    2,
+    450,
+    1000,
+    900,
+    2000,
+  ],
+  ['Zjadłem 1/3 pizzy', 'Pizza', 1 / 3, 450, 900, 150, 300],
+])(
+  'scales the full described meal exactly once: %s',
+  async (
+    description,
+    name,
+    quantity,
+    grams,
+    kcal,
+    expectedGrams,
+    expectedKcal,
+  ) => {
+    const result = {
+      ...output,
+      ingredients: [{ ...output.ingredients[0], name, quantity, grams, kcal }],
+    };
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [
+          { content: { parts: [{ text: JSON.stringify(result) }] } },
+        ],
+      }),
+    });
+    const estimate = await analyzePhoto({ ...options, description });
+    expect(estimate.ingredients[0].grams).toBeCloseTo(expectedGrams);
+    expect(estimate.ingredients[0].kcal).toBeCloseTo(expectedKcal);
+    expect(estimate.ingredients[0].protein).toBeCloseTo(5 * quantity);
+    expect(estimate.ingredients[0].salt).toBeNull();
+    const sent = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(sent.contents[0].parts).toContainEqual({ text: description });
+  },
+);
+
+test('mixed foods scale independently rather than multiplying the entire meal', async () => {
+  const result = {
+    ...output,
+    ingredients: [
+      {
+        ...output.ingredients[0],
+        name: 'Roll',
+        quantity: 5,
+        grams: 60,
+        kcal: 170,
+      },
+      {
+        ...output.ingredients[0],
+        name: 'Egg',
+        quantity: 1,
+        grams: 55,
+        kcal: 80,
+      },
+    ],
+  };
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [{ content: { parts: [{ text: JSON.stringify(result) }] } }],
+    }),
+  });
+  const estimate = await analyzePhoto({
+    ...options,
+    description: '5 rolls and 1 egg',
+  });
+  expect(estimate.ingredients.map((i) => i.kcal)).toEqual([850, 80]);
+});
+
+test.each([undefined, 0, -1, '5', 1001])(
+  'rejects an unusable portion quantity: %s',
+  async (quantity) => {
+    const result = {
+      ...output,
+      ingredients: [{ ...output.ingredients[0], quantity }],
+    };
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [
+          { content: { parts: [{ text: JSON.stringify(result) }] } },
+        ],
+      }),
+    });
+    await expect(analyzePhoto(options)).rejects.toMatchObject({
+      code: 'invalid',
+    });
+  },
+);
