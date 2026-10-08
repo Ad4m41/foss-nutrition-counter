@@ -2,7 +2,7 @@ import { validateWaterChange } from '../core/water';
 import * as SQLite from 'expo-sqlite';
 import * as SecureStore from 'expo-secure-store';
 import { Directory, File, Paths } from 'expo-file-system';
-import { Meal, Settings } from '../core/nutrition';
+import { Meal, Settings, mealPhotos } from '../core/nutrition';
 import { randomUUID } from 'expo-crypto';
 import { Backup } from '../core/backup';
 import { AiUsage } from '../core/aiUsage';
@@ -61,18 +61,27 @@ export async function writeSettings(settings: Settings) {
 }
 export async function saveMeal(meal: Meal): Promise<Meal> {
   let saved = meal;
-  let copied: File | undefined;
-  if (
-    meal.photoUri &&
-    !meal.photoUri.startsWith(photoDirectory().uri.replace(/\/$/, '') + '/')
-  ) {
-    const directory = photoDirectory();
-    directory.create({ idempotent: true, intermediates: true });
-    copied = new File(directory, `${meal.id}.jpg`);
-    new File(meal.photoUri).copy(copied);
-    saved = { ...meal, photoUri: copied.uri };
-  }
+  const copied: File[] = [];
   try {
+    const uris: string[] = [];
+    for (const uri of mealPhotos(meal)) {
+      if (uri.startsWith(photoDirectory().uri.replace(/\/$/, '') + '/')) {
+        uris.push(uri);
+        continue;
+      }
+      const directory = photoDirectory();
+      directory.create({ idempotent: true, intermediates: true });
+      const file = new File(directory, `${randomUUID()}.jpg`);
+      copied.push(file);
+      await new File(uri).copy(file);
+      if (!file.exists) throw new Error('Photo copy missing');
+      uris.push(file.uri);
+    }
+    saved = {
+      ...meal,
+      photoUri: uris[0],
+      ...(meal.photoUris ? { photoUris: uris } : {}),
+    };
     await (
       await db()
     ).runAsync(
@@ -82,15 +91,19 @@ export async function saveMeal(meal: Meal): Promise<Meal> {
       JSON.stringify(saved),
     );
   } catch (error) {
-    if (copied?.exists) copied.delete();
+    for (const file of copied) {
+      try {
+        if (file.exists) file.delete();
+      } catch {}
+    }
     throw error;
   }
   return saved;
 }
 export async function deleteMeal(meal: Meal) {
   // Remove the private file first. A failure keeps the row available for retry.
-  if (meal.photoUri) {
-    const file = new File(meal.photoUri);
+  for (const uri of mealPhotos(meal)) {
+    const file = new File(uri);
     if (file.exists) file.delete();
   }
   await (await db()).runAsync('DELETE FROM meals WHERE id = ?', meal.id);
@@ -163,19 +176,23 @@ export async function replaceData(backup: Backup) {
   const meals: Meal[] = [];
   try {
     for (const meal of backup.meals) {
-      if (!meal.photoUri) {
-        meals.push(meal);
-        continue;
+      const uris: string[] = [];
+      for (const uri of mealPhotos(meal)) {
+        const directory = photoDirectory();
+        directory.create({ idempotent: true, intermediates: true });
+        const file = new File(
+          directory,
+          `${randomUUID()}.${uri.startsWith('data:image/png') ? 'png' : 'jpg'}`,
+        );
+        staged.push(file);
+        file.write(uri.split(',')[1], { encoding: 'base64' });
+        uris.push(file.uri);
       }
-      const directory = photoDirectory();
-      directory.create({ idempotent: true, intermediates: true });
-      const file = new File(
-        directory,
-        `${randomUUID()}.${meal.photoUri.startsWith('data:image/png') ? 'png' : 'jpg'}`,
-      );
-      staged.push(file);
-      file.write(meal.photoUri.split(',')[1], { encoding: 'base64' });
-      meals.push({ ...meal, photoUri: file.uri });
+      meals.push({
+        ...meal,
+        photoUri: uris[0],
+        ...(meal.photoUris ? { photoUris: uris } : {}),
+      });
     }
     await connection.withExclusiveTransactionAsync(async (tx) => {
       await tx.execAsync(
@@ -212,8 +229,8 @@ export async function replaceData(backup: Backup) {
   // Old photos are removed only after a successful database commit.
   for (const meal of previous) {
     try {
-      if (meal.photoUri) {
-        const file = new File(meal.photoUri);
+      for (const uri of mealPhotos(meal)) {
+        const file = new File(uri);
         if (file.exists) file.delete();
       }
     } catch {}

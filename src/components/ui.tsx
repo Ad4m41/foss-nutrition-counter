@@ -380,7 +380,7 @@ export function Nutrition({
   value,
   heading,
 }: {
-  value: Nutrients;
+  value: { [Key in keyof Nutrients]: number | null };
   heading?: string;
 }) {
   const { t } = useApp();
@@ -421,7 +421,7 @@ export function Nutrition({
               {value[key] == null || !Number.isFinite(value[key])
                 ? t.unknown
                 : key === 'kcal'
-                  ? `${Math.round(value.kcal)} ${t.kcal}`
+                  ? `${Math.round(value[key]!)} ${t.kcal}`
                   : `${Math.round(value[key]! * (key === 'salt' ? 100 : 10)) / (key === 'salt' ? 100 : 10)} g`}
             </Text>
           </View>

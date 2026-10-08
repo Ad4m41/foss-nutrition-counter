@@ -84,6 +84,7 @@ test('checks a text-only product using structured output without an image', asyn
     allergens: [],
     uncertainties: ['No label supplied'],
     advice: 'Read the label',
+    nutrition: null,
   };
   fetchMock.mockResolvedValue({
     ok: true,
@@ -141,6 +142,7 @@ test('checks a product with a native signal and reports its tokens', async () =>
                   allergens: [],
                   uncertainties: [],
                   advice: 'Read the label',
+                  nutrition: null,
                 }),
               },
             ],
@@ -477,3 +479,27 @@ test.each([undefined, 0, -1, '5', 1001])(
     });
   },
 );
+
+test('sends multiple JPEGs in one request and instructs AI not to double count repeated views', async () => {
+  fetchMock.mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      candidates: [{ content: { parts: [{ text: JSON.stringify(output) }] } }],
+    }),
+  });
+  await analyzePhoto({
+    ...options,
+    base64: undefined,
+    images: ['dish', 'angle', 'label'],
+  });
+  const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+  expect(
+    body.contents[0].parts
+      .filter((part: { inlineData?: unknown }) => part.inlineData)
+      .map((part: { inlineData: { data: string } }) => part.inlineData.data),
+  ).toEqual(['dish', 'angle', 'label']);
+  expect(body.systemInstruction.parts[0].text).toContain(
+    'Never count the same food twice',
+  );
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+});

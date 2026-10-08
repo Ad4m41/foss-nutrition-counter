@@ -1,4 +1,9 @@
-import { AnalysisError } from './nutrition';
+import { AnalysisError, Nutrients, nutrientKeys } from './nutrition';
+export type ProductNutrition = {
+  basis: string;
+  source: 'label' | 'estimate';
+  values: { [Key in keyof Nutrients]: number | null };
+};
 export type ProductAnalysis = {
   name: string;
   summary: string;
@@ -7,6 +12,7 @@ export type ProductAnalysis = {
   allergens: string[];
   uncertainties: string[];
   advice: string;
+  nutrition: ProductNutrition | null;
 };
 export const productListKeys = [
   'strengths',
@@ -35,6 +41,37 @@ export function validateProduct(value: unknown): ProductAnalysis {
     )
   )
     throw new AnalysisError('invalid');
+  let nutrition: ProductNutrition | null = null;
+  if (data.nutrition !== null) {
+    if (!data.nutrition || typeof data.nutrition !== 'object')
+      throw new AnalysisError('invalid');
+    const candidate = data.nutrition as Record<string, unknown>;
+    if (
+      !isText(candidate.basis) ||
+      !['label', 'estimate'].includes(candidate.source as string) ||
+      !candidate.values ||
+      typeof candidate.values !== 'object'
+    )
+      throw new AnalysisError('invalid');
+    const values = candidate.values as Record<string, unknown>;
+    for (const key of nutrientKeys) {
+      const value = values[key];
+      if (
+        value !== null &&
+        (typeof value !== 'number' || !Number.isFinite(value) || value < 0)
+      )
+        throw new AnalysisError('invalid');
+    }
+    if (nutrientKeys.every((key) => values[key] === null))
+      throw new AnalysisError('invalid');
+    nutrition = {
+      basis: candidate.basis.trim(),
+      source: candidate.source as ProductNutrition['source'],
+      values: Object.fromEntries(
+        nutrientKeys.map((key) => [key, values[key]]),
+      ) as ProductNutrition['values'],
+    };
+  }
   return {
     name: (data.name as string).trim(),
     summary: data.summary as string,
@@ -43,5 +80,6 @@ export function validateProduct(value: unknown): ProductAnalysis {
     concerns: data.concerns as string[],
     allergens: data.allergens as string[],
     uncertainties: data.uncertainties as string[],
+    nutrition,
   };
 }

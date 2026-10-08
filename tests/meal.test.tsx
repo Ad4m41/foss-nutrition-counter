@@ -9,7 +9,11 @@ import MealScreen from '../src/app/meal';
 import { en } from '../src/core/i18n';
 import { AnalysisError, Meal } from '../src/core/nutrition';
 import { analyzePhoto } from '../src/services/gemini';
-import { pickPhoto } from '../src/services/photos';
+import {
+  disposePhoto,
+  pickPhotos,
+  recoverPhotos,
+} from '../src/services/photos';
 import { validateQuestions } from '../src/core/clarification';
 const mockPrevented: Record<string, { preventRemove: boolean }> = {};
 const mockParams: {
@@ -73,7 +77,8 @@ jest.mock('react-native-reanimated', () =>
 );
 jest.mock('@react-native-community/slider', () => 'Slider');
 jest.mock('../src/services/photos', () => ({
-  pickPhoto: jest.fn(),
+  recoverPhotos: jest.fn().mockResolvedValue([]),
+  pickPhotos: jest.fn(),
   disposePhoto: jest.fn(),
   photoBase64: jest.fn().mockResolvedValue('retained-image'),
 }));
@@ -87,15 +92,19 @@ beforeEach(() => {
   delete mockPrevented['meal-route'];
   delete mockParams.capture;
   delete mockParams.mode;
-  jest.mocked(pickPhoto).mockClear();
+  jest.mocked(pickPhotos).mockClear();
+  jest.mocked(recoverPhotos).mockReset().mockResolvedValue([]);
+  jest.mocked(disposePhoto).mockClear();
   mockSaveMeal.mockReset();
   jest.mocked(analyzePhoto).mockReset();
   mockConfirm.mockReset().mockResolvedValue(true);
   mockApp.settings.consent = true;
   mockBack.mockClear();
   jest
-    .mocked(pickPhoto)
-    .mockResolvedValue({ uri: 'file:///photo.jpg', base64: 'image' } as never);
+    .mocked(pickPhotos)
+    .mockResolvedValue([
+      { uri: 'file:///photo.jpg', base64: 'image' },
+    ] as never);
 });
 async function getPhoto() {
   await fireEvent.press(screen.getByText(en.gallery));
@@ -202,8 +211,8 @@ test('add-from-camera opens the camera once and keeps the selected day', async (
   mockParams.capture = 'camera';
   mockParams.mode = 'manual';
   await render(<MealScreen />);
-  await waitFor(() => expect(pickPhoto).toHaveBeenCalledWith(true));
-  expect(pickPhoto).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(pickPhotos).toHaveBeenCalledWith(true, 4));
+  expect(pickPhotos).toHaveBeenCalledTimes(1);
   expect(screen.getByLabelText(en.date).props.value).toBe('2026-10-02');
 });
 
@@ -312,7 +321,7 @@ test('answers send the original photo and description once, with untouched slide
   );
   const second = jest.mocked(analyzePhoto).mock.calls[1][0];
   expect(second).toMatchObject({
-    base64: 'image',
+    images: ['image'],
     description: 'Rice with vegetables',
     clarification: { answers: { oil: false, food: 'Brown rice' } },
   });
@@ -358,7 +367,7 @@ test('text-only meal input can run AI and bypasses the questions step when confi
   await screen.findByLabelText(en.name);
   expect(analyzePhoto).toHaveBeenCalledWith(
     expect.objectContaining({
-      base64: undefined,
+      images: [],
       description: '200 g cooked rice',
     }),
   );
@@ -406,7 +415,7 @@ test('saved meal correction sends retained photo and current portions; saves onl
     expect(screen.getByLabelText(en.name).props.value).toBe('Chicken'),
   );
   const sent = jest.mocked(analyzePhoto).mock.calls[0][0];
-  expect(sent.base64).toBe('retained-image');
+  expect(sent.images).toEqual(['retained-image']);
   expect(JSON.parse(sent.revision!)).toMatchObject({
     correction: 'Chicken, not pork. Keep 200 g.',
     previousEstimate: {
@@ -451,4 +460,88 @@ test('failed correction preserves existing estimate and correction for retry', a
     'Chicken, not pork',
   );
   expect(mockSaveMeal).not.toHaveBeenCalled();
+});
+
+test('restored Android camera result is shown without opening the camera a second time', async () => {
+  mockParams.capture = 'camera';
+  jest.mocked(recoverPhotos).mockResolvedValue([
+    {
+      uri: 'file:///recovered.jpg',
+      base64: 'first-photo',
+    },
+  ] as never);
+  await render(<MealScreen />);
+  await waitFor(() =>
+    expect(screen.getByLabelText(en.photo).props.source.uri).toBe(
+      'file:///recovered.jpg',
+    ),
+  );
+  expect(pickPhotos).not.toHaveBeenCalled();
+  jest.mocked(analyzePhoto).mockResolvedValue(estimate);
+  await fireEvent.press(screen.getByText(en.analyze));
+  await screen.findByLabelText(en.name);
+  expect(analyzePhoto).toHaveBeenCalledWith(
+    expect.objectContaining({ images: ['first-photo'] }),
+  );
+});
+test('updating the saved meal never disposes its retained photo', async () => {
+  mockParams.id = 'saved-meal';
+  const meal: Meal = {
+    ...estimate,
+    id: 'saved-meal',
+    day: '2026-10-02',
+    createdAt: '2026-10-02T12:00:00Z',
+    source: 'ai',
+    photoUri: 'file:///documents/meal-photos/saved.jpg',
+  };
+  mockApp.meals = [meal];
+  const view = await render(<MealScreen />);
+  mockApp.meals = [{ ...meal, notes: 'Updated by save' }];
+  await view.rerender(<MealScreen />);
+  await view.unmount();
+  expect(disposePhoto).not.toHaveBeenCalled();
+});
+
+test('all selected photos reach AI, removed photos are omitted, and the remaining photos persist', async () => {
+  jest.mocked(pickPhotos).mockResolvedValue([
+    { uri: 'file:///dish.jpg', base64: 'dish' },
+    { uri: 'file:///label.jpg', base64: 'label' },
+  ] as never);
+  jest.mocked(analyzePhoto).mockResolvedValue(estimate);
+  mockSaveMeal.mockResolvedValue(undefined);
+  await render(<MealScreen />);
+  await getPhoto();
+  expect(screen.getByLabelText(`${en.photo} 2`)).toBeTruthy();
+  await fireEvent.press(screen.getByText(en.analyze));
+  await screen.findByLabelText(en.name);
+  expect(analyzePhoto).toHaveBeenCalledWith(
+    expect.objectContaining({ images: ['dish', 'label'] }),
+  );
+  await fireEvent.press(screen.getByText(en.save));
+  await waitFor(() =>
+    expect(mockSaveMeal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        photoUri: 'file:///dish.jpg',
+        photoUris: ['file:///dish.jpg', 'file:///label.jpg'],
+      }),
+    ),
+  );
+});
+test('a removed draft photo is excluded from the AI request', async () => {
+  jest.mocked(pickPhotos).mockResolvedValue([
+    { uri: 'file:///dish.jpg', base64: 'dish' },
+    { uri: 'file:///label.jpg', base64: 'label' },
+  ] as never);
+  jest.mocked(analyzePhoto).mockResolvedValue(estimate);
+  await render(<MealScreen />);
+  await getPhoto();
+  await fireEvent.press(
+    screen.getByRole('button', { name: `${en.removePhoto} 2` }),
+  );
+  await fireEvent.press(screen.getByText(en.analyze));
+  await screen.findByLabelText(en.name);
+  expect(analyzePhoto).toHaveBeenCalledWith(
+    expect.objectContaining({ images: ['dish'] }),
+  );
+  expect(disposePhoto).toHaveBeenCalledWith('file:///label.jpg');
 });

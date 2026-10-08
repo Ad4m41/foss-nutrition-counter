@@ -1,6 +1,6 @@
 import { validateWaterChange } from '../core/water';
 // Browser preview only. The API key lives in memory, never localStorage.
-import { Meal, Settings } from '../core/nutrition';
+import { Meal, Settings, mealPhotos } from '../core/nutrition';
 import { Backup } from '../core/backup';
 import { AiUsage } from '../core/aiUsage';
 let key = '';
@@ -16,16 +16,29 @@ export async function writeSettings(settings: Settings) {
   localStorage.setItem(SETTINGS, JSON.stringify(settings));
 }
 export async function saveMeal(meal: Meal) {
-  if (meal.photoUri && !meal.photoUri.startsWith('data:')) {
-    const blob = await (await fetch(meal.photoUri)).blob();
-    const photoUri = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-    meal = { ...meal, photoUri };
+  const uris: string[] = [];
+  for (const uri of mealPhotos(meal)) {
+    if (uri.startsWith('data:')) {
+      uris.push(uri);
+      continue;
+    }
+    const response = await fetch(uri);
+    if (!response.ok) throw new Error('Photo unavailable');
+    const blob = await response.blob();
+    uris.push(
+      await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      }),
+    );
   }
+  meal = {
+    ...meal,
+    photoUri: uris[0],
+    ...(meal.photoUris ? { photoUris: uris } : {}),
+  };
   const meals = await listMeals();
   localStorage.setItem(
     MEALS,

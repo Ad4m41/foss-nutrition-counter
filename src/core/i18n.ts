@@ -42,6 +42,11 @@ export const en = {
   productDescription: 'Product name, ingredients or label details',
   productHint: 'For example: natural yogurt, or paste the ingredients',
   productPhoto: 'Product label photo',
+  productNutrition: 'Nutrition',
+  productNutritionLabel: 'From the supplied label or nutrition details',
+  productNutritionEstimate: 'AI estimate · actual values may differ',
+  productNutritionMissing:
+    'Not enough information to give nutrition values. Add a readable label or describe the food and portion.',
   productAnalyze: 'Check',
   productAnalyzing: 'Checking the product…',
   productInputMissing:
@@ -63,6 +68,8 @@ export const en = {
     'Gemini did not return a usable product explanation. Try a clearer label or add ingredients.',
   productNoFoodError:
     'Could not recognize a food product. Add its name or a clearer label photo.',
+  multiplePhotosHelp:
+    'Add up to 4 photos: the meal, another angle or a label. AI analyzes them together.',
   removePhoto: 'Remove photo',
   aiUsageTitle: 'AI usage',
   aiDailyLimit: 'Daily analysis limit',
@@ -367,6 +374,12 @@ export const pl: Record<keyof typeof en, string> = {
   productDescription: 'Nazwa produktu, skład lub dane z etykiety',
   productHint: 'Np. jogurt naturalny albo wklej skład',
   productPhoto: 'Zdjęcie etykiety produktu',
+  productNutrition: 'Wartości odżywcze',
+  productNutritionLabel: 'Z podanej etykiety lub tabeli wartości odżywczych',
+  productNutritionEstimate:
+    'Szacunek AI · rzeczywiste wartości mogą się różnić',
+  productNutritionMissing:
+    'Za mało danych, aby podać wartości odżywcze. Dodaj czytelną etykietę lub opisz jedzenie i porcję.',
   productAnalyze: 'Sprawdź',
   productAnalyzing: 'Sprawdzam produkt…',
   productInputMissing:
@@ -388,6 +401,8 @@ export const pl: Record<keyof typeof en, string> = {
     'Gemini nie zwróciło poprawnego opisu produktu. Spróbuj czytelniejszej etykiety lub dodaj skład.',
   productNoFoodError:
     'Nie rozpoznano produktu spożywczego. Podaj nazwę lub czytelniejsze zdjęcie etykiety.',
+  multiplePhotosHelp:
+    'Dodaj do 4 zdjęć: danie, inne ujęcie lub etykietę. AI przeanalizuje je razem.',
   removePhoto: 'Usuń zdjęcie',
   aiUsageTitle: 'Użycie AI',
   aiDailyLimit: 'Dzienny limit analiz',

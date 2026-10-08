@@ -1,65 +1,51 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useApp } from '../state/AppProvider';
-import { AnalysisError } from '../core/nutrition';
+import { AnalysisError, MAX_MEAL_PHOTOS } from '../core/nutrition';
 import { ProductAnalysis, productListKeys } from '../core/product';
 import { analyzeProduct } from '../services/gemini';
-import { disposePhoto, pickPhoto } from '../services/photos';
+import { usePhotoInput } from '../hooks/usePhotoInput';
+import { PhotoGallery } from '../components/PhotoGallery';
 import { PhotoActions } from '../components/PhotoActions';
 import { confirmAction } from '../components/confirm';
-import { Body, Button, Field, Label, Notice, Page } from '../components/ui';
+import {
+  Body,
+  Button,
+  Field,
+  Label,
+  Notice,
+  Nutrition,
+  Page,
+} from '../components/ui';
 
 export default function ProductScreen() {
   const { apiKey, settings, updateSettings, trackAi, t } = useApp();
   const [description, setDescription] = useState('');
-  const [photo, setPhoto] = useState<{ uri: string; base64: string } | null>(
-    null,
-  );
+  const photoInput = usePhotoInput();
+  const photos = photoInput.photos;
   const [result, setResult] = useState<ProductAnalysis | null>(null);
   const [message, setMessage] = useState('');
-  const [busy, setBusy] = useState<'photo' | 'analysis' | null>(null);
+  const [operation, setBusy] = useState<'analysis' | null>(null);
+  const busy = !photoInput.ready || photoInput.busy ? 'photo' : operation;
   const lock = useRef(false);
   const controller = useRef<AbortController | null>(null);
   useEffect(() => () => controller.current?.abort(), []);
-  useEffect(
-    () => () => {
-      if (photo) disposePhoto(photo.uri);
-    },
-    [photo],
-  );
   usePreventRemove(busy !== null, () => setMessage(t.pending));
 
   async function choosePhoto(camera: boolean) {
-    if (lock.current) return;
-    lock.current = true;
-    setBusy('photo');
+    if (lock.current || busy === 'photo') return;
     setMessage('');
-    try {
-      const picked = await pickPhoto(camera);
-      if (picked) {
-        setPhoto({ uri: picked.uri, base64: picked.base64 ?? '' });
-        setResult(null);
-      }
-    } catch (error) {
-      setMessage(
-        error instanceof Error && error.message === 'cameraPermission'
-          ? t.cameraPermission
-          : t.photoError,
-      );
-    } finally {
-      lock.current = false;
-      setBusy(null);
-    }
+    if (await photoInput.choose(camera)) setResult(null);
   }
   async function check() {
-    if (lock.current) return;
+    if (lock.current || busy === 'photo') return;
     if (!apiKey) {
       setMessage(t.productKeyMissing);
       return;
     }
-    if (!description.trim() && !photo?.base64) {
+    if (!description.trim() && !photos.length) {
       setMessage(t.productInputMissing);
       return;
     }
@@ -89,7 +75,7 @@ export default function ProductScreen() {
           key: apiKey,
           model: settings.model,
           language: settings.language,
-          base64: photo?.base64,
+          images: photos.map((photo) => photo.base64!),
           description,
           signal: controller.current!.signal,
           onUsage,
@@ -145,27 +131,20 @@ export default function ProductScreen() {
           editable={!busy}
         />
       </View>
-      {photo && (
-        <>
-          <Image
-            source={{ uri: photo.uri }}
-            accessibilityLabel={t.productPhoto}
-            style={{ width: '100%', height: 220, borderRadius: 16 }}
-            resizeMode="contain"
-          />
-          <Button
-            title={t.removePhoto}
-            secondary
-            disabled={!!busy}
-            onPress={() => {
-              setPhoto(null);
-              setResult(null);
-            }}
-          />
-        </>
-      )}
-      <PhotoActions
+      <PhotoGallery
+        uris={photos.map((photo) => photo.uri)}
+        label={t.productPhoto}
         disabled={!!busy}
+        onRemove={(uri) => {
+          photoInput.remove(uri);
+          setResult(null);
+        }}
+      />
+      <Body muted>
+        {t.multiplePhotosHelp} ({photos.length}/{MAX_MEAL_PHOTOS})
+      </Body>
+      <PhotoActions
+        disabled={!!busy || photos.length >= MAX_MEAL_PHOTOS}
         onCamera={() => {
           void choosePhoto(true);
         }}
@@ -173,7 +152,9 @@ export default function ProductScreen() {
           void choosePhoto(false);
         }}
       />
-      {message ? <Notice error text={message} /> : null}
+      {message || photoInput.error ? (
+        <Notice error text={message || t[photoInput.error!]} />
+      ) : null}
       {!apiKey && (
         <>
           <Notice text={t.productKeyMissing} />
@@ -205,6 +186,22 @@ export default function ProductScreen() {
           <Label large>{result.name}</Label>
           <Body>{result.summary}</Body>
           <Notice text={t.productEstimate} />
+          <View style={{ marginTop: 12, marginBottom: 24, gap: 8 }}>
+            <Label>{t.productNutrition}</Label>
+            {result.nutrition ? (
+              <>
+                <Body muted>{result.nutrition.basis}</Body>
+                <Body muted>
+                  {result.nutrition.source === 'label'
+                    ? t.productNutritionLabel
+                    : t.productNutritionEstimate}
+                </Body>
+                <Nutrition value={result.nutrition.values} />
+              </>
+            ) : (
+              <Body muted>{t.productNutritionMissing}</Body>
+            )}
+          </View>
           {productListKeys.map((key) => (
             <View key={key}>
               <Label>{headings[key]}</Label>

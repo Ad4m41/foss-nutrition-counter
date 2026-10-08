@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { router, Stack, useLocalSearchParams, useRoute } from 'expo-router';
 import {
   useNavigation,
@@ -13,6 +13,8 @@ import {
   Ingredient,
   localDay,
   Meal,
+  mealPhotos,
+  MAX_MEAL_PHOTOS,
   Nutrients,
   newIngredient,
   nutrientKeys,
@@ -37,7 +39,8 @@ import {
   useTheme,
 } from '../components/ui';
 import { confirmAction } from '../components/confirm';
-import { disposePhoto, pickPhoto, photoBase64 } from '../services/photos';
+import { photoBase64 } from '../services/photos';
+import { usePhotoInput } from '../hooks/usePhotoInput';
 import { analyzePhoto } from '../services/gemini';
 import {
   ClarificationQuestion,
@@ -46,6 +49,7 @@ import {
   hasQuestionAnswers,
 } from '../core/clarification';
 import { MealQuestions } from '../components/MealQuestions';
+import { PhotoGallery } from '../components/PhotoGallery';
 import { PhotoActions } from '../components/PhotoActions';
 type DraftIngredient = {
   baseGrams: number;
@@ -123,12 +127,14 @@ export default function MealScreen() {
   const [source, setSource] = useState<Meal['source']>(
     original?.source ?? 'manual',
   );
-  const [photoUri, setPhotoUri] = useState(original?.photoUri);
-  const [photoData, setPhotoData] = useState('');
+  const photoInput = usePhotoInput(original ? mealPhotos(original) : []);
+  const photoUris = photoInput.photos.map((photo) => photo.uri);
+  const photoUri = photoUris[0];
   const [correction, setCorrection] = useState('');
   const [correctionContext, setCorrectionContext] = useState('');
   const [description, setDescription] = useState('');
-  const [busy, setBusy] = useState<'photo' | 'analysis' | 'save' | null>(null);
+  const [operation, setBusy] = useState<'analysis' | 'save' | null>(null);
+  const busy = !photoInput.ready || photoInput.busy ? 'photo' : operation;
   const lock = useRef(false);
   const autoCamera = useRef(false);
   const controller = useRef<AbortController | null>(null);
@@ -141,7 +147,7 @@ export default function MealScreen() {
     ingredients,
     notes,
     source,
-    photoUri,
+    photoUris,
     description,
     correction,
     questions,
@@ -150,14 +156,8 @@ export default function MealScreen() {
   const [initial] = useState(snapshot);
   const dirty = initial !== snapshot;
   useEffect(() => () => controller.current?.abort(), []);
-  useEffect(
-    () => () => {
-      if (photoUri && photoUri !== original?.photoUri) disposePhoto(photoUri);
-    },
-    [photoUri, original?.photoUri],
-  );
   usePreventRemove(!leaving && (dirty || busy !== null), async ({ data }) => {
-    if (lock.current) {
+    if (lock.current || busy === 'photo') {
       setMessage(t.pending);
       return;
     }
@@ -197,43 +197,32 @@ export default function MealScreen() {
     );
   }
   async function photo(camera: boolean) {
-    if (lock.current) return;
-    lock.current = true;
-    setBusy('photo');
+    if (lock.current || busy === 'photo') return;
     setMessage('');
-    try {
-      const result = await pickPhoto(camera);
-      if (result) {
-        setPhotoUri(result.uri);
-        setPhotoData(result.base64 ?? '');
-      }
-    } catch (error) {
-      setMessage(
-        error instanceof Error && error.message === 'cameraPermission'
-          ? t.cameraPermission
-          : t.photoError,
-      );
-    } finally {
-      lock.current = false;
-      setBusy(null);
-    }
+    await photoInput.choose(camera);
   }
   useEffect(() => {
-    if (params.capture === 'camera' && !original && !autoCamera.current) {
+    if (
+      photoInput.ready &&
+      params.capture === 'camera' &&
+      !original &&
+      !autoCamera.current
+    ) {
       autoCamera.current = true;
-      void photo(true);
+      // An Android recovered result already contains the first camera photo.
+      if (!photoUri && !photoInput.error) void photo(true);
     }
-    // Launch the camera once for the explicit add-from-camera action.
+    // Launch only once after pending Android results have been recovered.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.capture]);
+  }, [params.capture, photoInput.ready, photoUri, photoInput.error]);
   async function analyze(clarification?: MealClarification, revise = false) {
-    if (lock.current) return;
+    if (lock.current || busy === 'photo') return;
     if (!apiKey) {
       setMessage(t.keyMissing);
       return;
     }
     if (revise && !correction.trim()) return;
-    if (!revise && !correctionContext && !photoData && !description.trim()) {
+    if (!revise && !correctionContext && !photoUri && !description.trim()) {
       setMessage(t.mealInputMissing);
       return;
     }
@@ -281,14 +270,14 @@ export default function MealScreen() {
             correction: correction.trim(),
           })
         : correctionContext;
-      const image =
-        photoData ||
-        (photoUri && revision ? await photoBase64(photoUri) : undefined);
+      const images: string[] = [];
+      for (const photo of photoInput.photos)
+        images.push(photo.base64 || (await photoBase64(photo.uri)));
       const result = await trackAi('meal', (onUsage) =>
         analyzePhoto({
           key: apiKey,
           model: settings.model,
-          base64: image || undefined,
+          images,
           revision: revision || undefined,
           description,
           language: settings.language,
@@ -344,7 +333,7 @@ export default function MealScreen() {
     setPhase('review');
   }
   async function save() {
-    if (lock.current) return;
+    if (lock.current || busy === 'photo') return;
     const parsed = ingredients.map(toIngredient);
     if (
       !name.trim() ||
@@ -367,6 +356,7 @@ export default function MealScreen() {
         notes,
         source,
         photoUri,
+        photoUris,
         createdAt: original?.createdAt ?? new Date().toISOString(),
       });
       setLeaving(true);
@@ -381,6 +371,7 @@ export default function MealScreen() {
     if (
       !original ||
       lock.current ||
+      busy === 'photo' ||
       !(await confirmAction(t.delete, t.deleteBody, t.delete, t.cancel, true))
     )
       return;
@@ -479,20 +470,17 @@ export default function MealScreen() {
                 )}
               </Body>
             </View>
-            {photoUri && (
-              <Image
-                source={{ uri: photoUri }}
-                accessibilityLabel={t.photo}
-                style={{
-                  width: '100%',
-                  height: 220,
-                  borderRadius: 16,
-                  marginBottom: 16,
-                }}
-              />
-            )}
-            <PhotoActions
+            <PhotoGallery
+              uris={photoUris}
+              label={t.photo}
               disabled={!!busy}
+              onRemove={photoInput.remove}
+            />
+            <Body muted>
+              {t.multiplePhotosHelp} ({photoUris.length}/{MAX_MEAL_PHOTOS})
+            </Body>
+            <PhotoActions
+              disabled={!!busy || photoUris.length >= MAX_MEAL_PHOTOS}
               onCamera={() => {
                 void photo(true);
               }}
@@ -544,7 +532,9 @@ export default function MealScreen() {
             )}
           </>
         )}
-      {message ? <Notice error text={message} /> : null}
+      {message || photoInput.error ? (
+        <Notice error text={message || t[photoInput.error!]} />
+      ) : null}
       {busy === 'analysis' && (
         <Button
           title={t.cancel}
@@ -560,19 +550,8 @@ export default function MealScreen() {
           disabled={!!busy}
         />
       )}
-      {phase === 'review' && source === 'ai' && !original && photoUri && (
-        <Image
-          source={{ uri: photoUri }}
-          accessibilityLabel={t.photo}
-          style={{ width: '100%', height: 180, borderRadius: 16 }}
-        />
-      )}
-      {original?.photoUri && (
-        <Image
-          source={{ uri: original.photoUri }}
-          accessibilityLabel={t.photo}
-          style={{ width: '100%', height: 180, borderRadius: 16 }}
-        />
+      {phase === 'review' && (original || source === 'ai') && (
+        <PhotoGallery uris={photoUris} label={t.photo} />
       )}
       {phase === 'review' && (
         <View>

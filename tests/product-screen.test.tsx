@@ -30,7 +30,8 @@ jest.mock('react-native-safe-area-context', () => ({
 jest.mock('@expo/vector-icons/Ionicons', () => 'Icon');
 jest.mock('../src/services/gemini', () => ({ analyzeProduct: jest.fn() }));
 jest.mock('../src/services/photos', () => ({
-  pickPhoto: jest.fn(),
+  recoverPhotos: jest.fn().mockResolvedValue([]),
+  pickPhotos: jest.fn(),
   disposePhoto: jest.fn(),
 }));
 jest.mock('../src/components/confirm', () => ({
@@ -55,6 +56,7 @@ beforeEach(() => {
       allergens: [],
       uncertainties: ['No label provided'],
       advice: 'Check the ingredients.',
+      nutrition: null,
     });
 });
 async function enterProduct() {
@@ -118,4 +120,37 @@ test('unexpected analysis errors are not described as failed saving', async () =
   expect(screen.getByLabelText(en.productDescription).props.value).toBe(
     'Yogurt',
   );
+});
+
+test('shows product nutrition with its basis, source and unknown values without saving a meal', async () => {
+  jest.mocked(analyzeProduct).mockResolvedValue({
+    name: 'Yogurt',
+    summary: 'Plain yogurt',
+    strengths: [],
+    concerns: [],
+    allergens: [],
+    uncertainties: [],
+    advice: 'Read the label',
+    nutrition: {
+      basis: 'Per 100 g',
+      source: 'label',
+      values: {
+        kcal: 60,
+        protein: 4,
+        carbs: 5,
+        fat: 3,
+        salt: null,
+        fiber: null,
+        sugars: null,
+        saturatedFat: null,
+      },
+    },
+  });
+  await render(<ProductScreen />);
+  await enterProduct();
+  await screen.findByText('60 kcal');
+  expect(screen.getByText('Per 100 g')).toBeTruthy();
+  expect(screen.getByText(en.productNutritionLabel)).toBeTruthy();
+  expect(screen.getAllByText(en.unknown)).toHaveLength(4);
+  expect(mockSaveMeal).not.toHaveBeenCalled();
 });

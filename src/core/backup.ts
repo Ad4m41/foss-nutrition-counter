@@ -159,14 +159,20 @@ export function validateBackup(value: unknown): Backup {
       } as Meal['ingredients'][number];
     });
     if (!ingredients.length) throw new Error('Empty meal');
-    if (
-      meal.photoUri !== undefined &&
-      (typeof meal.photoUri !== 'string' ||
-        !/^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(
-          meal.photoUri,
-        ))
-    )
+    const validPhoto = (value: unknown): value is string =>
+      typeof value === 'string' &&
+      /^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(value);
+    if (meal.photoUri !== undefined && !validPhoto(meal.photoUri))
       throw new Error('Invalid photo');
+    if (
+      meal.photoUris !== undefined &&
+      (!Array.isArray(meal.photoUris) ||
+        meal.photoUris.length > 4 ||
+        !meal.photoUris.every(validPhoto) ||
+        new Set(meal.photoUris).size !== meal.photoUris.length ||
+        meal.photoUri !== meal.photoUris[0])
+    )
+      throw new Error('Invalid photos');
     return {
       id: meal.id,
       name: meal.name,
@@ -176,6 +182,7 @@ export function validateBackup(value: unknown): Backup {
       source: meal.source as Meal['source'],
       ingredients,
       ...(meal.photoUri ? { photoUri: meal.photoUri as string } : {}),
+      ...(meal.photoUris ? { photoUris: meal.photoUris as string[] } : {}),
     };
   });
   const water: Record<string, number> = {};

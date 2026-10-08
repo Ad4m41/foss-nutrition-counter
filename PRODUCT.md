@@ -16,7 +16,7 @@ People who want to log meals on an Android phone or iPhone, using an AI analysis
 
 ## Product Purpose
 
-A free, open source nutrition diary tracking calories, protein, carbohydrates, fats, saturated fat, sugars, fiber and salt. Photograph a meal, review estimated portions and nutrition, and save it to a daily diary.
+A free, open source nutrition diary tracking calories, protein, carbohydrates, fats, saturated fat, sugars, fiber and salt. Add up to four photos of a meal, alternate angles or labels, review estimated portions and nutrition, and save it to a daily diary.
 
 ## Capabilities and Constraints
 
@@ -26,7 +26,9 @@ Local adult profile setup collects age, height, weight, sex, a five-level daily 
 
 First launch opens Gemini key setup with a persistent manual-mode skip. Saved keys are checked at startup and on return from the background. Rejected keys reopen setup; rate limits do not block entry. Network failures retain access with a saved key.
 
-Product checks explain a supplied name, ingredients or label photo without creating a diary entry. Local Gemini history records reported token usage and an optional shared daily analysis limit. Failed, cancelled and interrupted attempts count toward the device limit; key checks are excluded. No account-wide AI Studio synchronization.
+Product checks explain a supplied name, ingredients or label photo without creating a diary entry. Results include nutrition for an explicit serving or per 100 g/ml, distinguished as supplied label facts or an AI estimate. Missing nutrients stay unknown; insufficient food context shows a request for a clearer label or description. Local Gemini history records reported token usage and an optional shared daily analysis limit. Failed, cancelled and interrupted attempts count toward the device limit; key checks are excluded. No account-wide AI Studio synchronization.
+
+Camera and gallery results are recovered after Android activity recreation before any automatic camera launch. Processed photo drafts live in private documents while analysis runs. Meal persistence awaits a separate permanent photo copy before writing its database row; failed copies or database writes preserve the previous meal and its photo. Editor cleanup owns acquired drafts only and cannot delete retained meal photos. All meal photos are retained and included in later AI corrections and backups; existing single-photo meals remain supported. Multiple gallery selections are processed sequentially to bound native memory use. AI receives all selected images in one request and is instructed not to count repeated views as separate portions.
 
 ## Visual Direction
 

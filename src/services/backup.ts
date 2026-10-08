@@ -1,3 +1,4 @@
+import { mealPhotos } from '../core/nutrition';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
@@ -17,13 +18,15 @@ export async function shareBackup(
   data: Omit<Backup, 'format' | 'version' | 'createdAt'>,
 ) {
   const meals = [];
-  for (const meal of data.meals)
+  for (const meal of data.meals) {
+    const uris = [];
+    for (const uri of mealPhotos(meal)) uris.push(await photoForBackup(uri));
     meals.push({
       ...meal,
-      ...(meal.photoUri
-        ? { photoUri: await photoForBackup(meal.photoUri) }
-        : {}),
+      photoUri: uris[0],
+      ...(meal.photoUris ? { photoUris: uris } : {}),
     });
+  }
   const backup = validateBackup({
     ...data,
     meals,

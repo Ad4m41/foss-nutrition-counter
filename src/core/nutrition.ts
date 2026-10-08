@@ -37,6 +37,7 @@ export type Meal = {
   source: 'manual' | 'ai';
   notes: string;
   photoUri?: string;
+  photoUris?: string[];
 };
 export type Settings = {
   goal: number;
@@ -185,4 +186,12 @@ export function validateAnalysis(value: unknown): Analysis {
     throw new AnalysisError('invalid');
   }
   return { name: data.name.trim(), ingredients, notes: data.notes, questions };
+}
+
+export const MAX_MEAL_PHOTOS = 4;
+/** First image remains the cover for older meal rows and diary thumbnails. */
+export function mealPhotos(
+  meal: Pick<Meal, 'photoUri' | 'photoUris'>,
+): string[] {
+  return [...new Set(meal.photoUris ?? (meal.photoUri ? [meal.photoUri] : []))];
 }
