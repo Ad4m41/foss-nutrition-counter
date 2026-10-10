@@ -1,5 +1,6 @@
+import { PressFeedback } from './PressFeedback';
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '../state/AppProvider';
 import { feedback } from './feedback';
@@ -33,7 +34,7 @@ export function SettingsSectionBar({
         }}
       >
         {(['account', 'app'] as const).map((section) => (
-          <Pressable
+          <PressFeedback
             key={section}
             accessibilityRole="tab"
             accessibilityLabel={
@@ -71,7 +72,7 @@ export function SettingsSectionBar({
             >
               {section === 'account' ? t.accountTab : t.appSettingsTab}
             </Text>
-          </Pressable>
+          </PressFeedback>
         ))}
       </View>
     </View>

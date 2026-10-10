@@ -19,9 +19,6 @@ jest.mock('../src/state/AppProvider', () => ({
 jest.mock('react-native-worklets', () =>
   require('react-native-worklets/src/mock'),
 );
-jest.mock('react-native-reanimated', () =>
-  require('react-native-reanimated/mock'),
-);
 jest.mock('@expo/vector-icons/Ionicons', () => 'Icon');
 beforeEach(() => {
   mockWater = 0;

@@ -1,11 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import Animated, {
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
+import { PressFeedback } from './PressFeedback';
 import { feedback } from './feedback';
 import { fonts, useTheme } from './ui';
 export function Segmented<T extends string>({
@@ -22,17 +17,7 @@ export function Segmented<T extends string>({
   const colors = useTheme();
   const [width, setWidth] = useState(0);
   const index = options.findIndex((option) => option.value === value);
-  const x = useSharedValue(0);
-  const cell = width / options.length;
-  useEffect(() => {
-    x.value = withTiming(Math.max(0, index) * cell, {
-      duration: 240,
-      reduceMotion: ReduceMotion.System,
-    });
-  }, [index, cell, x]);
-  const style = useAnimatedStyle(() => ({
-    transform: [{ translateX: x.value }],
-  }));
+  const cell = options.length ? width / options.length : 0;
   return (
     <View
       onLayout={(e) => setWidth(e.nativeEvent.layout.width - 8)}
@@ -44,7 +29,7 @@ export function Segmented<T extends string>({
       }}
     >
       {index >= 0 && width > 0 && (
-        <Animated.View
+        <View
           pointerEvents="none"
           style={[
             {
@@ -56,12 +41,12 @@ export function Segmented<T extends string>({
               backgroundColor: colors.primary,
               borderRadius: 12,
             },
-            style,
+            { transform: [{ translateX: Math.max(0, index) * cell }] },
           ]}
         />
       )}
       {options.map((option) => (
-        <Pressable
+        <PressFeedback
           key={option.value}
           accessibilityRole="button"
           accessibilityLabel={option.label}
@@ -90,7 +75,7 @@ export function Segmented<T extends string>({
           >
             {option.label}
           </Text>
-        </Pressable>
+        </PressFeedback>
       ))}
     </View>
   );

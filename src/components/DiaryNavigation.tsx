@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
-import Animated, {
-  SlideInDown,
-  ReduceMotion,
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
+import { PressFeedback } from './PressFeedback';
+import { Overlay } from './Overlay';
 import { router, Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -80,11 +75,11 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
           }}
         >
           {tab(0, 'restaurant-outline', t.diary)}
-          <Pressable
+          <PressFeedback
+            haptic="press"
             accessibilityRole="button"
             accessibilityLabel={t.addAction}
             onPress={() => {
-              feedback('press');
               setAdding(true);
             }}
             style={({ pressed }) => ({
@@ -95,87 +90,52 @@ export function DiaryNavigation({ state, navigation }: BottomTabBarProps) {
               backgroundColor: colors.accent,
               alignItems: 'center',
               justifyContent: 'center',
-              transform: [{ scale: pressed ? 0.94 : 1 }],
+              opacity: pressed ? 0.92 : 1,
             })}
           >
             <Ionicons name="add" size={30} color={colors.accentText} />
-          </Pressable>
+          </PressFeedback>
           {tab(1, 'options-outline', t.settings)}
         </View>
       </View>
-      {adding && (
-        <Modal
-          visible={adding}
-          transparent
-          animationType="none"
-          onRequestClose={() => setAdding(false)}
+      <Overlay
+        open={adding}
+        onClose={() => setAdding(false)}
+        closeLabel={t.cancel}
+      >
+        <Text
+          accessibilityRole="header"
+          style={{
+            fontFamily: fonts.display,
+            color: colors.text,
+            fontSize: 27,
+            marginBottom: 20,
+          }}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              backgroundColor: '#00000066',
-            }}
-          >
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t.cancel}
-              onPress={() => setAdding(false)}
-              style={{ flex: 1 }}
-            />
-            <Animated.View
-              entering={SlideInDown.duration(260).reduceMotion(
-                ReduceMotion.System,
-              )}
-              accessibilityViewIsModal
-              style={{
-                backgroundColor: colors.bg,
-                padding: 24,
-                paddingBottom: Math.max(24, insets.bottom),
-                borderTopLeftRadius: 24,
-                borderTopRightRadius: 24,
-              }}
-            >
-              <Text
-                accessibilityRole="header"
-                style={{
-                  fontFamily: fonts.display,
-                  color: colors.text,
-                  fontSize: 27,
-                  marginBottom: 20,
-                }}
-              >
-                {t.addAction}
-              </Text>
-              <Button
-                title={t.addMeal}
-                icon="sparkles-outline"
-                onPress={() => add('ai')}
-              />
-              <Button
-                title={t.manual}
-                icon="create-outline"
-                secondary
-                onPress={() => add('manual')}
-              />
-              <Button
-                title={t.checkProduct}
-                icon="search-outline"
-                secondary
-                onPress={() => {
-                  setAdding(false);
-                  router.push('/product');
-                }}
-              />
-              <Button
-                title={t.cancel}
-                secondary
-                onPress={() => setAdding(false)}
-              />
-            </Animated.View>
-          </View>
-        </Modal>
-      )}
+          {t.addAction}
+        </Text>
+        <Button
+          title={t.addMeal}
+          icon="sparkles-outline"
+          onPress={() => add('ai')}
+        />
+        <Button
+          title={t.manual}
+          icon="create-outline"
+          secondary
+          onPress={() => add('manual')}
+        />
+        <Button
+          title={t.checkProduct}
+          icon="search-outline"
+          secondary
+          onPress={() => {
+            setAdding(false);
+            router.push('/product');
+          }}
+        />
+        <Button title={t.cancel} secondary onPress={() => setAdding(false)} />
+      </Overlay>
     </>
   );
 }
@@ -196,31 +156,8 @@ function NavigationTab({
   onLongPress: () => void;
 }) {
   const colors = useTheme();
-  const selected = useSharedValue(focused ? 1 : 0);
-  const scale = useSharedValue(1);
-  useEffect(() => {
-    selected.value = withTiming(focused ? 1 : 0, {
-      duration: 220,
-      reduceMotion: ReduceMotion.System,
-    });
-  }, [focused, selected]);
-  const highlight = useAnimatedStyle(() => ({
-    opacity: selected.value,
-    transform: [{ scaleX: 0.65 + selected.value * 0.35 }],
-  }));
-  const pressStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }, { translateY: -selected.value * 2 }],
-  }));
-  const press = (value: number) => {
-    scale.set(
-      withTiming(value, {
-        duration: 110,
-        reduceMotion: ReduceMotion.System,
-      }),
-    );
-  };
   return (
-    <Pressable
+    <PressFeedback
       accessibilityRole="tab"
       accessibilityLabel={label}
       accessibilityState={{ selected: focused }}
@@ -229,8 +166,6 @@ function NavigationTab({
         onPress();
       }}
       onLongPress={onLongPress}
-      onPressIn={() => press(0.9)}
-      onPressOut={() => press(1)}
       style={{
         flex: 1,
         minHeight: 64,
@@ -238,7 +173,7 @@ function NavigationTab({
         justifyContent: 'center',
       }}
     >
-      <Animated.View style={[{ alignItems: 'center', gap: 3 }, pressStyle]}>
+      <View style={{ alignItems: 'center', gap: 3 }}>
         <View
           style={{
             width: 64,
@@ -247,16 +182,14 @@ function NavigationTab({
             justifyContent: 'center',
           }}
         >
-          <Animated.View
-            style={[
-              {
-                position: 'absolute',
-                inset: 0,
-                borderRadius: 12,
-                backgroundColor: colors.tint,
-              },
-              highlight,
-            ]}
+          <View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 12,
+              backgroundColor: focused ? colors.tint : 'transparent',
+            }}
           />
           <Ionicons
             name={focused ? selectedIcon : icon}
@@ -273,7 +206,7 @@ function NavigationTab({
         >
           {label}
         </Text>
-      </Animated.View>
-    </Pressable>
+      </View>
+    </PressFeedback>
   );
 }

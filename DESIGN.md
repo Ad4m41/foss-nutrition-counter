@@ -231,3 +231,13 @@ Sidecar HTML/CSS specimens translate the native components for the design panel.
 - Don't replace bundled Manrope with platform typography for the main hierarchy.
 - Don't invent personalized macro targets or fill absent goals.
 - Don't treat web captures or sidecar specimens as native device approval.
+
+## Motion implementation
+
+Shared motion settings live in `src/components/motion.ts`. `PressFeedback` gives touch controls a 3% scale over 120 ms with the strong ease-out curve; reduced motion removes the scale. Primary and icon controls fire one light haptic on press-in. Tab and settings selection updates immediately with no sliding or lift. Progress fills are absolute, childless layers and update over 180 ms without reflowing siblings.
+
+`Overlay` owns native modal presence through a 240 ms entry and 180 ms exit, cancels interrupted transitions, and keeps content scrollable above the keyboard. Bottom panels move 24 units with opacity; centered dialogs use opacity and a 0.97-to-1 scale. Reduced motion keeps only the fade. Navigation retains its existing Android stability fallback.
+
+The age wheel renders scrolling, numeral color and cylinder transforms on the UI runtime. React receives the selected age on drag release or momentum completion. Detent haptics cross to the React Native runtime only when the rounded age changes during a user scroll. Buttons and accessibility actions still update immediately.
+
+Expo Go supports functional and layout review. Timing, frame rate and haptic feel remain unverified until reviewed on a physical device in a release build.

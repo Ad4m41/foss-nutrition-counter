@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,7 +20,7 @@ import {
   additionalNutrientKeys,
 } from '../core/nutrition';
 import { useApp } from '../state/AppProvider';
-import { feedback } from './feedback';
+import { PressFeedback } from './PressFeedback';
 const light = {
   bg: '#FAF7F2',
   surface: '#FFFFFF',
@@ -231,7 +230,8 @@ export function Button({
       ? colors.primary
       : colors.onPrimary;
   return (
-    <Pressable
+    <PressFeedback
+      haptic="press"
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? title}
       accessibilityState={{
@@ -241,7 +241,6 @@ export function Button({
       }}
       disabled={disabled || loading}
       onPress={() => {
-        feedback('press');
         onPress();
       }}
       style={({ pressed }) => [
@@ -253,7 +252,7 @@ export function Button({
             : secondary
               ? colors.tint
               : colors.primary,
-          opacity: disabled || loading ? 0.55 : pressed ? 0.8 : 1,
+          opacity: disabled || loading ? 0.55 : pressed ? 0.92 : 1,
         },
       ]}
     >
@@ -275,7 +274,7 @@ export function Button({
       >
         {title}
       </Text>
-    </Pressable>
+    </PressFeedback>
   );
 }
 export function IconButton({
@@ -291,12 +290,13 @@ export function IconButton({
 }) {
   const colors = useTheme();
   return (
-    <Pressable
+    <PressFeedback
+      haptic="press"
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={() => {
-        feedback('press');
         onPress();
       }}
       style={({ pressed }) => ({
@@ -304,11 +304,11 @@ export function IconButton({
         minHeight: 48,
         justifyContent: 'center',
         alignItems: 'center',
-        opacity: disabled ? 0.4 : pressed ? 0.6 : 1,
+        opacity: disabled ? 0.4 : pressed ? 0.85 : 1,
       })}
     >
       <Ionicons name={icon} size={23} color={colors.primary} />
-    </Pressable>
+    </PressFeedback>
   );
 }
 export function Field({ label, ...props }: TextInputProps & { label: string }) {

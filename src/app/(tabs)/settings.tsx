@@ -367,6 +367,16 @@ export default function SettingsScreen() {
             void Linking.openURL('https://www.gnu.org/licenses/agpl-3.0.html');
           }}
         />
+        <Button
+          title={t.repository}
+          secondary
+          icon="logo-github"
+          onPress={() => {
+            void Linking.openURL(
+              'https://github.com/Ad4m41/foss-nutrition-counter',
+            );
+          }}
+        />
       </View>
     </Page>
   );

@@ -1,5 +1,7 @@
+import { Overlay } from './Overlay';
+import { PressFeedback } from './PressFeedback';
 import React, { useRef, useState } from 'react';
-import { Image, Modal, Pressable, Switch, Text, View } from 'react-native';
+import { Image, Switch, Text, View } from 'react-native';
 import { feedback } from './feedback';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Language } from '../core/nutrition';
@@ -52,13 +54,13 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
   }
   return (
     <View style={{ gap: 12 }}>
-      <Pressable
+      <PressFeedback
+        haptic="press"
         accessibilityRole="button"
         accessibilityLabel={`${t.language}: ${selected.name}`}
         accessibilityState={{ disabled: disabled || busy, expanded: open }}
         disabled={disabled || busy}
         onPress={() => {
-          feedback('press');
           setSearch('');
           setOpen(true);
         }}
@@ -89,7 +91,7 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
           {selected.name}
         </Text>
         <Ionicons name="chevron-down" size={21} color={colors.primary} />
-      </Pressable>
+      </PressFeedback>
       <View
         style={{
           flexDirection: 'row',
@@ -112,90 +114,71 @@ export function LanguageSelect({ disabled = false }: { disabled?: boolean }) {
         />
       </View>
       {error && <Notice error text={t.storageError} />}
-      <Modal
-        visible={open}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setOpen(false)}
+      <Overlay
+        open={open}
+        onClose={() => {
+          if (!busy) setOpen(false);
+        }}
+        closeLabel={t.cancel}
+        placement="center"
       >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            padding: 24,
-            backgroundColor: '#00000066',
-          }}
-        >
-          <View
-            accessibilityViewIsModal
-            style={{
-              backgroundColor: colors.bg,
-              padding: 20,
-              borderRadius: 20,
-              gap: 16,
-            }}
-          >
-            <Field
-              label={t.searchLanguage}
-              value={search}
-              onChangeText={setSearch}
-              autoCorrect={false}
-            />
-            {languages
-              .filter((item) =>
-                item.search.includes(search.trim().toLowerCase()),
-              )
-              .map((item) => (
-                <Pressable
-                  key={item.code}
-                  accessibilityRole="button"
-                  accessibilityLabel={item.name}
-                  accessibilityState={{
-                    selected: item.code === settings.language,
-                    disabled: busy,
-                  }}
-                  disabled={busy}
-                  onPress={() => {
-                    void change(item.code);
-                  }}
-                  style={({ pressed }) => ({
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 12,
-                    minHeight: 52,
-                    padding: 12,
-                    borderRadius: 12,
-                    backgroundColor:
-                      item.code === settings.language
-                        ? colors.tint
-                        : colors.surface,
-                    opacity: pressed ? 0.7 : 1,
-                  })}
-                >
-                  <Image
-                    source={item.flag}
-                    style={{ width: 30, height: 20, borderRadius: 3 }}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: fonts.bold,
-                      color: colors.text,
-                      fontSize: 17,
-                      flex: 1,
-                    }}
-                  >
-                    {item.name}
-                  </Text>
-                </Pressable>
-              ))}
-            {!languages.some((item) =>
-              item.search.includes(search.trim().toLowerCase()),
-            ) && <Body muted>{t.noLanguages}</Body>}
-            {error && <Notice error text={t.storageError} />}
-            <Button title={t.cancel} secondary onPress={() => setOpen(false)} />
-          </View>
-        </View>
-      </Modal>
+        <Field
+          label={t.searchLanguage}
+          value={search}
+          onChangeText={setSearch}
+          autoCorrect={false}
+        />
+        {languages
+          .filter((item) => item.search.includes(search.trim().toLowerCase()))
+          .map((item) => (
+            <PressFeedback
+              key={item.code}
+              accessibilityRole="button"
+              accessibilityLabel={item.name}
+              accessibilityState={{
+                selected: item.code === settings.language,
+                disabled: busy,
+              }}
+              disabled={busy}
+              onPress={() => {
+                void change(item.code);
+              }}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                minHeight: 52,
+                padding: 12,
+                borderRadius: 12,
+                backgroundColor:
+                  item.code === settings.language
+                    ? colors.tint
+                    : colors.surface,
+                opacity: pressed ? 0.7 : 1,
+              })}
+            >
+              <Image
+                source={item.flag}
+                style={{ width: 30, height: 20, borderRadius: 3 }}
+              />
+              <Text
+                style={{
+                  fontFamily: fonts.bold,
+                  color: colors.text,
+                  fontSize: 17,
+                  flex: 1,
+                }}
+              >
+                {item.name}
+              </Text>
+            </PressFeedback>
+          ))}
+        {!languages.some((item) =>
+          item.search.includes(search.trim().toLowerCase()),
+        ) && <Body muted>{t.noLanguages}</Body>}
+        {error && <Notice error text={t.storageError} />}
+        <Button title={t.cancel} secondary onPress={() => setOpen(false)} />
+      </Overlay>
     </View>
   );
 }

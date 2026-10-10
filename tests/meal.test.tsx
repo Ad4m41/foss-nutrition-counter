@@ -72,9 +72,6 @@ jest.mock('@expo/vector-icons/Ionicons', () => 'Icon');
 jest.mock('react-native-worklets', () =>
   require('react-native-worklets/src/mock'),
 );
-jest.mock('react-native-reanimated', () =>
-  require('react-native-reanimated/mock'),
-);
 jest.mock('@react-native-community/slider', () => 'Slider');
 jest.mock('../src/services/photos', () => ({
   recoverPhotos: jest.fn().mockResolvedValue([]),

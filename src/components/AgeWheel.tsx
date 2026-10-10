@@ -1,3 +1,4 @@
+import { scheduleOnRN } from 'react-native-worklets';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   NativeSyntheticEvent,
@@ -15,6 +16,8 @@ import Animated, {
   useSharedValue,
   type SharedValue,
   useReducedMotion,
+  useAnimatedScrollHandler,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { feedback } from './feedback';
@@ -25,7 +28,6 @@ function WheelNumber({
   index,
   offset,
   height,
-  selected,
   onSelect,
   reduced,
 }: {
@@ -33,14 +35,14 @@ function WheelNumber({
   index: number;
   offset: SharedValue<number>;
   height: number;
-  selected: boolean;
   onSelect: () => void;
   reduced: boolean;
 }) {
   const colors = useTheme();
   const style = useAnimatedStyle(() => {
-    const distance = (index * height - offset.value) / height;
+    const distance = (index * height - offset.get()) / height;
     return {
+      color: Math.abs(distance) < 0.5 ? colors.primary : colors.muted,
       opacity: interpolate(
         Math.abs(distance),
         [0, 1, 2],
@@ -78,7 +80,6 @@ function WheelNumber({
             fontSize: 40,
             lineHeight: height,
             textAlign: 'center',
-            color: selected ? colors.primary : colors.muted,
             fontVariant: ['tabular-nums'],
           },
           style,
@@ -106,6 +107,7 @@ export function AgeWheel({
   const initial = value ?? 30;
   const offset = useSharedValue((initial - 18) * height);
   const ref = useRef<ScrollView>(null);
+  const dragging = useSharedValue(false);
   const selected = useRef(initial);
   // Keep the native initial position stable across controlled value updates.
   const [initialOffset] = useState(() => ({
@@ -132,11 +134,25 @@ export function AgeWheel({
       selected.current = age;
       setPreview(age);
       onChange(age);
-      feedback();
     },
     [disabled, onChange],
   );
-  function scrolling(event: NativeSyntheticEvent<NativeScrollEvent>) {
+  const scrolling = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      offset.set(event.contentOffset.y);
+    },
+    onBeginDrag: () => {
+      dragging.set(true);
+    },
+  });
+  useAnimatedReaction(
+    () => Math.min(100, Math.max(18, 18 + Math.round(offset.get() / height))),
+    (age, previous) => {
+      if (previous !== null && age !== previous && dragging.get())
+        scheduleOnRN(feedback);
+    },
+  );
+  function settle(event: NativeSyntheticEvent<NativeScrollEvent>) {
     const y = event.nativeEvent.contentOffset.y;
     offset.set(y);
     commit(Math.min(100, Math.max(18, 18 + Math.round(y / height))));
@@ -208,8 +224,14 @@ export function AgeWheel({
           bounces={false}
           scrollEventThrottle={16}
           onScroll={scrolling}
-          onMomentumScrollEnd={scrolling}
-          onScrollEndDrag={scrolling}
+          onMomentumScrollEnd={(event) => {
+            dragging.set(false);
+            settle(event);
+          }}
+          onScrollEndDrag={(event) => {
+            dragging.set(false);
+            settle(event);
+          }}
           contentOffset={initialOffset}
           contentContainerStyle={{ paddingVertical: height * 2 }}
         >
@@ -220,7 +242,6 @@ export function AgeWheel({
               index={index}
               offset={offset}
               height={height}
-              selected={(value ?? preview) === age}
               reduced={reduced}
               onSelect={() => choose(age)}
             />

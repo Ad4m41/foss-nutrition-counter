@@ -14,6 +14,7 @@ export default function TabLayout() {
         detachInactiveScreens={Platform.OS !== 'android'}
         tabBar={(props) => <DiaryNavigation {...props} />}
         screenOptions={{
+          animation: 'none',
           headerStyle: { backgroundColor: colors.bg },
           headerTintColor: colors.text,
           headerShadowVisible: false,

@@ -101,6 +101,7 @@ export const en = {
   aiProduct: 'Product check',
   aiMoreHistory: 'Show more history',
   license: 'License: AGPL-3.0-only',
+  repository: 'Source code on GitHub',
 
   continue: 'Continue',
   back: 'Back',
@@ -434,6 +435,7 @@ export const pl: Record<keyof typeof en, string> = {
   aiProduct: 'Sprawdzenie produktu',
   aiMoreHistory: 'Pokaż starsze analizy',
   license: 'Licencja: AGPL-3.0-only',
+  repository: 'Kod źródłowy na GitHubie',
 
   continue: 'Dalej',
   back: 'Wstecz',

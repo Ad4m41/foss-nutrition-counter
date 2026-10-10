@@ -1,5 +1,6 @@
+import { PressFeedback } from './PressFeedback';
 import React, { useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useApp } from '../state/AppProvider';
 import { feedback } from './feedback';
@@ -89,7 +90,7 @@ export function WaterTracker({ day }: { day: string }) {
           color={colors.water}
           label={t.water}
         />
-        <Pressable
+        <PressFeedback
           accessibilityRole="button"
           accessibilityState={{ expanded: help }}
           onPress={() => {
@@ -107,7 +108,7 @@ export function WaterTracker({ day }: { day: string }) {
           >
             {t.waterInfo} {help ? '−' : '+'}
           </Text>
-        </Pressable>
+        </PressFeedback>
         {help && (
           <View style={{ gap: 8 }}>
             <Body muted>{t.waterHelp}</Body>
@@ -116,7 +117,7 @@ export function WaterTracker({ day }: { day: string }) {
       </View>
       <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
         {[-250, 250].map((amount, index) => (
-          <Pressable
+          <PressFeedback
             key={amount}
             accessibilityRole="button"
             accessibilityLabel={`${amount > 0 ? '+' : '−'}250 ml`}
@@ -148,7 +149,7 @@ export function WaterTracker({ day }: { day: string }) {
             >
               {amount > 0 ? '+' : '−'}250 ml
             </Text>
-          </Pressable>
+          </PressFeedback>
         ))}
       </View>
       {error && (

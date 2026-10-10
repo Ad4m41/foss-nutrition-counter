@@ -1,5 +1,6 @@
+import { PressFeedback } from './PressFeedback';
 import React, { useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -255,7 +256,7 @@ export function ProfileForm({
                 }}
               >
                 {[0, 1, 2, 3, 4].map((level) => (
-                  <Pressable
+                  <PressFeedback
                     key={level}
                     accessibilityRole="button"
                     accessibilityLabel={t[`activity${level}` as 'activity0']}
@@ -285,7 +286,7 @@ export function ProfileForm({
                     >
                       {level + 1}
                     </Text>
-                  </Pressable>
+                  </PressFeedback>
                 ))}
               </View>
             </View>
@@ -322,7 +323,7 @@ export function ProfileForm({
         {step === 2 && (
           <>
             {(['lose', 'maintain', 'gain'] as const).map((goal) => (
-              <Pressable
+              <PressFeedback
                 key={goal}
                 accessibilityRole="button"
                 accessibilityLabel={t[goal]}
@@ -387,7 +388,7 @@ export function ProfileForm({
                   size={24}
                   color={goal === objective ? colors.primary : colors.muted}
                 />
-              </Pressable>
+              </PressFeedback>
             ))}
             {estimate && (
               <View

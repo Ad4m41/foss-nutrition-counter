@@ -6,10 +6,6 @@ jest.mock('react-native-worklets', () =>
   require('react-native-worklets/src/mock'),
 );
 
-jest.mock('react-native-reanimated', () => ({
-  ...require('react-native-reanimated/mock'),
-  useReducedMotion: () => false,
-}));
 jest.mock('../src/state/AppProvider', () => ({
   useApp: () => ({ t: require('../src/core/i18n').en }),
 }));
@@ -43,7 +39,8 @@ test('fast flick 19 to 25 keeps momentum position after drag release and timeout
   await fireEvent(wheel(), 'scroll', position(22));
   await fireEvent(wheel(), 'scroll', position(25));
   await act(() => jest.advanceTimersByTime(200));
-  expect(screen.getByLabelText('Age').props.accessibilityValue.now).toBe(25);
+  // Continuous scroll runs on the UI thread; React receives the settled age.
+  expect(screen.getByLabelText('Age').props.accessibilityValue.now).toBe(19);
   expect(wheel().props.contentOffset.y).toBe(wheel().props.snapToInterval);
   await fireEvent(wheel(), 'momentumScrollEnd', position(25));
   expect(screen.getByLabelText('Age').props.accessibilityValue.now).toBe(25);

@@ -1,11 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  ReduceMotion,
-} from 'react-native-reanimated';
+import Animated, { useReducedMotion } from 'react-native-reanimated';
+import { motion } from './motion';
 import { useTheme } from './ui';
 import { progressSegments } from '../core/progress';
 export function ProgressTrack({
@@ -26,27 +22,13 @@ export function ProgressTrack({
   const target = showOverflow
     ? segments.within
     : Math.min(1, segments.within + segments.excess);
-  const progress = useSharedValue(target);
   const excessTarget = showOverflow ? segments.excess : 0;
-  const excess = useSharedValue(excessTarget);
-  useEffect(() => {
-    progress.value = withTiming(target, {
-      duration: 420,
-      reduceMotion: ReduceMotion.System,
-    });
-  }, [target, progress]);
-  useEffect(() => {
-    excess.value = withTiming(excessTarget, {
-      duration: 420,
-      reduceMotion: ReduceMotion.System,
-    });
-  }, [excessTarget, excess]);
-  const animated = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%`,
-  }));
-  const animatedExcess = useAnimatedStyle(() => ({
-    width: `${excess.value * 100}%`,
-  }));
+  const reduced = useReducedMotion();
+  const transition = {
+    transitionProperty: ['width', 'left'] as ('width' | 'left')[],
+    transitionDuration: reduced ? 0 : motion.state,
+    transitionTimingFunction: motion.cssEaseOut,
+  };
   return (
     <View
       accessibilityRole={goal ? 'progressbar' : undefined}
@@ -66,17 +48,33 @@ export function ProgressTrack({
         backgroundColor: colors.line,
         borderRadius: 4,
         overflow: 'hidden',
-        flexDirection: 'row',
       }}
     >
       <Animated.View
-        style={[{ height: 5, backgroundColor: color }, animated]}
+        style={[
+          {
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${target * 100}%`,
+            backgroundColor: color,
+          },
+          transition,
+        ]}
       />
       {showOverflow && (
         <Animated.View
           style={[
-            { height: 5, backgroundColor: colors.danger },
-            animatedExcess,
+            {
+              position: 'absolute',
+              left: `${target * 100}%`,
+              top: 0,
+              bottom: 0,
+              width: `${excessTarget * 100}%`,
+              backgroundColor: colors.danger,
+            },
+            transition,
           ]}
         />
       )}

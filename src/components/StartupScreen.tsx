@@ -1,38 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import {
-  AccessibilityInfo,
-  ActivityIndicator,
-  Animated,
-  View,
-} from 'react-native';
+import React from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
+import { motion } from './motion';
 import { useApp } from '../state/AppProvider';
 import { useTheme } from './ui';
+
+const LOGO_ENTER = FadeIn.duration(motion.enter).reduceMotion(
+  ReduceMotion.System,
+);
 
 /** Shared by storage/font loading and silent saved-key validation. */
 export function StartupScreen() {
   const colors = useTheme();
   const { t } = useApp();
-  const [opacity] = useState(() => new Animated.Value(1));
-  useEffect(() => {
-    let active = true;
-    let animation: Animated.CompositeAnimation | undefined;
-    void AccessibilityInfo.isReduceMotionEnabled()
-      .then((reduced) => {
-        if (!active || reduced) return;
-        opacity.setValue(0.35);
-        animation = Animated.timing(opacity, {
-          toValue: 1,
-          duration: 420,
-          useNativeDriver: true,
-        });
-        animation.start();
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-      animation?.stop();
-    };
-  }, [opacity]);
   return (
     <View
       accessibilityLabel={t.startupLoading}
@@ -46,9 +26,10 @@ export function StartupScreen() {
       }}
     >
       <Animated.Image
+        entering={LOGO_ENTER}
         source={require('../../assets/icon.png')}
         accessible={false}
-        style={{ width: 112, height: 112, borderRadius: 26, opacity }}
+        style={{ width: 112, height: 112, borderRadius: 26 }}
       />
       <ActivityIndicator color={colors.primary} size="small" />
     </View>
