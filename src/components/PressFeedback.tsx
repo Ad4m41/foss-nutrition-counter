@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Pressable, type PressableProps } from 'react-native';
 import Animated, { useReducedMotion } from 'react-native-reanimated';
 import { feedback } from './feedback';
@@ -12,11 +12,15 @@ export function PressFeedback({
   children,
   onPressIn,
   onPressOut,
+  onPress,
+  onTouchStart,
+  onTouchMove,
   disabled,
   haptic,
   ...props
 }: PressableProps & { haptic?: 'press' | 'selection' }) {
   const [pressed, setPressed] = useState(false);
+  const touch = useRef({ x: 0, y: 0, cancelled: false });
   const reduced = useReducedMotion();
   const active = pressed && !disabled;
   return (
@@ -24,15 +28,42 @@ export function PressFeedback({
       {...props}
       disabled={disabled}
       pressRetentionOffset={props.pressRetentionOffset ?? 16}
+      unstable_pressDelay={props.unstable_pressDelay ?? 100}
+      onTouchStart={(event) => {
+        touch.current = {
+          x: event.nativeEvent.pageX,
+          y: event.nativeEvent.pageY,
+          cancelled: false,
+        };
+        onTouchStart?.(event);
+      }}
+      onTouchMove={(event) => {
+        const { x, y, cancelled } = touch.current;
+        if (
+          !cancelled &&
+          Math.hypot(event.nativeEvent.pageX - x, event.nativeEvent.pageY - y) >
+            10
+        ) {
+          // Cancel once per gesture, including slow drags inside a large button.
+          touch.current.cancelled = true;
+          setPressed(false);
+        }
+        onTouchMove?.(event);
+      }}
       onPressIn={(event) => {
-        if (disabled) return;
+        if (disabled || touch.current.cancelled) return;
         setPressed(true);
-        if (haptic) feedback(haptic);
         onPressIn?.(event);
       }}
       onPressOut={(event) => {
         setPressed(false);
         onPressOut?.(event);
+      }}
+      onPress={(event) => {
+        // Pressability owns tap/scroll arbitration and accessibility activation.
+        if (disabled) return;
+        if (haptic) feedback(haptic);
+        onPress?.(event);
       }}
       style={[
         typeof style === 'function' ? style({ pressed: active }) : style,
